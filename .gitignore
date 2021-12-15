@@ -1,0 +1,14 @@
+.env
+.coverage
+.pytest_cache
+.tags
+*.pyc
+*.pyo
+*.swp
+build/
+dist/
+htmlcov/
+tmp/
+.venv/
+.vscode/
+__pycache__/
