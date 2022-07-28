@@ -1,26 +1,23 @@
-python-igraph-ctypes
-====================
+# python-igraph-ctypes
 
 This repository contains an **experimental** Python API to the [igraph C
 library](https://igraph.org), with the following goals:
 
-* It should contain as little C code as possible.
+- It should contain as little hand-written C code as possible.
 
-* It should rely on code generation to create most of the glue code between
+- It should rely on code generation to create most of the glue code between
   Python and igraph's core C API to make it easier to adapt to changes in the
   underlying C library without having to re-write too much of the Python code.
 
-* It should provide full type annotations.
+- It should provide full type annotations.
 
-Status
-------
+## Status
 
 This repo is **highly experimental** and currently it is only in
 a proof-of-concept stage. The vast majority of igraph's API is not exposed, and
 things may break randomly, or they may not even work.
 
-Usage
------
+## Usage
 
 1. Clone the repo.
 
@@ -32,3 +29,7 @@ Usage
 4. Run `poetry run pytest` to run the unit tests, or `poetry run python` to run
    a Python interpreter where you can `import igraph_ctypes`
 
+## Caveats
+
+- Apparently you'll need to ensure that the igraph shared library is built
+  without sanitizers, otherwise the `dlopen()` call fails, at least on macOS.

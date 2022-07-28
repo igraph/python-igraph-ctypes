@@ -2,9 +2,9 @@
 
 from typing import Iterable
 
-from .conversion import *  # noqa
+from .conversion import any_to_igraph_bool_t, vertex_pairs_to_igraph_vector_int_t
 from .lib import *  # noqa
-from .types import igraph_bool_t, VertexPair
+from .types import VertexPair
 from .wrappers import _Graph
 
 
@@ -12,7 +12,7 @@ def empty(n: int = 0, directed: bool = False) -> _Graph:
     """Type-annotated wrapper for `igraph_empty()`."""
     # Convert input arguments
     c_n = n
-    c_directed = igraph_bool_t(1 if directed else 0)
+    c_directed = any_to_igraph_bool_t(directed)
 
     # Prepare output arguments
     c_graph = _Graph()
@@ -91,7 +91,7 @@ def add_edges(graph: _Graph, edges: Iterable[VertexPair]) -> None:
     """Type-annotated wrapper for `igraph_add_edges()`."""
     # Convert input arguments
     c_graph = graph
-    c_edges = vertex_pairs_to_igraph_vector_t(edges)
+    c_edges = vertex_pairs_to_igraph_vector_int_t(edges)
 
     # Prepare output arguments
     # Nothing to do

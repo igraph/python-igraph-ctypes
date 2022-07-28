@@ -1,0 +1,32 @@
+igraph_arpack_rnsolve:
+  IGNORE: PythonCTypes
+
+igraph_arpack_rssolve:
+  IGNORE: PythonCTypes
+
+igraph_bfs:
+  IGNORE: PythonCTypes
+
+igraph_dfs:
+  IGNORE: PythonCTypes
+
+igraph_cliques_callback:
+  IGNORE: PythonCTypes
+
+igraph_maximal_cliques_callback:
+  IGNORE: PythonCTypes
+
+igraph_community_leading_eigenvector:
+  IGNORE: PythonCTypes
+
+igraph_subisomorphic_function_vf2:
+  IGNORE: PythonCTypes
+
+igraph_eigen_adjacency:
+  IGNORE: PythonCTypes
+
+igraph_eigen_matrix:
+  IGNORE: PythonCTypes
+
+igraph_eigen_matrix_symmetric:
+  IGNORE: PythonCTypes

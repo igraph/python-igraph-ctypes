@@ -1,8 +1,14 @@
 from ctypes import byref
 from typing import Any, Callable, Generic, NoReturn, Optional, Type, TypeVar
 
-from .lib import igraph_destroy, igraph_vector_destroy, igraph_vector_init
-from .types import igraph_t, igraph_vector_t
+from .lib import (
+    igraph_destroy,
+    igraph_vector_destroy,
+    igraph_vector_init,
+    igraph_vector_int_destroy,
+    igraph_vector_int_init,
+)
+from .types import igraph_t, igraph_vector_t, igraph_vector_int_t
 
 C = TypeVar("C", bound="Boxed")
 T = TypeVar("T")
@@ -124,4 +130,10 @@ _Vector = create_boxed(
     igraph_vector_t,
     constructor=igraph_vector_init,
     destructor=igraph_vector_destroy,
+)
+_VectorInt = create_boxed(
+    "_VectorInt",
+    igraph_vector_int_t,
+    constructor=igraph_vector_int_init,
+    destructor=igraph_vector_int_destroy,
 )

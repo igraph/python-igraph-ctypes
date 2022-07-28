@@ -28,7 +28,7 @@ class Graph:
         Creates an empty graph. All positional and keyword arguments are
         forwarded to `create_empty_graph()`, except `_wrap`, which may be used
         to let the graph take an ownership of a low-level ctypes wrapper object
-        for an igraph graph. Typically you will not need to use the `_wrap
+        for an igraph graph. Typically you will not need to use `_wrap`.
         """
         self._instance = _wrap or empty(*args, **kwds)
 
