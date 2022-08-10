@@ -1,2 +1,91 @@
 ERROR:
   CTYPES_RETURN_TYPE: handle_igraph_error_t
+
+BOOLEAN:
+  PY_TYPE: bool
+  INCONV:
+    IN: "%C% = any_to_igraph_bool_t(%I%)"
+    OUT: "%C% = igraph_bool_t()"
+
+INTEGER:
+  PY_TYPE: int
+  INCONV:
+    OUT: "%C% = igraph_integer_t()"
+
+REAL:
+  PY_TYPE: float
+  INCONV:
+    OUT: "%C% = igraph_real_t()"
+
+CSTRING:
+  PY_TYPE: str
+
+VECTOR:
+  PY_TYPE: List[float]
+  INCONV:
+    IN: "%C% = any_to_Vector(%I%)"
+    OUT: "%C% = _Vector()"
+
+VECTOR_INT:
+  PY_TYPE: Iterable[int]
+  PY_RETURN_TYPE: List[int]
+  INCONV:
+    IN: "%C% = iterable_to_igraph_vector_int_t(%I%)"
+    OUT: "%C% = _VectorInt.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_t_to_list(%C%)"
+
+VECTOR_BOOL:
+  PY_TYPE: List[bool]
+
+GRAPH:
+  PY_TYPE: _Graph
+  INCONV:
+    OUT: "%C% = _Graph()"
+  OUTCONV:
+    OUT: |-
+      %I% = %C%.mark_initialized()
+    INOUT: ~
+
+ATTRIBUTES:
+  PY_TYPE: ~
+
+VERTEX:
+  PY_TYPE: VertexLike
+  PY_RETURN_TYPE: int
+  INCONV:
+    IN: "%C% = vertexlike_to_igraph_integer_t(%I%)"
+    OUT: "%C% = igraph_integer_t(0)"
+
+VERTEX_INDICES:
+  PY_TYPE: Iterable[VertexLike]
+  PY_RETURN_TYPE: List[int]
+  INCONV:
+    IN: "%C% = vertex_indices_to_igraph_vector_int_t(%I%)"
+    OUT: "%C% = _VectorInt.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_t_to_list(%C%)"
+
+VERTEX_INDEX_PAIRS:
+  PY_TYPE: Iterable[VertexPair]
+  INCONV:
+    IN: "%C% = vertex_pairs_to_igraph_vector_int_t(%I%)"
+    OUT: "%C% = _VectorInt.create(0)"
+
+EDGE:
+  PY_TYPE: EdgeLike
+  PY_RETURN_TYPE: int
+  INCONV:
+    IN: "%C% = edgelike_to_igraph_integer_t(%I%)"
+    OUT: "%C% = igraph_integer_t(0)"
+
+EDGE_INDICES:
+  PY_TYPE: Iterable[EdgeLike]
+  PY_RETURN_TYPE: List[int]
+  INCONV:
+    IN: "%C% = edge_indices_to_igraph_vector_int_t(%I%)"
+    OUT: "%C% = _VectorInt.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_t_to_list(%C%)"
+
+NEIMODE:
+  PY_TYPE: NeighborMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"

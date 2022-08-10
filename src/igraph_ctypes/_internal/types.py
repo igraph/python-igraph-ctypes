@@ -342,6 +342,9 @@ igraph_isocompat_t = CFUNCTYPE(
 ###########################################################################
 # Type aliases used by the higher level interface
 
+EdgeLike = int
+"""Type alias for Python types that can be converted to an igraph edge ID"""
+
 VertexLike = int
 """Type alias for Python types that can be converted to an igraph vertex ID"""
 

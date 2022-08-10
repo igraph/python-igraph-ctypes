@@ -68,13 +68,17 @@ igraph_vector_destroy = _lib.igraph_vector_destroy
 igraph_vector_destroy.restype = None
 igraph_vector_destroy.argtypes = [c_void_p]
 
+igraph_vector_e = _lib.igraph_vector_e
+igraph_vector_e.restype = igraph_real_t
+igraph_vector_e.argtypes = [POINTER(igraph_vector_t), igraph_integer_t]
+
 igraph_vector_push_back = _lib.igraph_vector_push_back
 igraph_vector_push_back.restype = handle_igraph_error_t
 igraph_vector_push_back.argtypes = [POINTER(igraph_vector_t), igraph_real_t]
 
-igraph_destroy = _lib.igraph_destroy
-igraph_destroy.restype = None
-igraph_destroy.argtypes = [POINTER(igraph_t)]
+igraph_vector_size = _lib.igraph_vector_size
+igraph_vector_size.restype = igraph_integer_t
+igraph_vector_size.argtypes = [POINTER(igraph_vector_t)]
 
 # Integer vector type
 
@@ -82,13 +86,21 @@ igraph_vector_int_init = _lib.igraph_vector_int_init
 igraph_vector_int_init.restype = handle_igraph_error_t
 igraph_vector_int_init.argtypes = [POINTER(igraph_vector_int_t), igraph_integer_t]
 
-igraph_vector_int_destroy = _lib.igraph_vector_destroy
+igraph_vector_int_destroy = _lib.igraph_vector_int_destroy
 igraph_vector_int_destroy.restype = None
 igraph_vector_int_destroy.argtypes = [c_void_p]
+
+igraph_vector_int_e = _lib.igraph_vector_int_e
+igraph_vector_int_e.restype = igraph_integer_t
+igraph_vector_int_e.argtypes = [POINTER(igraph_vector_int_t), igraph_integer_t]
 
 igraph_vector_int_push_back = _lib.igraph_vector_int_push_back
 igraph_vector_int_push_back.restype = handle_igraph_error_t
 igraph_vector_int_push_back.argtypes = [POINTER(igraph_vector_int_t), igraph_integer_t]
+
+igraph_vector_int_size = _lib.igraph_vector_int_size
+igraph_vector_int_size.restype = igraph_integer_t
+igraph_vector_int_size.argtypes = [POINTER(igraph_vector_int_t)]
 
 # Graph type
 

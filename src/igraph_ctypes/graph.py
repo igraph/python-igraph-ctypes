@@ -1,15 +1,18 @@
-from typing import Iterable, Optional, TypeVar
+from typing import Iterable, List, Optional, TypeVar
 
-from igraph_ctypes._internal.types import VertexPair
-
+from ._internal.enums import NeighborMode
 from ._internal.functions import (
     add_edges,
     add_vertices,
     ecount,
+    edge,
     empty,
+    get_eid,
     is_directed,
+    neighbors,
     vcount,
 )
+from ._internal.types import VertexLike, VertexPair
 from ._internal.wrappers import _Graph
 
 
@@ -44,9 +47,34 @@ class Graph:
         """Returns the number of edges in the graph."""
         return ecount(self._instance)
 
+    def edge(self, eid: int) -> VertexPair:
+        """Returns the endpoints of the edge with the given index from the
+        graph.
+        """
+        return edge(self._instance, eid)
+
+    def get_edge_id(
+        self,
+        from_: VertexLike,
+        to: VertexLike,
+        *,
+        directed: bool = True,
+        error: bool = True
+    ) -> int:
+        """Returns the ID of an arbitrary edge between the given source and
+        target vertices.
+        """
+        return get_eid(self._instance, from_, to, directed, error)
+
     def is_directed(self) -> bool:
         """Returns whether the graph is directed."""
         return is_directed(self._instance)
+
+    def neighbors(
+        self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
+    ) -> List[int]:
+        """Returns the list of neighbors of a vertex."""
+        return neighbors(self._instance, vid, mode)
 
     def vcount(self) -> int:
         """Returns the number of vertices in the graph."""

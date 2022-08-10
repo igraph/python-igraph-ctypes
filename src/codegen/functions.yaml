@@ -30,3 +30,7 @@ igraph_eigen_matrix:
 
 igraph_eigen_matrix_symmetric:
   IGNORE: PythonCTypes
+
+igraph_empty_attrs:
+  # Not needed at all
+  IGNORE: PythonCTypes, PythonCTypesTypedWrapper
