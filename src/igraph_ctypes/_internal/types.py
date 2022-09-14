@@ -14,7 +14,7 @@ from ctypes import (
     Structure,
     Union,
 )
-from typing import Tuple
+from typing import Iterable, Literal, Tuple
 
 
 def vector_fields(base_type):
@@ -345,8 +345,18 @@ igraph_isocompat_t = CFUNCTYPE(
 EdgeLike = int
 """Type alias for Python types that can be converted to an igraph edge ID"""
 
+EdgeSelector = Iterable[EdgeLike] | Literal["all"] | None
+"""Type alias for Python types that can be converted to an igraph edge
+selector.
+"""
+
 VertexLike = int
 """Type alias for Python types that can be converted to an igraph vertex ID"""
 
 VertexPair = Tuple[VertexLike, VertexLike]
 """A pair of objects that can both be converted into igraph vertex IDs"""
+
+VertexSelector = Iterable[VertexLike] | Literal["all"] | None
+"""Type alias for Python types that can be converted to an igraph vertex
+selector.
+"""

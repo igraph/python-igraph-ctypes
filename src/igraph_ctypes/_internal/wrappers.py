@@ -3,12 +3,23 @@ from typing import Any, Callable, Generic, NoReturn, Optional, Type, TypeVar
 
 from .lib import (
     igraph_destroy,
+    igraph_es_destroy,
     igraph_vector_destroy,
     igraph_vector_init,
     igraph_vector_int_destroy,
     igraph_vector_int_init,
+    igraph_vs_destroy,
 )
-from .types import igraph_t, igraph_vector_t, igraph_vector_int_t
+from .types import (
+    igraph_t,
+    igraph_es_t,
+    igraph_vector_t,
+    igraph_vector_int_t,
+    igraph_vs_t,
+)
+
+__all__ = ("_EdgeSelector", "_Graph", "_Vector", "_VectorInt", "_VertexSelector")
+
 
 C = TypeVar("C", bound="Boxed")
 T = TypeVar("T")
@@ -32,10 +43,12 @@ class Boxed(Generic[T]):
         raise NotImplementedError
 
     @classmethod
+    def create_with(cls, func, *args, **kwds):
+        raise NotImplementedError
+
+    @classmethod
     def from_param(cls, obj: Any) -> T:
-        if not isinstance(obj, cls):
-            raise TypeError(f"expected igraph_t, got {type(obj)!r}")
-        return obj._as_parameter_  # type: ignore
+        raise NotImplementedError
 
     @classmethod
     def wrap(cls, instance: T):
@@ -109,6 +122,12 @@ def create_boxed(
             constructor(byref(instance), *args, **kwds)  # type: ignore
             return cls(instance)
 
+        @classmethod
+        def create_with(cls, func, *args, **kwds):
+            instance = cls_outer()
+            func(byref(instance), *args, **kwds)  # type: ignore
+            return cls(instance)
+
         def __init__(self, instance: Optional[T] = None):
             """Constructor."""
             if instance is None:
@@ -136,4 +155,14 @@ _VectorInt = create_boxed(
     igraph_vector_int_t,
     constructor=igraph_vector_int_init,
     destructor=igraph_vector_int_destroy,
+)
+_VertexSelector = create_boxed(
+    "_VertexSelector",
+    igraph_vs_t,
+    destructor=igraph_vs_destroy,
+)
+_EdgeSelector = create_boxed(
+    "_EdgeSelector",
+    igraph_es_t,
+    destructor=igraph_es_destroy,
 )

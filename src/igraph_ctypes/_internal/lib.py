@@ -102,6 +102,50 @@ igraph_vector_int_size = _lib.igraph_vector_int_size
 igraph_vector_int_size.restype = igraph_integer_t
 igraph_vector_int_size.argtypes = [POINTER(igraph_vector_int_t)]
 
+# Vertex selector type
+
+igraph_vs_none = _lib.igraph_vs_none
+igraph_vs_none.restype = handle_igraph_error_t
+igraph_vs_none.argtypes = [POINTER(igraph_vs_t)]
+
+igraph_vs_1 = _lib.igraph_vs_1
+igraph_vs_1.restype = handle_igraph_error_t
+igraph_vs_1.argtypes = [POINTER(igraph_vs_t), igraph_integer_t]
+
+igraph_vs_all = _lib.igraph_vs_all
+igraph_vs_all.restype = handle_igraph_error_t
+igraph_vs_all.argtypes = [POINTER(igraph_vs_t)]
+
+igraph_vs_vector = _lib.igraph_vs_vector
+igraph_vs_vector.restype = handle_igraph_error_t
+igraph_vs_vector.argtypes = [POINTER(igraph_vs_t), POINTER(igraph_vector_int_t)]
+
+igraph_vs_destroy = _lib.igraph_vs_destroy
+igraph_vs_destroy.restype = None
+igraph_vs_destroy.argtypes = [c_void_p]
+
+# Edge selector type
+
+igraph_es_none = _lib.igraph_es_none
+igraph_es_none.restype = handle_igraph_error_t
+igraph_es_none.argtypes = [POINTER(igraph_es_t)]
+
+igraph_es_1 = _lib.igraph_es_1
+igraph_es_1.restype = handle_igraph_error_t
+igraph_es_1.argtypes = [POINTER(igraph_es_t), igraph_integer_t]
+
+igraph_es_all = _lib.igraph_es_all
+igraph_es_all.restype = handle_igraph_error_t
+igraph_es_all.argtypes = [POINTER(igraph_es_t)]
+
+igraph_es_vector = _lib.igraph_es_vector
+igraph_es_vector.restype = handle_igraph_error_t
+igraph_es_vector.argtypes = [POINTER(igraph_es_t), POINTER(igraph_vector_int_t)]
+
+igraph_es_destroy = _lib.igraph_es_destroy
+igraph_es_destroy.restype = None
+igraph_es_destroy.argtypes = [c_void_p]
+
 # Graph type
 
 igraph_destroy = _lib.igraph_destroy
@@ -1262,7 +1306,7 @@ igraph_community_optimal_modularity.argtypes = [POINTER(igraph_t), POINTER(igrap
 
 igraph_community_leiden = _lib.igraph_community_leiden
 igraph_community_leiden.restype = handle_igraph_error_t
-igraph_community_leiden.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_real_t, igraph_real_t, igraph_bool_t, POINTER(igraph_vector_int_t), POINTER(igraph_integer_t), POINTER(igraph_real_t)]
+igraph_community_leiden.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_real_t, igraph_real_t, igraph_bool_t, igraph_integer_t, POINTER(igraph_vector_int_t), POINTER(igraph_integer_t), POINTER(igraph_real_t)]
 
 igraph_split_join_distance = _lib.igraph_split_join_distance
 igraph_split_join_distance.restype = handle_igraph_error_t
@@ -1438,7 +1482,7 @@ igraph_motifs_randesu_no.argtypes = [POINTER(igraph_t), POINTER(igraph_integer_t
 
 igraph_dyad_census = _lib.igraph_dyad_census
 igraph_dyad_census.restype = handle_igraph_error_t
-igraph_dyad_census.argtypes = [POINTER(igraph_t), POINTER(igraph_integer_t), POINTER(igraph_integer_t), POINTER(igraph_integer_t)]
+igraph_dyad_census.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_real_t), POINTER(igraph_real_t)]
 
 igraph_triad_census = _lib.igraph_triad_census
 igraph_triad_census.restype = handle_igraph_error_t

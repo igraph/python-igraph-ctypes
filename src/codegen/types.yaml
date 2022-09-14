@@ -70,6 +70,13 @@ VERTEX_INDEX_PAIRS:
     IN: "%C% = vertex_pairs_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
 
+VERTEX_SELECTOR:
+  PY_TYPE: VertexSelector
+  INCONV:
+    IN: "%C% = vertex_selector_to_igraph_vs_t(%I%, %C1%)"
+  DEFAULT:
+    ALL: '"all"'
+
 EDGE:
   PY_TYPE: EdgeLike
   PY_RETURN_TYPE: int
@@ -85,7 +92,24 @@ EDGE_INDICES:
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_list(%C%)"
 
+EDGE_SELECTOR:
+  PY_TYPE: EdgeSelector
+  INCONV:
+    IN: "%C% = edge_selector_to_igraph_es_t(%I%, %C1%)"
+  DEFAULT:
+    ALL: '"all"'
+
 NEIMODE:
   PY_TYPE: NeighborMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+STAR_MODE:
+  PY_TYPE: StarMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+WHEEL_MODE:
+  PY_TYPE: WheelMode
   INCONV:
     IN: "%C% = c_int(%I%)"
