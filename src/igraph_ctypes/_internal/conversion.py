@@ -1,5 +1,9 @@
 """Conversion functions from Python types to internal igraph types."""
 
+import numpy as np
+import numpy.typing as npt
+
+from ctypes import memmove
 from typing import Any, Iterable, List
 
 from .lib import (
@@ -8,12 +12,15 @@ from .lib import (
     igraph_es_vector,
     igraph_es_1,
     igraph_vector_bool_e,
+    igraph_vector_bool_e_ptr,
     igraph_vector_bool_push_back,
     igraph_vector_bool_size,
     igraph_vector_int_e,
+    igraph_vector_int_e_ptr,
     igraph_vector_int_push_back,
     igraph_vector_int_size,
     igraph_vector_e,
+    igraph_vector_e_ptr,
     igraph_vector_push_back,
     igraph_vector_size,
     igraph_vs_all,
@@ -47,6 +54,9 @@ __all__ = (
     "igraph_vector_t_to_list",
     "igraph_vector_bool_t_to_list",
     "igraph_vector_int_t_to_list",
+    "igraph_vector_t_to_numpy_array",
+    "igraph_vector_bool_t_to_numpy_array",
+    "igraph_vector_int_t_to_numpy_array",
     "iterable_to_igraph_vector_bool_t",
     "iterable_to_igraph_vector_int_t",
     "iterable_to_igraph_vector_t",
@@ -198,3 +208,27 @@ def igraph_vector_bool_t_to_list(vector: _VectorInt) -> List[bool]:
 def igraph_vector_int_t_to_list(vector: _VectorInt) -> List[int]:
     n = igraph_vector_int_size(vector)
     return [int(igraph_vector_int_e(vector, i)) for i in range(n)]
+
+
+def igraph_vector_t_to_numpy_array(vector: _Vector) -> npt.NDArray[np.float64]:
+    n = igraph_vector_size(vector)
+    result = np.zeros(n, dtype=np.float64)
+    if n > 0:
+        memmove(result.ctypes.data, igraph_vector_e_ptr(vector, 0), result.nbytes)
+    return result
+
+
+def igraph_vector_bool_t_to_numpy_array(vector: _VectorBool) -> npt.NDArray[np.bool_]:
+    n = igraph_vector_bool_size(vector)
+    result = np.zeros(n, dtype=np.bool_)
+    if n > 0:
+        memmove(result.ctypes.data, igraph_vector_bool_e_ptr(vector, 0), result.nbytes)
+    return result
+
+
+def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> npt.NDArray[np.int64]:
+    n = igraph_vector_int_size(vector)
+    result = np.zeros(n, dtype=np.int64)
+    if n > 0:
+        memmove(result.ctypes.data, igraph_vector_int_e_ptr(vector, 0), result.nbytes)
+    return result

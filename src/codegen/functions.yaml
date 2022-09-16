@@ -1,9 +1,3 @@
-igraph_arpack_rnsolve:
-  IGNORE: PythonCTypes, PythonCTypesTypedWrapper
-
-igraph_arpack_rssolve:
-  IGNORE: PythonCTypes, PythonCTypesTypedWrapper
-
 igraph_bfs:
   IGNORE: PythonCTypes
 
@@ -34,3 +28,19 @@ igraph_eigen_matrix_symmetric:
 igraph_empty_attrs:
   # Not needed at all
   IGNORE: PythonCTypes, PythonCTypesTypedWrapper
+
+igraph_arpack_rnsolve:
+  # Not needed at all
+  IGNORE: PythonCTypes, PythonCTypesTypedWrapper
+
+igraph_arpack_rssolve:
+  # Not needed at all
+  IGNORE: PythonCTypes, PythonCTypesTypedWrapper
+
+igraph_correlated_game:
+  # complex default value for 'p' argument
+  IGNORE: PythonCTypesTypedWrapper
+
+igraph_correlated_pair_game:
+  # complex default value for 'p' argument
+  IGNORE: PythonCTypesTypedWrapper

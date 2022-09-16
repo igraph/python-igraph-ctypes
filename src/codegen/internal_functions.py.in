@@ -1,4 +1,7 @@
-from typing import Iterable, List, Tuple
+import numpy as np
+import numpy.typing as npt
+
+from typing import Iterable, Optional, Tuple
 
 from .conversion import *  # noqa
 from .enums import *  # noqa

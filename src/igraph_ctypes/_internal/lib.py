@@ -72,6 +72,10 @@ igraph_vector_e = _lib.igraph_vector_e
 igraph_vector_e.restype = igraph_real_t
 igraph_vector_e.argtypes = [POINTER(igraph_vector_t), igraph_integer_t]
 
+igraph_vector_e_ptr = _lib.igraph_vector_e_ptr
+igraph_vector_e_ptr.restype = POINTER(igraph_real_t)
+igraph_vector_e_ptr.argtypes = [POINTER(igraph_vector_t), igraph_integer_t]
+
 igraph_vector_push_back = _lib.igraph_vector_push_back
 igraph_vector_push_back.restype = handle_igraph_error_t
 igraph_vector_push_back.argtypes = [POINTER(igraph_vector_t), igraph_real_t]
@@ -94,6 +98,10 @@ igraph_vector_int_e = _lib.igraph_vector_int_e
 igraph_vector_int_e.restype = igraph_integer_t
 igraph_vector_int_e.argtypes = [POINTER(igraph_vector_int_t), igraph_integer_t]
 
+igraph_vector_int_e_ptr = _lib.igraph_vector_int_e_ptr
+igraph_vector_int_e_ptr.restype = POINTER(igraph_integer_t)
+igraph_vector_int_e_ptr.argtypes = [POINTER(igraph_vector_int_t), igraph_integer_t]
+
 igraph_vector_int_push_back = _lib.igraph_vector_int_push_back
 igraph_vector_int_push_back.restype = handle_igraph_error_t
 igraph_vector_int_push_back.argtypes = [POINTER(igraph_vector_int_t), igraph_integer_t]
@@ -115,6 +123,10 @@ igraph_vector_bool_destroy.argtypes = [c_void_p]
 igraph_vector_bool_e = _lib.igraph_vector_bool_e
 igraph_vector_bool_e.restype = igraph_bool_t
 igraph_vector_bool_e.argtypes = [POINTER(igraph_vector_bool_t), igraph_integer_t]
+
+igraph_vector_bool_e_ptr = _lib.igraph_vector_bool_e_ptr
+igraph_vector_bool_e_ptr.restype = POINTER(igraph_bool_t)
+igraph_vector_bool_e_ptr.argtypes = [POINTER(igraph_vector_bool_t), igraph_integer_t]
 
 igraph_vector_bool_push_back = _lib.igraph_vector_bool_push_back
 igraph_vector_bool_push_back.restype = handle_igraph_error_t
