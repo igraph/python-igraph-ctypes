@@ -102,6 +102,28 @@ igraph_vector_int_size = _lib.igraph_vector_int_size
 igraph_vector_int_size.restype = igraph_integer_t
 igraph_vector_int_size.argtypes = [POINTER(igraph_vector_int_t)]
 
+# Boolean vector type
+
+igraph_vector_bool_init = _lib.igraph_vector_bool_init
+igraph_vector_bool_init.restype = handle_igraph_error_t
+igraph_vector_bool_init.argtypes = [POINTER(igraph_vector_bool_t), igraph_integer_t]
+
+igraph_vector_bool_destroy = _lib.igraph_vector_bool_destroy
+igraph_vector_bool_destroy.restype = None
+igraph_vector_bool_destroy.argtypes = [c_void_p]
+
+igraph_vector_bool_e = _lib.igraph_vector_bool_e
+igraph_vector_bool_e.restype = igraph_bool_t
+igraph_vector_bool_e.argtypes = [POINTER(igraph_vector_bool_t), igraph_integer_t]
+
+igraph_vector_bool_push_back = _lib.igraph_vector_bool_push_back
+igraph_vector_bool_push_back.restype = handle_igraph_error_t
+igraph_vector_bool_push_back.argtypes = [POINTER(igraph_vector_bool_t), igraph_bool_t]
+
+igraph_vector_bool_size = _lib.igraph_vector_bool_size
+igraph_vector_bool_size.restype = igraph_integer_t
+igraph_vector_bool_size.argtypes = [POINTER(igraph_vector_bool_t)]
+
 # Vertex selector type
 
 igraph_vs_none = _lib.igraph_vs_none

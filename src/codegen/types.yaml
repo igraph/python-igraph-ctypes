@@ -23,8 +23,9 @@ CSTRING:
 VECTOR:
   PY_TYPE: List[float]
   INCONV:
-    IN: "%C% = any_to_Vector(%I%)"
+    IN: "%C% = iterable_to_igraph_vector_t(%I%)"
     OUT: "%C% = _Vector()"
+  OUTCONV: "%I% = igraph_vector_t_to_list(%C%)"
 
 VECTOR_INT:
   PY_TYPE: Iterable[int]
@@ -35,7 +36,21 @@ VECTOR_INT:
   OUTCONV: "%I% = igraph_vector_int_t_to_list(%C%)"
 
 VECTOR_BOOL:
-  PY_TYPE: List[bool]
+  # we can convert anything into a bool
+  PY_TYPE: List[Any]
+  PY_RETURN_TYPE: List[bool]
+  INCONV:
+    IN: "%C% = iterable_to_igraph_vector_bool_t(%I%)"
+    OUT: "%C% = _VectorBool.create(0)"
+  OUTCONV: "%I% = igraph_vector_bool_t_to_list(%C%)"
+
+INDEX_VECTOR:
+  PY_TYPE: Iterable[int]
+  PY_RETURN_TYPE: List[int]
+  INCONV:
+    IN: "%C% = iterable_to_igraph_vector_int_t(%I%)"
+    OUT: "%C% = _VectorInt.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_t_to_list(%C%)"
 
 GRAPH:
   PY_TYPE: _Graph
@@ -106,6 +121,11 @@ NEIMODE:
 
 STAR_MODE:
   PY_TYPE: StarMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+TREE_MODE:
+  PY_TYPE: TreeMode
   INCONV:
     IN: "%C% = c_int(%I%)"
 

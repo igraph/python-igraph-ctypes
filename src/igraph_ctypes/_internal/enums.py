@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-__all__ = ("NeighborMode", "StarMode", "WheelMode")
+__all__ = ("NeighborMode", "StarMode", "TreeMode", "WheelMode")
 
 
 class NeighborMode(IntEnum):
@@ -18,6 +18,14 @@ class StarMode(IntEnum):
     IN = 1
     UNDIRECTED = 2
     MUTUAL = 3
+
+
+class TreeMode(IntEnum):
+    """Python counterpart of an ``igraph_tree_mode_t`` enum."""
+
+    OUT = 0
+    IN = 1
+    UNDIRECTED = 2
 
 
 class WheelMode(IntEnum):

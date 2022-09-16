@@ -7,10 +7,14 @@ from .lib import (
     igraph_es_none,
     igraph_es_vector,
     igraph_es_1,
+    igraph_vector_bool_e,
+    igraph_vector_bool_push_back,
+    igraph_vector_bool_size,
     igraph_vector_int_e,
     igraph_vector_int_push_back,
     igraph_vector_int_size,
     igraph_vector_e,
+    igraph_vector_push_back,
     igraph_vector_size,
     igraph_vs_all,
     igraph_vs_none,
@@ -26,7 +30,14 @@ from .types import (
     VertexPair,
     VertexSelector,
 )
-from .wrappers import _EdgeSelector, _Graph, _Vector, _VectorInt, _VertexSelector
+from .wrappers import (
+    _EdgeSelector,
+    _Graph,
+    _Vector,
+    _VectorBool,
+    _VectorInt,
+    _VertexSelector,
+)
 
 __all__ = (
     "any_to_igraph_bool_t",
@@ -34,8 +45,11 @@ __all__ = (
     "edge_indices_to_igraph_vector_int_t",
     "edge_selector_to_igraph_es_t",
     "igraph_vector_t_to_list",
+    "igraph_vector_bool_t_to_list",
     "igraph_vector_int_t_to_list",
+    "iterable_to_igraph_vector_bool_t",
     "iterable_to_igraph_vector_int_t",
+    "iterable_to_igraph_vector_t",
     "vertexlike_to_igraph_integer_t",
     "vertex_indices_to_igraph_vector_int_t",
     "vertex_pairs_to_igraph_vector_int_t",
@@ -87,6 +101,18 @@ def edge_selector_to_igraph_es_t(
         return _EdgeSelector.create_with(igraph_es_1, selector)
 
 
+def iterable_to_igraph_vector_bool_t(items: Iterable[Any]) -> _VectorBool:
+    """Converts an iterable containing Python objects to an igraph vector of
+    booleans based on their truth values.
+    """
+    # TODO(ntamas): more efficient copy for NumPy arrays or cases where we could
+    # get around with an igraph_vector_bool_view()
+    result: _VectorBool = _VectorBool.create(0)
+    for item in items:
+        igraph_vector_bool_push_back(result, bool(item))
+    return result
+
+
 def iterable_to_igraph_vector_int_t(items: Iterable[int]) -> _VectorInt:
     """Converts an iterable containing Python integers to an igraph vector of
     integers.
@@ -96,6 +122,18 @@ def iterable_to_igraph_vector_int_t(items: Iterable[int]) -> _VectorInt:
     result: _VectorInt = _VectorInt.create(0)
     for item in items:
         igraph_vector_int_push_back(result, item)
+    return result
+
+
+def iterable_to_igraph_vector_t(items: Iterable[float]) -> _Vector:
+    """Converts an iterable containing Python integers or floats to an igraph
+    vector of floats.
+    """
+    # TODO(ntamas): more efficient copy for NumPy arrays or cases where we could
+    # get around with an igraph_vector_int_view()
+    result: _Vector = _Vector.create(0)
+    for item in items:
+        igraph_vector_push_back(result, item)
     return result
 
 
@@ -147,9 +185,14 @@ def vertex_selector_to_igraph_vs_t(
 ################################################################################
 
 
-def igraph_vector_t_to_list(vector: _Vector) -> List[int]:
+def igraph_vector_t_to_list(vector: _Vector) -> List[float]:
     n = igraph_vector_size(vector)
-    return [int(igraph_vector_e(vector, i)) for i in range(n)]
+    return [float(igraph_vector_e(vector, i)) for i in range(n)]
+
+
+def igraph_vector_bool_t_to_list(vector: _VectorInt) -> List[bool]:
+    n = igraph_vector_bool_size(vector)
+    return [bool(igraph_vector_bool_e(vector, i)) for i in range(n)]
 
 
 def igraph_vector_int_t_to_list(vector: _VectorInt) -> List[int]:

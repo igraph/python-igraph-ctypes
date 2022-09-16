@@ -6,6 +6,8 @@ from .lib import (
     igraph_es_destroy,
     igraph_vector_destroy,
     igraph_vector_init,
+    igraph_vector_bool_destroy,
+    igraph_vector_bool_init,
     igraph_vector_int_destroy,
     igraph_vector_int_init,
     igraph_vs_destroy,
@@ -14,11 +16,19 @@ from .types import (
     igraph_t,
     igraph_es_t,
     igraph_vector_t,
+    igraph_vector_bool_t,
     igraph_vector_int_t,
     igraph_vs_t,
 )
 
-__all__ = ("_EdgeSelector", "_Graph", "_Vector", "_VectorInt", "_VertexSelector")
+__all__ = (
+    "_EdgeSelector",
+    "_Graph",
+    "_Vector",
+    "_VectorBool",
+    "_VectorInt",
+    "_VertexSelector",
+)
 
 
 C = TypeVar("C", bound="Boxed")
@@ -149,6 +159,12 @@ _Vector = create_boxed(
     igraph_vector_t,
     constructor=igraph_vector_init,
     destructor=igraph_vector_destroy,
+)
+_VectorBool = create_boxed(
+    "_VectorBool",
+    igraph_vector_bool_t,
+    constructor=igraph_vector_bool_init,
+    destructor=igraph_vector_bool_destroy,
 )
 _VectorInt = create_boxed(
     "_VectorInt",
