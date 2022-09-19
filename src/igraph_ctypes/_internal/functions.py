@@ -296,7 +296,7 @@ def create(edges: Iterable[int], n: int = 0, directed: bool = True) -> _Graph:
     """Type-annotated wrapper for ``igraph_create``."""
     # Prepare input arguments
     c_graph = _Graph()
-    c_edges = iterable_to_igraph_vector_int_t(edges)
+    c_edges = iterable_to_igraph_vector_int_t_view(edges)
     c_n = n
     c_directed = any_to_igraph_bool_t(directed)
 
@@ -397,7 +397,7 @@ def symmetric_tree(branches: Iterable[int], type: TreeMode = TreeMode.OUT) -> _G
     """Type-annotated wrapper for ``igraph_symmetric_tree``."""
     # Prepare input arguments
     c_graph = _Graph()
-    c_branches = iterable_to_igraph_vector_int_t(branches)
+    c_branches = iterable_to_igraph_vector_int_t_view(branches)
     c_type = c_int(type)
 
     # Call wrapped function
@@ -563,7 +563,7 @@ def lcf_vector(n: int, shifts: Iterable[int], repeats: int = 1) -> _Graph:
     # Prepare input arguments
     c_graph = _Graph()
     c_n = n
-    c_shifts = iterable_to_igraph_vector_int_t(shifts)
+    c_shifts = iterable_to_igraph_vector_int_t_view(shifts)
     c_repeats = repeats
 
     # Call wrapped function
@@ -585,7 +585,7 @@ def full_multipartite(n: Iterable[int], directed: bool = False, mode: NeighborMo
     # Prepare input arguments
     c_graph = _Graph()
     c_types = _VectorInt.create(0)
-    c_n = iterable_to_igraph_vector_int_t(n)
+    c_n = iterable_to_igraph_vector_int_t_view(n)
     c_directed = any_to_igraph_bool_t(directed)
     c_mode = c_int(mode)
 
@@ -607,7 +607,7 @@ def circulant(n: int, shifts: Iterable[int], directed: bool = False) -> _Graph:
     # Prepare input arguments
     c_graph = _Graph()
     c_n = n
-    c_shifts = iterable_to_igraph_vector_int_t(shifts)
+    c_shifts = iterable_to_igraph_vector_int_t_view(shifts)
     c_directed = any_to_igraph_bool_t(directed)
 
     # Call wrapped function
@@ -809,8 +809,8 @@ def cited_type_game(nodes: int, types: Iterable[int], pref: Iterable[float], edg
     # Prepare input arguments
     c_graph = _Graph()
     c_nodes = nodes
-    c_types = iterable_to_igraph_vector_int_t(types)
-    c_pref = iterable_to_igraph_vector_t(pref)
+    c_types = iterable_to_igraph_vector_int_t_view(types)
+    c_pref = iterable_to_igraph_vector_t_view(pref)
     c_edges_per_step = edges_per_step
     c_directed = any_to_igraph_bool_t(directed)
 
@@ -870,8 +870,8 @@ def static_fitness_game(no_of_edges: int, fitness_out: Iterable[float], fitness_
     # Prepare input arguments
     c_graph = _Graph()
     c_no_of_edges = no_of_edges
-    c_fitness_out = iterable_to_igraph_vector_t(fitness_out)
-    c_fitness_in = iterable_to_igraph_vector_t(fitness_in)
+    c_fitness_out = iterable_to_igraph_vector_t_view(fitness_out)
+    c_fitness_in = iterable_to_igraph_vector_t_view(fitness_in)
     c_loops = any_to_igraph_bool_t(loops)
     c_multiple = any_to_igraph_bool_t(multiple)
 
@@ -1031,6 +1031,8 @@ def get_shortest_path(graph: _Graph, from_: VertexLike, to: VertexLike, mode: Ne
 # igraph_distances_bellman_ford: no Python type known for type: MATRIX
 
 # igraph_distances_johnson: no Python type known for type: MATRIX
+
+# igraph_distances_floyd_warshall: no Python type known for type: MATRIX
 
 
 def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", cutoff: int = -1, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np.int64]:
@@ -1514,7 +1516,7 @@ def is_chordal(graph: _Graph, alpha: Optional[Iterable[int]] = None, alpham1: Op
     """Type-annotated wrapper for ``igraph_is_chordal``."""
     # Prepare input arguments
     c_graph = graph
-    c_alpha = iterable_to_igraph_vector_int_t(alpha)
+    c_alpha = iterable_to_igraph_vector_int_t_view(alpha)
     c_alpham1 = vertex_indices_to_igraph_vector_int_t(alpham1)
     c_chordal = igraph_bool_t()
     c_fillin = _VectorInt.create(0)
@@ -1539,7 +1541,7 @@ def is_chordal(graph: _Graph, alpha: Optional[Iterable[int]] = None, alpham1: Op
 def centralization(scores: Iterable[float], theoretical_max: float = 0, normalized: bool = True) -> float:
     """Type-annotated wrapper for ``igraph_centralization``."""
     # Prepare input arguments
-    c_scores = iterable_to_igraph_vector_t(scores)
+    c_scores = iterable_to_igraph_vector_t_view(scores)
     c_theoretical_max = theoretical_max
     c_normalized = any_to_igraph_bool_t(normalized)
 
@@ -1680,7 +1682,7 @@ def assortativity_nominal(graph: _Graph, types: Iterable[int], directed: bool = 
     """Type-annotated wrapper for ``igraph_assortativity_nominal``."""
     # Prepare input arguments
     c_graph = graph
-    c_types = iterable_to_igraph_vector_int_t(types)
+    c_types = iterable_to_igraph_vector_int_t_view(types)
     c_res = igraph_real_t()
     c_directed = any_to_igraph_bool_t(directed)
     c_normalized = any_to_igraph_bool_t(normalized)
@@ -1699,8 +1701,8 @@ def assortativity(graph: _Graph, values: Iterable[float], values_in: Optional[It
     """Type-annotated wrapper for ``igraph_assortativity``."""
     # Prepare input arguments
     c_graph = graph
-    c_values = iterable_to_igraph_vector_t(values)
-    c_values_in = iterable_to_igraph_vector_t(values_in)
+    c_values = iterable_to_igraph_vector_t_view(values)
+    c_values_in = iterable_to_igraph_vector_t_view(values_in)
     c_res = igraph_real_t()
     c_directed = any_to_igraph_bool_t(directed)
     c_normalized = any_to_igraph_bool_t(normalized)
@@ -2254,8 +2256,8 @@ def community_fluid_communities(graph: _Graph, no_of_communities: int) -> npt.ND
 def split_join_distance(comm1: Iterable[int], comm2: Iterable[int]) -> Tuple[int, int]:
     """Type-annotated wrapper for ``igraph_split_join_distance``."""
     # Prepare input arguments
-    c_comm1 = iterable_to_igraph_vector_int_t(comm1)
-    c_comm2 = iterable_to_igraph_vector_int_t(comm2)
+    c_comm1 = iterable_to_igraph_vector_int_t_view(comm1)
+    c_comm2 = iterable_to_igraph_vector_int_t_view(comm2)
     c_distance12 = igraph_integer_t()
     c_distance21 = igraph_integer_t()
 
@@ -2840,7 +2842,7 @@ def isoclass_subgraph(graph: _Graph, vids: Iterable[int]) -> int:
     """Type-annotated wrapper for ``igraph_isoclass_subgraph``."""
     # Prepare input arguments
     c_graph = graph
-    c_vids = iterable_to_igraph_vector_int_t(vids)
+    c_vids = iterable_to_igraph_vector_int_t_view(vids)
     c_isoclass = igraph_integer_t()
 
     # Call wrapped function
@@ -2909,7 +2911,7 @@ def permute_vertices(graph: _Graph, permutation: Iterable[int]) -> _Graph:
     # Prepare input arguments
     c_graph = graph
     c_res = _Graph()
-    c_permutation = iterable_to_igraph_vector_int_t(permutation)
+    c_permutation = iterable_to_igraph_vector_int_t_view(permutation)
 
     # Call wrapped function
     igraph_permute_vertices(c_graph, c_res, c_permutation)
@@ -2985,7 +2987,7 @@ def graph_count(n: int, directed: bool = False) -> int:
 def running_mean(data: Iterable[float], binwidth: int) -> npt.NDArray[np.float64]:
     """Type-annotated wrapper for ``igraph_running_mean``."""
     # Prepare input arguments
-    c_data = iterable_to_igraph_vector_t(data)
+    c_data = iterable_to_igraph_vector_t_view(data)
     c_res = _Vector()
     c_binwidth = binwidth
 
@@ -3022,7 +3024,7 @@ def random_sample(l: int, h: int, length: int) -> npt.NDArray[np.int64]:
 def dim_select(sv: Iterable[float]) -> int:
     """Type-annotated wrapper for ``igraph_dim_select``."""
     # Prepare input arguments
-    c_sv = iterable_to_igraph_vector_t(sv)
+    c_sv = iterable_to_igraph_vector_t_view(sv)
     c_dim = igraph_integer_t()
 
     # Call wrapped function
@@ -3145,7 +3147,7 @@ def from_prufer(prufer: Iterable[int]) -> _Graph:
     """Type-annotated wrapper for ``igraph_from_prufer``."""
     # Prepare input arguments
     c_graph = _Graph()
-    c_prufer = iterable_to_igraph_vector_int_t(prufer)
+    c_prufer = iterable_to_igraph_vector_int_t_view(prufer)
 
     # Call wrapped function
     igraph_from_prufer(c_graph, c_prufer)

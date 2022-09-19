@@ -1,3 +1,4 @@
+from numpy import array
 from pytest import raises
 
 from igraph_ctypes._internal.enums import NeighborMode
@@ -34,6 +35,17 @@ def test_add_edges():
     assert g.ecount() == 0
 
     g.add_edges((i, (i + 1) % n) for i in range(n))
+    assert g.ecount() == 5
+
+
+def test_add_edges_from_numpy_array():
+    n = 5
+
+    g = create_empty_graph(n)
+    assert g.ecount() == 0
+
+    arr = array([[i, (i + 1) % n] for i in range(n)])
+    g.add_edges(arr)
     assert g.ecount() == 5
 
 

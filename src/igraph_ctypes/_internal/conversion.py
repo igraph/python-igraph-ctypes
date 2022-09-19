@@ -3,7 +3,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from ctypes import memmove
+from ctypes import memmove, POINTER
 from typing import Any, Iterable, List
 
 from .lib import (
@@ -13,16 +13,22 @@ from .lib import (
     igraph_es_1,
     igraph_vector_bool_e,
     igraph_vector_bool_e_ptr,
+    igraph_vector_bool_init_array,
     igraph_vector_bool_push_back,
     igraph_vector_bool_size,
+    igraph_vector_bool_view,
     igraph_vector_int_e,
     igraph_vector_int_e_ptr,
+    igraph_vector_int_init_array,
     igraph_vector_int_push_back,
     igraph_vector_int_size,
+    igraph_vector_int_view,
     igraph_vector_e,
     igraph_vector_e_ptr,
+    igraph_vector_init_array,
     igraph_vector_push_back,
     igraph_vector_size,
+    igraph_vector_view,
     igraph_vs_all,
     igraph_vs_none,
     igraph_vs_vector,
@@ -31,6 +37,10 @@ from .lib import (
 from .types import (
     igraph_bool_t,
     igraph_integer_t,
+    igraph_real_t,
+    np_type_of_igraph_bool_t,
+    np_type_of_igraph_integer_t,
+    np_type_of_igraph_real_t,
     EdgeLike,
     EdgeSelector,
     VertexLike,
@@ -88,6 +98,9 @@ def edge_indices_to_igraph_vector_int_t(indices: Iterable[EdgeLike]) -> _VectorI
     """Converts an iterable containing edge-like objects to an igraph vector
     of edge IDs.
     """
+    if isinstance(indices, np.ndarray):
+        return numpy_array_to_igraph_vector_int_t(indices)
+
     result: _VectorInt = _VectorInt.create(0)
     for index in indices:
         igraph_vector_int_push_back(result, edgelike_to_igraph_integer_t(index))
@@ -123,16 +136,35 @@ def iterable_to_igraph_vector_bool_t(items: Iterable[Any]) -> _VectorBool:
     return result
 
 
+def iterable_to_igraph_vector_bool_t_view(items: Iterable[Any]) -> _VectorBool:
+    """Converts an iterable containing Python objects to an igraph vector of
+    booleans based on their truth values, possibly creating a shallow view if
+    the input is an appropriate NumPy array.
+    """
+    # TODO(ntamas)
+    return iterable_to_igraph_vector_bool_t(items)
+
+
 def iterable_to_igraph_vector_int_t(items: Iterable[int]) -> _VectorInt:
     """Converts an iterable containing Python integers to an igraph vector of
     integers.
     """
-    # TODO(ntamas): more efficient copy for NumPy arrays or cases where we could
-    # get around with an igraph_vector_int_view()
-    result: _VectorInt = _VectorInt.create(0)
-    for item in items:
-        igraph_vector_int_push_back(result, item)
-    return result
+    if isinstance(items, np.ndarray):
+        return numpy_array_to_igraph_vector_int_t(items)
+    else:
+        result = _VectorInt.create(0)
+        for item in items:
+            igraph_vector_int_push_back(result, item)
+        return result
+
+
+def iterable_to_igraph_vector_int_t_view(items: Iterable[Any]) -> _VectorInt:
+    """Converts an iterable containing Python objects to an igraph vector of
+    integers, possibly creating a shallow view if the input is an appropriate
+    NumPy array.
+    """
+    # TODO(ntamas)
+    return iterable_to_igraph_vector_int_t(items)
 
 
 def iterable_to_igraph_vector_t(items: Iterable[float]) -> _Vector:
@@ -147,6 +179,72 @@ def iterable_to_igraph_vector_t(items: Iterable[float]) -> _Vector:
     return result
 
 
+def iterable_to_igraph_vector_t_view(items: Iterable[float]) -> _Vector:
+    """Converts an iterable containing Python integers or floats to an igraph
+    vector of floats, possibly creating a shallow view if the input is an
+    appropriate NumPy array.
+    """
+    # TODO(ntamas)
+    return iterable_to_igraph_vector_t(items)
+
+
+def _force_into_flat_1d_numpy_array(
+    arr: np.ndarray, np_type, flatten: bool
+) -> np.ndarray:
+    if len(arr.shape) != 1:
+        if flatten:
+            arr = arr.reshape((-1,))
+        else:
+            raise TypeError("NumPy array must be one-dimensional")
+    return np.ravel(arr.astype(np_type, order="C", casting="safe", copy=False))
+
+
+def numpy_array_to_igraph_vector_bool_t(
+    arr: np.ndarray, flatten: bool = False
+) -> _VectorBool:
+    """Converts a one-dimensional NumPy array to an igraph vector of booleans."""
+    arr = _force_into_flat_1d_numpy_array(
+        arr, np_type_of_igraph_bool_t, flatten=flatten
+    )
+    arr = np.ravel(
+        arr.astype(np_type_of_igraph_bool_t, order="C", casting="safe", copy=False)
+    )
+    return _VectorBool.create_with(
+        igraph_vector_bool_init_array,
+        arr.ctypes.data_as(POINTER(igraph_bool_t)),
+        arr.shape[0],
+    )
+
+
+def numpy_array_to_igraph_vector_int_t(
+    arr: np.ndarray, flatten: bool = False
+) -> _VectorInt:
+    """Converts a one-dimensional NumPy array to an igraph vector of integers."""
+    arr = _force_into_flat_1d_numpy_array(
+        arr, np_type_of_igraph_integer_t, flatten=flatten
+    )
+    arr = np.ravel(
+        arr.astype(np_type_of_igraph_integer_t, order="C", casting="safe", copy=False)
+    )
+    return _VectorInt.create_with(
+        igraph_vector_int_init_array,
+        arr.ctypes.data_as(POINTER(igraph_integer_t)),
+        arr.shape[0],
+    )
+
+
+def numpy_array_to_igraph_vector_t(arr: np.ndarray, flatten: bool = False) -> _Vector:
+    """Converts a one-dimensional NumPy array to an igraph vector of realsa."""
+    arr = _force_into_flat_1d_numpy_array(
+        arr, np_type_of_igraph_real_t, flatten=flatten
+    )
+    return _Vector.create_with(
+        igraph_vector_init_array,
+        arr.ctypes.data_as(POINTER(igraph_real_t)),
+        arr.shape[0],
+    )
+
+
 def vertexlike_to_igraph_integer_t(vertex: VertexLike) -> igraph_integer_t:
     """Converts a vertex-like object to an igraph integer."""
     return igraph_integer_t(vertex)
@@ -156,6 +254,9 @@ def vertex_indices_to_igraph_vector_int_t(indices: Iterable[VertexLike]) -> _Vec
     """Converts an iterable containing vertex-like objects to an igraph vector
     of vertex IDs.
     """
+    if isinstance(indices, np.ndarray):
+        return numpy_array_to_igraph_vector_int_t(indices)
+
     result: _VectorInt = _VectorInt.create(0)
     for index in indices:
         igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(index))
@@ -166,6 +267,9 @@ def vertex_pairs_to_igraph_vector_int_t(pairs: Iterable[VertexPair]) -> _VectorI
     """Converts an iterable containing pairs of vertex-like objects to an
     igraph vector of vertex IDs.
     """
+    if isinstance(pairs, np.ndarray):
+        return numpy_array_to_igraph_vector_int_t(pairs, flatten=True)
+
     result: _VectorInt = _VectorInt.create(0)
     for u, v in pairs:
         igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(u))

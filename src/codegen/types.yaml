@@ -24,7 +24,8 @@ VECTOR:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: npt.NDArray[np.float64]
   INCONV:
-    IN: "%C% = iterable_to_igraph_vector_t(%I%)"
+    IN: "%C% = iterable_to_igraph_vector_t_view(%I%)"
+    INOUT: "%C% = iterable_to_igraph_vector_t(%I%)"
     OUT: "%C% = _Vector()"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
@@ -32,7 +33,8 @@ VECTOR_INT:
   PY_TYPE: Iterable[int]
   PY_RETURN_TYPE: npt.NDArray[np.int64]
   INCONV:
-    IN: "%C% = iterable_to_igraph_vector_int_t(%I%)"
+    IN: "%C% = iterable_to_igraph_vector_int_t_view(%I%)"
+    INOUT: "%C% = iterable_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
 
@@ -41,7 +43,8 @@ VECTOR_BOOL:
   PY_TYPE: Iterable[Any]
   PY_RETURN_TYPE: npt.NDArray[np.bool_]
   INCONV:
-    IN: "%C% = iterable_to_igraph_vector_bool_t(%I%)"
+    IN: "%C% = iterable_to_igraph_vector_bool_t_view(%I%)"
+    INOUT: "%C% = iterable_to_igraph_vector_bool_t(%I%)"
     OUT: "%C% = _VectorBool.create(0)"
   OUTCONV: "%I% = igraph_vector_bool_t_to_numpy_array(%C%)"
 
@@ -49,7 +52,8 @@ INDEX_VECTOR:
   PY_TYPE: Iterable[int]
   PY_RETURN_TYPE: npt.NDArray[np.int64]
   INCONV:
-    IN: "%C% = iterable_to_igraph_vector_int_t(%I%)"
+    IN: "%C% = iterable_to_igraph_vector_int_t_view(%I%)"
+    INOUT: "%C% = iterable_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
 
