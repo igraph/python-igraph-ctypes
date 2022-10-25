@@ -160,6 +160,102 @@ igraph_vector_bool_size = _lib.igraph_vector_bool_size
 igraph_vector_bool_size.restype = igraph_integer_t
 igraph_vector_bool_size.argtypes = [POINTER(igraph_vector_bool_t)]
 
+# Matrix type
+
+igraph_matrix_init = _lib.igraph_matrix_init
+igraph_matrix_init.restype = handle_igraph_error_t
+igraph_matrix_init.argtypes = [
+    POINTER(igraph_matrix_t),
+    igraph_integer_t,
+    igraph_integer_t,
+]
+
+igraph_matrix_destroy = _lib.igraph_matrix_destroy
+igraph_matrix_destroy.restype = None
+igraph_matrix_destroy.argtypes = [c_void_p]
+
+igraph_matrix_init_array = _lib.igraph_matrix_init_array
+igraph_matrix_init_array.restype = handle_igraph_error_t
+igraph_matrix_init_array.argtypes = [
+    POINTER(igraph_matrix_t),
+    POINTER(igraph_real_t),
+    igraph_integer_t,
+    igraph_integer_t,
+]
+
+igraph_matrix_view = _lib.igraph_matrix_view
+igraph_matrix_view.restype = handle_igraph_error_t
+igraph_matrix_view.argtypes = [
+    POINTER(igraph_matrix_t),
+    POINTER(igraph_real_t),
+    igraph_integer_t,
+    igraph_integer_t,
+]
+
+igraph_matrix_ncol = _lib.igraph_matrix_ncol
+igraph_matrix_ncol.restype = igraph_integer_t
+igraph_matrix_ncol.argtypes = [POINTER(igraph_matrix_t)]
+
+igraph_matrix_nrow = _lib.igraph_matrix_nrow
+igraph_matrix_nrow.restype = igraph_integer_t
+igraph_matrix_nrow.argtypes = [POINTER(igraph_matrix_t)]
+
+igraph_matrix_e = _lib.igraph_matrix_e
+igraph_matrix_e.restype = igraph_real_t
+igraph_matrix_e.argtypes = [POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t]
+
+igraph_matrix_e_ptr = _lib.igraph_matrix_e_ptr
+igraph_matrix_e_ptr.restype = POINTER(igraph_real_t)
+igraph_matrix_e_ptr.argtypes = [POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t]
+
+# Integer matrix type
+
+igraph_matrix_int_init = _lib.igraph_matrix_int_init
+igraph_matrix_int_init.restype = handle_igraph_error_t
+igraph_matrix_int_init.argtypes = [
+    POINTER(igraph_matrix_int_t),
+    igraph_integer_t,
+    igraph_integer_t,
+]
+
+igraph_matrix_int_destroy = _lib.igraph_matrix_int_destroy
+igraph_matrix_int_destroy.restype = None
+igraph_matrix_int_destroy.argtypes = [c_void_p]
+
+igraph_matrix_int_init_array = _lib.igraph_matrix_int_init_array
+igraph_matrix_int_init_array.restype = handle_igraph_error_t
+igraph_matrix_int_init_array.argtypes = [
+    POINTER(igraph_matrix_int_t),
+    POINTER(igraph_integer_t),
+    igraph_integer_t,
+    igraph_integer_t,
+]
+
+igraph_matrix_int_view = _lib.igraph_matrix_int_view
+igraph_matrix_int_view.restype = handle_igraph_error_t
+igraph_matrix_int_view.argtypes = [
+    POINTER(igraph_matrix_int_t),
+    POINTER(igraph_integer_t),
+    igraph_integer_t,
+    igraph_integer_t,
+]
+
+igraph_matrix_int_ncol = _lib.igraph_matrix_int_ncol
+igraph_matrix_int_ncol.restype = igraph_integer_t
+igraph_matrix_int_ncol.argtypes = [POINTER(igraph_matrix_int_t)]
+
+igraph_matrix_int_nrow = _lib.igraph_matrix_int_nrow
+igraph_matrix_int_nrow.restype = igraph_integer_t
+igraph_matrix_int_nrow.argtypes = [POINTER(igraph_matrix_int_t)]
+
+igraph_matrix_int_e = _lib.igraph_matrix_int_e
+igraph_matrix_int_e.restype = igraph_integer_t
+igraph_matrix_int_e.argtypes = [POINTER(igraph_matrix_int_t), igraph_integer_t, igraph_integer_t]
+
+igraph_matrix_int_e_ptr = _lib.igraph_matrix_int_e_ptr
+igraph_matrix_int_e_ptr.restype = POINTER(igraph_integer_t)
+igraph_matrix_int_e_ptr.argtypes = [POINTER(igraph_matrix_int_t), igraph_integer_t, igraph_integer_t]
+
 # Vertex selector type
 
 igraph_vs_none = _lib.igraph_vs_none

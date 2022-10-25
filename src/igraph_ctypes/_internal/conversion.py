@@ -11,6 +11,14 @@ from .lib import (
     igraph_es_none,
     igraph_es_vector,
     igraph_es_1,
+    igraph_matrix_int_init_array,
+    igraph_matrix_int_ncol,
+    igraph_matrix_int_nrow,
+    igraph_matrix_int_e_ptr,
+    igraph_matrix_init_array,
+    igraph_matrix_ncol,
+    igraph_matrix_nrow,
+    igraph_matrix_e_ptr,
     igraph_vector_bool_e,
     igraph_vector_bool_e_ptr,
     igraph_vector_bool_init_array,
@@ -43,6 +51,8 @@ from .types import (
     np_type_of_igraph_real_t,
     EdgeLike,
     EdgeSelector,
+    MatrixLike,
+    MatrixIntLike,
     VertexLike,
     VertexPair,
     VertexSelector,
@@ -50,6 +60,8 @@ from .types import (
 from .wrappers import (
     _EdgeSelector,
     _Graph,
+    _Matrix,
+    _MatrixInt,
     _Vector,
     _VectorBool,
     _VectorInt,
@@ -61,6 +73,8 @@ __all__ = (
     "edgelike_to_igraph_integer_t",
     "edge_indices_to_igraph_vector_int_t",
     "edge_selector_to_igraph_es_t",
+    "igraph_matrix_t_to_numpy_array",
+    "igraph_matrix_int_t_to_numpy_array",
     "igraph_vector_t_to_list",
     "igraph_vector_bool_t_to_list",
     "igraph_vector_int_t_to_list",
@@ -68,8 +82,15 @@ __all__ = (
     "igraph_vector_bool_t_to_numpy_array",
     "igraph_vector_int_t_to_numpy_array",
     "iterable_to_igraph_vector_bool_t",
+    "iterable_to_igraph_vector_bool_t_view",
     "iterable_to_igraph_vector_int_t",
+    "iterable_to_igraph_vector_int_t_view",
     "iterable_to_igraph_vector_t",
+    "iterable_to_igraph_vector_t_view",
+    "sequence_to_igraph_matrix_int_t",
+    "sequence_to_igraph_matrix_int_t_view",
+    "sequence_to_igraph_matrix_t",
+    "sequence_to_igraph_matrix_t_view",
     "vertexlike_to_igraph_integer_t",
     "vertex_indices_to_igraph_vector_int_t",
     "vertex_pairs_to_igraph_vector_int_t",
@@ -128,8 +149,6 @@ def iterable_to_igraph_vector_bool_t(items: Iterable[Any]) -> _VectorBool:
     """Converts an iterable containing Python objects to an igraph vector of
     booleans based on their truth values.
     """
-    # TODO(ntamas): more efficient copy for NumPy arrays or cases where we could
-    # get around with an igraph_vector_bool_view()
     result: _VectorBool = _VectorBool.create(0)
     for item in items:
         igraph_vector_bool_push_back(result, bool(item))
@@ -171,8 +190,6 @@ def iterable_to_igraph_vector_t(items: Iterable[float]) -> _Vector:
     """Converts an iterable containing Python integers or floats to an igraph
     vector of floats.
     """
-    # TODO(ntamas): more efficient copy for NumPy arrays or cases where we could
-    # get around with an igraph_vector_int_view()
     result: _Vector = _Vector.create(0)
     for item in items:
         igraph_vector_push_back(result, item)
@@ -188,9 +205,49 @@ def iterable_to_igraph_vector_t_view(items: Iterable[float]) -> _Vector:
     return iterable_to_igraph_vector_t(items)
 
 
-def _force_into_flat_1d_numpy_array(
-    arr: np.ndarray, np_type, flatten: bool
-) -> np.ndarray:
+def sequence_to_igraph_matrix_int_t(items: MatrixIntLike) -> _MatrixInt:
+    """Converts a sequence of sequences of Python integers to an igraph matrix
+    of integers. Each sequence in the top-level sequence must have the same
+    length.
+    """
+    if isinstance(items, np.ndarray):
+        return numpy_array_to_igraph_matrix_int_t(items)
+    else:
+        raise NotImplementedError()
+
+
+def sequence_to_igraph_matrix_int_t_view(items: MatrixIntLike) -> _MatrixInt:
+    """Converts a sequence of sequences of Python integers to an igraph matrix
+    of integers, possibly creating a shallow view if the input is an
+    appropriate NumPy matrix. Each sequence in the top-level sequence must have
+    the same length.
+    """
+    # TODO(ntamas)
+    return sequence_to_igraph_matrix_int_t(items)
+
+
+def sequence_to_igraph_matrix_t(items: MatrixLike) -> _Matrix:
+    """Converts a sequence of sequences of Python integers or floats to an
+    igraph matrix of floats. Each sequence in the top-level sequence must have
+    the same length.
+    """
+    if isinstance(items, np.ndarray):
+        return numpy_array_to_igraph_matrix_t(items)
+    else:
+        raise NotImplementedError()
+
+
+def sequence_to_igraph_matrix_t_view(items: MatrixLike) -> _Matrix:
+    """Converts a sequence of sequences of Python integers or floats to an
+    igraph matrix of floats, possibly creating a shallow view if the input is an
+    appropriate NumPy matrix. Each sequence in the top-level sequence must have
+    the same length.
+    """
+    # TODO(ntamas)
+    return sequence_to_igraph_matrix_t(items)
+
+
+def _force_into_1d_numpy_array(arr: np.ndarray, np_type, flatten: bool) -> np.ndarray:
     if len(arr.shape) != 1:
         if flatten:
             arr = arr.reshape((-1,))
@@ -199,13 +256,39 @@ def _force_into_flat_1d_numpy_array(
     return np.ravel(arr.astype(np_type, order="C", casting="safe", copy=False))
 
 
+def _force_into_2d_numpy_array(arr: np.ndarray, np_type) -> np.ndarray:
+    if len(arr.shape) != 2:
+        raise TypeError("NumPy array must be two-dimensional")
+    return arr.astype(np_type, order="C", casting="safe", copy=False)
+
+
+def numpy_array_to_igraph_matrix_t(arr: np.ndarray) -> _Matrix:
+    """Converts a two-dimensional NumPy array to an igraph matrix of reals."""
+    arr = _force_into_2d_numpy_array(arr, np_type_of_igraph_real_t)
+    return _Matrix.create_with(
+        igraph_matrix_init_array,
+        arr.ctypes.data_as(POINTER(igraph_real_t)),
+        arr.shape[0],
+        arr.shape[1],
+    )
+
+
+def numpy_array_to_igraph_matrix_int_t(arr: np.ndarray) -> _MatrixInt:
+    """Converts a two-dimensional NumPy array to an igraph matrix of integers."""
+    arr = _force_into_2d_numpy_array(arr, np_type_of_igraph_integer_t)
+    return _MatrixInt.create_with(
+        igraph_matrix_int_init_array,
+        arr.ctypes.data_as(POINTER(igraph_real_t)),
+        arr.shape[0],
+        arr.shape[1],
+    )
+
+
 def numpy_array_to_igraph_vector_bool_t(
     arr: np.ndarray, flatten: bool = False
 ) -> _VectorBool:
     """Converts a one-dimensional NumPy array to an igraph vector of booleans."""
-    arr = _force_into_flat_1d_numpy_array(
-        arr, np_type_of_igraph_bool_t, flatten=flatten
-    )
+    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_bool_t, flatten=flatten)
     arr = np.ravel(
         arr.astype(np_type_of_igraph_bool_t, order="C", casting="safe", copy=False)
     )
@@ -220,9 +303,7 @@ def numpy_array_to_igraph_vector_int_t(
     arr: np.ndarray, flatten: bool = False
 ) -> _VectorInt:
     """Converts a one-dimensional NumPy array to an igraph vector of integers."""
-    arr = _force_into_flat_1d_numpy_array(
-        arr, np_type_of_igraph_integer_t, flatten=flatten
-    )
+    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_integer_t, flatten=flatten)
     arr = np.ravel(
         arr.astype(np_type_of_igraph_integer_t, order="C", casting="safe", copy=False)
     )
@@ -234,10 +315,8 @@ def numpy_array_to_igraph_vector_int_t(
 
 
 def numpy_array_to_igraph_vector_t(arr: np.ndarray, flatten: bool = False) -> _Vector:
-    """Converts a one-dimensional NumPy array to an igraph vector of realsa."""
-    arr = _force_into_flat_1d_numpy_array(
-        arr, np_type_of_igraph_real_t, flatten=flatten
-    )
+    """Converts a one-dimensional NumPy array to an igraph vector of reals."""
+    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_real_t, flatten=flatten)
     return _Vector.create_with(
         igraph_vector_init_array,
         arr.ctypes.data_as(POINTER(igraph_real_t)),
@@ -314,25 +393,53 @@ def igraph_vector_int_t_to_list(vector: _VectorInt) -> List[int]:
     return [int(igraph_vector_int_e(vector, i)) for i in range(n)]
 
 
-def igraph_vector_t_to_numpy_array(vector: _Vector) -> npt.NDArray[np.float64]:
+def igraph_matrix_t_to_numpy_array(
+    matrix: _Matrix,
+) -> npt.NDArray[np_type_of_igraph_real_t]:
+    shape = igraph_matrix_nrow(matrix), igraph_matrix_ncol(matrix)
+    result = np.zeros(shape, dtype=np_type_of_igraph_real_t)
+    if result.size > 0:
+        memmove(result.ctypes.data, igraph_matrix_e_ptr(matrix, 0, 0), result.nbytes)
+    return result
+
+
+def igraph_matrix_int_t_to_numpy_array(
+    matrix: _MatrixInt,
+) -> npt.NDArray[np_type_of_igraph_integer_t]:
+    shape = igraph_matrix_int_nrow(matrix), igraph_matrix_int_ncol(matrix)
+    result = np.zeros(shape, dtype=np_type_of_igraph_integer_t)
+    if result.size > 0:
+        memmove(
+            result.ctypes.data, igraph_matrix_int_e_ptr(matrix, 0, 0), result.nbytes
+        )
+    return result
+
+
+def igraph_vector_t_to_numpy_array(
+    vector: _Vector,
+) -> npt.NDArray[np_type_of_igraph_real_t]:
     n = igraph_vector_size(vector)
-    result = np.zeros(n, dtype=np.float64)
+    result = np.zeros(n, dtype=np_type_of_igraph_real_t)
     if n > 0:
         memmove(result.ctypes.data, igraph_vector_e_ptr(vector, 0), result.nbytes)
     return result
 
 
-def igraph_vector_bool_t_to_numpy_array(vector: _VectorBool) -> npt.NDArray[np.bool_]:
+def igraph_vector_bool_t_to_numpy_array(
+    vector: _VectorBool,
+) -> npt.NDArray[np_type_of_igraph_bool_t]:
     n = igraph_vector_bool_size(vector)
-    result = np.zeros(n, dtype=np.bool_)
+    result = np.zeros(n, dtype=np_type_of_igraph_bool_t)
     if n > 0:
         memmove(result.ctypes.data, igraph_vector_bool_e_ptr(vector, 0), result.nbytes)
     return result
 
 
-def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> npt.NDArray[np.int64]:
+def igraph_vector_int_t_to_numpy_array(
+    vector: _VectorInt,
+) -> npt.NDArray[np_type_of_igraph_integer_t]:
     n = igraph_vector_int_size(vector)
-    result = np.zeros(n, dtype=np.int64)
+    result = np.zeros(n, dtype=np_type_of_igraph_integer_t)
     if n > 0:
         memmove(result.ctypes.data, igraph_vector_int_e_ptr(vector, 0), result.nbytes)
     return result

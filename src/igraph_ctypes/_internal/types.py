@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 
 from ctypes import (
     CFUNCTYPE,
@@ -14,7 +15,7 @@ from ctypes import (
     Structure,
     Union,
 )
-from typing import Iterable, Literal, Tuple
+from typing import Iterable, Literal, Sequence, Tuple, Union as UnionType
 
 
 def vector_fields(base_type):
@@ -354,6 +355,12 @@ EdgeSelector = Iterable[EdgeLike] | Literal["all"] | None
 """Type alias for Python types that can be converted to an igraph edge
 selector.
 """
+
+MatrixLike = UnionType[Sequence[Sequence[float]], npt.NDArray]
+"""Type alias for Python types that can be converted to an igraph matrix."""
+
+MatrixIntLike = UnionType[Sequence[Sequence[int]], npt.NDArray]
+"""Type alias for Python types that can be converted to an igraph integer matrix."""
 
 VertexLike = int
 """Type alias for Python types that can be converted to an igraph vertex ID"""

@@ -4,6 +4,10 @@ from typing import Any, Callable, Generic, NoReturn, Optional, Type, TypeVar
 from .lib import (
     igraph_destroy,
     igraph_es_destroy,
+    igraph_matrix_destroy,
+    igraph_matrix_init,
+    igraph_matrix_int_destroy,
+    igraph_matrix_int_init,
     igraph_vector_destroy,
     igraph_vector_init,
     igraph_vector_bool_destroy,
@@ -15,6 +19,8 @@ from .lib import (
 from .types import (
     igraph_t,
     igraph_es_t,
+    igraph_matrix_t,
+    igraph_matrix_int_t,
     igraph_vector_t,
     igraph_vector_bool_t,
     igraph_vector_int_t,
@@ -24,6 +30,8 @@ from .types import (
 __all__ = (
     "_EdgeSelector",
     "_Graph",
+    "_Matrix",
+    "_MatrixInt",
     "_Vector",
     "_VectorBool",
     "_VectorInt",
@@ -154,6 +162,18 @@ def create_boxed(
 
 
 _Graph = create_boxed("_Graph", igraph_t, destructor=igraph_destroy)
+_Matrix = create_boxed(
+    "_Matrix",
+    igraph_matrix_t,
+    constructor=igraph_matrix_init,
+    destructor=igraph_matrix_destroy,
+)
+_MatrixInt = create_boxed(
+    "_MatrixInt",
+    igraph_matrix_int_t,
+    constructor=igraph_matrix_int_init,
+    destructor=igraph_matrix_int_destroy,
+)
 _Vector = create_boxed(
     "_Vector",
     igraph_vector_t,
