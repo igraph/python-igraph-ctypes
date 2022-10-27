@@ -112,7 +112,10 @@ def any_to_igraph_bool_t(obj: Any) -> igraph_bool_t:
 
 def edgelike_to_igraph_integer_t(edge: EdgeLike) -> igraph_integer_t:
     """Converts an edge-like object to an igraph integer."""
-    return igraph_integer_t(edge)
+    if isinstance(edge, int) and edge >= 0:
+        return igraph_integer_t(edge)
+    else:
+        raise ValueError(f"{edge!r} cannot be converted to an igraph edge index")
 
 
 def edge_indices_to_igraph_vector_int_t(indices: Iterable[EdgeLike]) -> _VectorInt:
@@ -326,7 +329,10 @@ def numpy_array_to_igraph_vector_t(arr: np.ndarray, flatten: bool = False) -> _V
 
 def vertexlike_to_igraph_integer_t(vertex: VertexLike) -> igraph_integer_t:
     """Converts a vertex-like object to an igraph integer."""
-    return igraph_integer_t(vertex)
+    if isinstance(vertex, int) and vertex >= 0:
+        return igraph_integer_t(vertex)
+    else:
+        raise ValueError(f"{vertex!r} cannot be converted to an igraph vertex index")
 
 
 def vertex_indices_to_igraph_vector_int_t(indices: Iterable[VertexLike]) -> _VectorInt:
@@ -383,7 +389,7 @@ def igraph_vector_t_to_list(vector: _Vector) -> List[float]:
     return [float(igraph_vector_e(vector, i)) for i in range(n)]
 
 
-def igraph_vector_bool_t_to_list(vector: _VectorInt) -> List[bool]:
+def igraph_vector_bool_t_to_list(vector: _VectorBool) -> List[bool]:
     n = igraph_vector_bool_size(vector)
     return [bool(igraph_vector_bool_e(vector, i)) for i in range(n)]
 

@@ -44,3 +44,19 @@ igraph_correlated_game:
 igraph_correlated_pair_game:
   # complex default value for 'p' argument
   IGNORE: PythonCTypesTypedWrapper
+
+igraph_layout_davidson_harel:
+  # complex default value for multiple arguments
+  IGNORE: PythonCTypesTypedWrapper
+
+igraph_layout_gem:
+  # complex default value for multiple arguments
+  IGNORE: PythonCTypesTypedWrapper
+
+igraph_layout_lgl:
+  # complex default value for multiple arguments
+  IGNORE: PythonCTypesTypedWrapper
+
+igraph_layout_star:
+  # complex default value for 'center' argument
+  IGNORE: PythonCTypesTypedWrapper

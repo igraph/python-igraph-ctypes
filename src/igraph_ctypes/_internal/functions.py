@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from typing import Any, Iterable, Optional, Sequence, Tuple, Union
+from typing import Any, Iterable, Optional, Tuple
 
 from .conversion import *  # noqa
 from .enums import *  # noqa
@@ -2530,24 +2530,6 @@ def layout_circle(graph: _Graph, order: VertexSelector = "all") -> npt.NDArray[n
     return res
 
 
-def layout_star(graph: _Graph, center: VertexLike = V(graph)[1], order: Optional[Iterable[int]] = None) -> npt.NDArray[np.float64]:
-    """Type-annotated wrapper for ``igraph_layout_star``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Matrix.create(0)
-    c_center = vertexlike_to_igraph_integer_t(center)
-    c_order = iterable_to_igraph_vector_int_t_view(order) if order is not None else None
-
-    # Call wrapped function
-    igraph_layout_star(c_graph, c_res, c_center, c_order)
-
-    # Prepare output arguments
-    res = igraph_matrix_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-
 def layout_grid(graph: _Graph, width: int = 0) -> npt.NDArray[np.float64]:
     """Type-annotated wrapper for ``igraph_layout_grid``."""
     # Prepare input arguments
@@ -2585,29 +2567,6 @@ def layout_grid_3d(graph: _Graph, width: int = 0, height: int = 0) -> npt.NDArra
 # igraph_layout_fruchterman_reingold: no Python type known for type: LAYOUT_GRID
 
 # igraph_layout_kamada_kawai: no Python type known for type: EDGEWEIGHTS
-
-
-def layout_lgl(graph: _Graph, maxiter: int = 150, maxdelta: float = VCOUNT(graph), area: float = VCOUNT(graph)^2, coolexp: float = 1.5, repulserad: float = VCOUNT(graph)^3, cellsize: float = VCOUNT(graph), root: int = -1) -> npt.NDArray[np.float64]:
-    """Type-annotated wrapper for ``igraph_layout_lgl``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Matrix.create(0)
-    c_maxiter = maxiter
-    c_maxdelta = maxdelta
-    c_area = area
-    c_coolexp = coolexp
-    c_repulserad = repulserad
-    c_cellsize = cellsize
-    c_root = root
-
-    # Call wrapped function
-    igraph_layout_lgl(c_graph, c_res, c_maxiter, c_maxdelta, c_area, c_coolexp, c_repulserad, c_cellsize, c_root)
-
-    # Prepare output arguments
-    res = igraph_matrix_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
 
 
 def layout_reingold_tilford(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, roots: Optional[Iterable[VertexLike]] = None, rootlevel: Optional[Iterable[int]] = None) -> npt.NDArray[np.float64]:
@@ -2732,46 +2691,6 @@ def layout_mds(graph: _Graph, dist: Optional[MatrixLike] = None, dim: int = 2) -
     return res
 
 # igraph_layout_bipartite: no Python type known for type: BIPARTITE_TYPES
-
-
-def layout_gem(graph: _Graph, res: MatrixLike = matrix(), use_seed: bool = False, maxiter: int = 40*vcount(graph)^2, temp_max: float = vcount(graph), temp_min: float = 1/10, temp_init: float = sqrt(vcount(graph))) -> None:
-    """Type-annotated wrapper for ``igraph_layout_gem``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = sequence_to_igraph_matrix_t(res)
-    c_use_seed = any_to_igraph_bool_t(use_seed)
-    c_maxiter = maxiter
-    c_temp_max = temp_max
-    c_temp_min = temp_min
-    c_temp_init = temp_init
-
-    # Call wrapped function
-    igraph_layout_gem(c_graph, c_res, c_use_seed, c_maxiter, c_temp_max, c_temp_min, c_temp_init)
-
-    # Prepare output arguments
-    res = igraph_matrix_t_to_numpy_array(c_res)
-
-
-def layout_davidson_harel(graph: _Graph, res: MatrixLike = matrix(), use_seed: bool = False, maxiter: int = 10, fineiter: int = FINEITER, cool_fact: float = 0.75, weight_node_dist: float = 1.0, weight_border: float = 0.0, weight_edge_lengths: float = ELENW, weight_edge_crossings: float = ECROSSW, weight_node_edge_dist: float = NEDISTW) -> None:
-    """Type-annotated wrapper for ``igraph_layout_davidson_harel``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = sequence_to_igraph_matrix_t(res)
-    c_use_seed = any_to_igraph_bool_t(use_seed)
-    c_maxiter = maxiter
-    c_fineiter = fineiter
-    c_cool_fact = cool_fact
-    c_weight_node_dist = weight_node_dist
-    c_weight_border = weight_border
-    c_weight_edge_lengths = weight_edge_lengths
-    c_weight_edge_crossings = weight_edge_crossings
-    c_weight_node_edge_dist = weight_node_edge_dist
-
-    # Call wrapped function
-    igraph_layout_davidson_harel(c_graph, c_res, c_use_seed, c_maxiter, c_fineiter, c_cool_fact, c_weight_node_dist, c_weight_border, c_weight_edge_lengths, c_weight_edge_crossings, c_weight_node_edge_dist)
-
-    # Prepare output arguments
-    res = igraph_matrix_t_to_numpy_array(c_res)
 
 
 def layout_umap(graph: _Graph, res: MatrixLike, sampling_prob: float, use_seed: bool = False, distances: Iterable[float] = None, min_dist: float = 0.01, epochs: int = 500) -> None:
