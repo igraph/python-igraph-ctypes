@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ctypes import memmove, POINTER
-from typing import Any, Iterable, List
+from typing import Any, Iterable, List, Sequence
 
 from .lib import (
     igraph_es_all,
@@ -216,7 +216,10 @@ def sequence_to_igraph_matrix_int_t(items: MatrixIntLike) -> _MatrixInt:
     if isinstance(items, np.ndarray):
         return numpy_array_to_igraph_matrix_int_t(items)
     else:
-        raise NotImplementedError()
+        _ensure_matrix(items)
+        return numpy_array_to_igraph_matrix_int_t(
+            np.array(items, dtype=np_type_of_igraph_integer_t)
+        )
 
 
 def sequence_to_igraph_matrix_int_t_view(items: MatrixIntLike) -> _MatrixInt:
@@ -237,7 +240,10 @@ def sequence_to_igraph_matrix_t(items: MatrixLike) -> _Matrix:
     if isinstance(items, np.ndarray):
         return numpy_array_to_igraph_matrix_t(items)
     else:
-        raise NotImplementedError()
+        _ensure_matrix(items)
+        return numpy_array_to_igraph_matrix_t(
+            np.array(items, dtype=np_type_of_igraph_real_t)
+        )
 
 
 def sequence_to_igraph_matrix_t_view(items: MatrixLike) -> _Matrix:
@@ -248,6 +254,20 @@ def sequence_to_igraph_matrix_t_view(items: MatrixLike) -> _Matrix:
     """
     # TODO(ntamas)
     return sequence_to_igraph_matrix_t(items)
+
+
+def _ensure_matrix(items: Sequence[Sequence[Any]]) -> None:
+    """Ensures that the given Python sequence of sequences is a valid matrix,
+    i.e. all of its items have the same length.
+
+    Raises:
+        ValueError: if the input is not a matrix
+    """
+    nrow = len(items)
+    if nrow:
+        ncol = len(items[0])
+        if not any(len(row) == ncol for row in items):
+            raise ValueError("rows of a matrix must have the same length")
 
 
 def _force_into_1d_numpy_array(arr: np.ndarray, np_type, flatten: bool) -> np.ndarray:
@@ -281,7 +301,7 @@ def numpy_array_to_igraph_matrix_int_t(arr: np.ndarray) -> _MatrixInt:
     arr = _force_into_2d_numpy_array(arr, np_type_of_igraph_integer_t)
     return _MatrixInt.create_with(
         igraph_matrix_int_init_array,
-        arr.ctypes.data_as(POINTER(igraph_real_t)),
+        arr.ctypes.data_as(POINTER(igraph_integer_t)),
         arr.shape[0],
         arr.shape[1],
     )
