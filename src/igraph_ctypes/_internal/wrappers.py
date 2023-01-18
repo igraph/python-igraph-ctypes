@@ -152,7 +152,9 @@ def create_boxed(
                 instance = cls_outer()
                 initialized = False
             elif not isinstance(instance, cls_outer):
-                raise TypeError(f"{name} must wrap an object of type {cls_outer!r}")
+                raise TypeError(
+                    f"{name} must wrap an object of type {cls_outer!r}, got {type(instance)!r}"
+                )
             else:
                 initialized = True
             super().__init__(instance, destructor, initialized)
