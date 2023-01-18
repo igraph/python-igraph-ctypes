@@ -402,6 +402,24 @@ def square_lattice(dimvector: Iterable[int], nei: int = 1, directed: bool = Fals
     return graph
 
 
+def triangular_lattice(dimvector: Iterable[int], directed: bool = False, mutual: bool = False) -> _Graph:
+    """Type-annotated wrapper for ``igraph_triangular_lattice``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_dimvector = iterable_to_igraph_vector_int_t_view(dimvector)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_mutual = any_to_igraph_bool_t(mutual)
+
+    # Call wrapped function
+    igraph_triangular_lattice(c_graph, c_dimvector, c_directed, c_mutual)
+
+    # Prepare output arguments
+    graph = c_graph.mark_initialized()
+
+    # Construct return value
+    return graph
+
+
 def ring(n: int, directed: bool = False, mutual: bool = False, circular: bool = True) -> _Graph:
     """Type-annotated wrapper for ``igraph_ring``."""
     # Prepare input arguments
@@ -1506,8 +1524,8 @@ def subcomponent(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMo
 # igraph_induced_subgraph: no Python type known for type: SUBGRAPH_IMPL
 
 
-def subgraph_edges(graph: _Graph, eids: EdgeSelector, delete_vertices: bool = True) -> _Graph:
-    """Type-annotated wrapper for ``igraph_subgraph_edges``."""
+def subgraph_from_edges(graph: _Graph, eids: EdgeSelector, delete_vertices: bool = True) -> _Graph:
+    """Type-annotated wrapper for ``igraph_subgraph_from_edges``."""
     # Prepare input arguments
     c_graph = graph
     c_res = _Graph()
@@ -1515,7 +1533,7 @@ def subgraph_edges(graph: _Graph, eids: EdgeSelector, delete_vertices: bool = Tr
     c_delete_vertices = any_to_igraph_bool_t(delete_vertices)
 
     # Call wrapped function
-    igraph_subgraph_edges(c_graph, c_res, c_eids, c_delete_vertices)
+    igraph_subgraph_from_edges(c_graph, c_res, c_eids, c_delete_vertices)
 
     # Prepare output arguments
     res = c_res.mark_initialized()
@@ -2693,40 +2711,54 @@ def layout_mds(graph: _Graph, dist: Optional[MatrixLike] = None, dim: int = 2) -
 # igraph_layout_bipartite: no Python type known for type: BIPARTITE_TYPES
 
 
-def layout_umap(graph: _Graph, res: MatrixLike, sampling_prob: float, use_seed: bool = False, distances: Iterable[float] = None, min_dist: float = 0.01, epochs: int = 500) -> None:
+def layout_umap(graph: _Graph, res: MatrixLike, use_seed: bool = False, distances: Optional[Iterable[float]] = None, min_dist: float = 0.0, epochs: int = 200, distances_are_weights: bool = False) -> None:
     """Type-annotated wrapper for ``igraph_layout_umap``."""
     # Prepare input arguments
     c_graph = graph
     c_res = sequence_to_igraph_matrix_t(res)
     c_use_seed = any_to_igraph_bool_t(use_seed)
-    c_distances = iterable_to_igraph_vector_t_view(distances)
+    c_distances = iterable_to_igraph_vector_t_view(distances) if distances is not None else None
     c_min_dist = min_dist
     c_epochs = epochs
-    c_sampling_prob = sampling_prob
+    c_distances_are_weights = any_to_igraph_bool_t(distances_are_weights)
 
     # Call wrapped function
-    igraph_layout_umap(c_graph, c_res, c_use_seed, c_distances, c_min_dist, c_epochs, c_sampling_prob)
+    igraph_layout_umap(c_graph, c_res, c_use_seed, c_distances, c_min_dist, c_epochs, c_distances_are_weights)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
 
 
-def layout_umap_3d(graph: _Graph, res: MatrixLike, sampling_prob: float, use_seed: bool = False, distances: Iterable[float] = None, min_dist: float = 0.01, epochs: int = 500) -> None:
+def layout_umap_3d(graph: _Graph, res: MatrixLike, use_seed: bool = False, distances: Optional[Iterable[float]] = None, min_dist: float = 0.0, epochs: int = 200, distances_are_weights: bool = False) -> None:
     """Type-annotated wrapper for ``igraph_layout_umap_3d``."""
     # Prepare input arguments
     c_graph = graph
     c_res = sequence_to_igraph_matrix_t(res)
     c_use_seed = any_to_igraph_bool_t(use_seed)
-    c_distances = iterable_to_igraph_vector_t_view(distances)
+    c_distances = iterable_to_igraph_vector_t_view(distances) if distances is not None else None
     c_min_dist = min_dist
     c_epochs = epochs
-    c_sampling_prob = sampling_prob
+    c_distances_are_weights = any_to_igraph_bool_t(distances_are_weights)
 
     # Call wrapped function
-    igraph_layout_umap_3d(c_graph, c_res, c_use_seed, c_distances, c_min_dist, c_epochs, c_sampling_prob)
+    igraph_layout_umap_3d(c_graph, c_res, c_use_seed, c_distances, c_min_dist, c_epochs, c_distances_are_weights)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
+
+
+def layout_umap_compute_weights(graph: _Graph, distances: Iterable[float], weights: Iterable[float]) -> None:
+    """Type-annotated wrapper for ``igraph_layout_umap_compute_weights``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_distances = iterable_to_igraph_vector_t_view(distances)
+    c_weights = iterable_to_igraph_vector_t(weights)
+
+    # Call wrapped function
+    igraph_layout_umap_compute_weights(c_graph, c_distances, c_weights)
+
+    # Prepare output arguments
+    weights = igraph_vector_t_to_numpy_array(c_weights)
 
 
 def cocitation(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np.float64]:
@@ -3814,7 +3846,7 @@ def random_sample(l: int, h: int, length: int) -> npt.NDArray[np_type_of_igraph_
     return res
 
 
-def convex_hull(data: MatrixLike) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np.float64]]:
+def convex_hull(data: MatrixLike) -> Tuple[npt.NDArray[np.int64], npt.NDArray[np.float64]]:
     """Type-annotated wrapper for ``igraph_convex_hull``."""
     # Prepare input arguments
     c_data = sequence_to_igraph_matrix_t_view(data)
@@ -3999,6 +4031,23 @@ def to_prufer(graph: _Graph) -> npt.NDArray[np.int64]:
 
     # Construct return value
     return prufer
+
+
+def tree_from_parent_vector(parents: Iterable[int], type: TreeMode = TreeMode.OUT) -> _Graph:
+    """Type-annotated wrapper for ``igraph_tree_from_parent_vector``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_parents = iterable_to_igraph_vector_int_t_view(parents)
+    c_type = c_int(type)
+
+    # Call wrapped function
+    igraph_tree_from_parent_vector(c_graph, c_parents, c_type)
+
+    # Prepare output arguments
+    graph = c_graph.mark_initialized()
+
+    # Construct return value
+    return graph
 
 # igraph_minimum_spanning_tree: no Python type known for type: EDGEWEIGHTS
 

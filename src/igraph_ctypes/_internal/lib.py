@@ -181,6 +181,7 @@ igraph_matrix_init_array.argtypes = [
     POINTER(igraph_real_t),
     igraph_integer_t,
     igraph_integer_t,
+    c_int,
 ]
 
 igraph_matrix_view = _lib.igraph_matrix_view
@@ -229,6 +230,7 @@ igraph_matrix_int_init_array.argtypes = [
     POINTER(igraph_integer_t),
     igraph_integer_t,
     igraph_integer_t,
+    c_int,
 ]
 
 igraph_matrix_int_view = _lib.igraph_matrix_int_view
@@ -274,6 +276,10 @@ igraph_vs_vector = _lib.igraph_vs_vector
 igraph_vs_vector.restype = handle_igraph_error_t
 igraph_vs_vector.argtypes = [POINTER(igraph_vs_t), POINTER(igraph_vector_int_t)]
 
+igraph_vs_vector_copy = _lib.igraph_vs_vector_copy
+igraph_vs_vector_copy.restype = handle_igraph_error_t
+igraph_vs_vector_copy.argtypes = [POINTER(igraph_vs_t), POINTER(igraph_vector_int_t)]
+
 igraph_vs_destroy = _lib.igraph_vs_destroy
 igraph_vs_destroy.restype = None
 igraph_vs_destroy.argtypes = [c_void_p]
@@ -295,6 +301,10 @@ igraph_es_all.argtypes = [POINTER(igraph_es_t)]
 igraph_es_vector = _lib.igraph_es_vector
 igraph_es_vector.restype = handle_igraph_error_t
 igraph_es_vector.argtypes = [POINTER(igraph_es_t), POINTER(igraph_vector_int_t)]
+
+igraph_es_vector_copy = _lib.igraph_es_vector_copy
+igraph_es_vector_copy.restype = handle_igraph_error_t
+igraph_es_vector_copy.argtypes = [POINTER(igraph_es_t), POINTER(igraph_vector_int_t)]
 
 igraph_es_destroy = _lib.igraph_es_destroy
 igraph_es_destroy.restype = None
@@ -321,6 +331,7 @@ igraph_degseq_t = c_int
 igraph_eigen_which_position_t = c_int
 igraph_erdos_renyi_t = c_int
 igraph_fas_algorithm_t = c_int
+igraph_floyd_warshall_algorithm_t = c_int
 igraph_get_adjacency_t = c_int
 igraph_imitate_algorithm_t = c_int
 igraph_laplacian_normalization_t = c_int
@@ -462,6 +473,10 @@ igraph_wheel.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_wheel_mode_
 igraph_square_lattice = _lib.igraph_square_lattice
 igraph_square_lattice.restype = handle_igraph_error_t
 igraph_square_lattice.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_bool_t, igraph_bool_t, POINTER(igraph_vector_bool_t)]
+
+igraph_triangular_lattice = _lib.igraph_triangular_lattice
+igraph_triangular_lattice.restype = handle_igraph_error_t
+igraph_triangular_lattice.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_bool_t, igraph_bool_t]
 
 igraph_ring = _lib.igraph_ring
 igraph_ring.restype = handle_igraph_error_t
@@ -765,7 +780,7 @@ igraph_distances_johnson.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t)
 
 igraph_distances_floyd_warshall = _lib.igraph_distances_floyd_warshall
 igraph_distances_floyd_warshall.restype = handle_igraph_error_t
-igraph_distances_floyd_warshall.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_t), igraph_neimode_t]
+igraph_distances_floyd_warshall.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_t), igraph_neimode_t, igraph_floyd_warshall_algorithm_t]
 
 igraph_voronoi = _lib.igraph_voronoi
 igraph_voronoi.restype = handle_igraph_error_t
@@ -855,9 +870,9 @@ igraph_induced_subgraph = _lib.igraph_induced_subgraph
 igraph_induced_subgraph.restype = handle_igraph_error_t
 igraph_induced_subgraph.argtypes = [POINTER(igraph_t), POINTER(igraph_t), igraph_vs_t, igraph_subgraph_implementation_t]
 
-igraph_subgraph_edges = _lib.igraph_subgraph_edges
-igraph_subgraph_edges.restype = handle_igraph_error_t
-igraph_subgraph_edges.argtypes = [POINTER(igraph_t), POINTER(igraph_t), igraph_es_t, igraph_bool_t]
+igraph_subgraph_from_edges = _lib.igraph_subgraph_from_edges
+igraph_subgraph_from_edges.restype = handle_igraph_error_t
+igraph_subgraph_from_edges.argtypes = [POINTER(igraph_t), POINTER(igraph_t), igraph_es_t, igraph_bool_t]
 
 igraph_reverse_edges = _lib.igraph_reverse_edges
 igraph_reverse_edges.restype = handle_igraph_error_t
@@ -1373,11 +1388,15 @@ igraph_layout_davidson_harel.argtypes = [POINTER(igraph_t), POINTER(igraph_matri
 
 igraph_layout_umap = _lib.igraph_layout_umap
 igraph_layout_umap.restype = handle_igraph_error_t
-igraph_layout_umap.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_bool_t, POINTER(igraph_vector_t), igraph_real_t, igraph_integer_t, igraph_real_t]
+igraph_layout_umap.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_bool_t, POINTER(igraph_vector_t), igraph_real_t, igraph_integer_t, igraph_bool_t]
 
 igraph_layout_umap_3d = _lib.igraph_layout_umap_3d
 igraph_layout_umap_3d.restype = handle_igraph_error_t
-igraph_layout_umap_3d.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_bool_t, POINTER(igraph_vector_t), igraph_real_t, igraph_integer_t, igraph_real_t]
+igraph_layout_umap_3d.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_bool_t, POINTER(igraph_vector_t), igraph_real_t, igraph_integer_t, igraph_bool_t]
+
+igraph_layout_umap_compute_weights = _lib.igraph_layout_umap_compute_weights
+igraph_layout_umap_compute_weights.restype = handle_igraph_error_t
+igraph_layout_umap_compute_weights.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t)]
 
 igraph_cocitation = _lib.igraph_cocitation
 igraph_cocitation.restype = handle_igraph_error_t
@@ -2018,6 +2037,10 @@ igraph_from_prufer.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t)]
 igraph_to_prufer = _lib.igraph_to_prufer
 igraph_to_prufer.restype = handle_igraph_error_t
 igraph_to_prufer.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t)]
+
+igraph_tree_from_parent_vector = _lib.igraph_tree_from_parent_vector
+igraph_tree_from_parent_vector.restype = handle_igraph_error_t
+igraph_tree_from_parent_vector.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_tree_mode_t]
 
 igraph_minimum_spanning_tree = _lib.igraph_minimum_spanning_tree
 igraph_minimum_spanning_tree.restype = handle_igraph_error_t
