@@ -197,9 +197,20 @@ class _igraph_vs_es_index_mode_t(Union):
 
 class _igraph_vs_es_index_pair_t(Union):
     """ctypes representation of an index pair, typically used in the
-    .data.seq field in an ``igraph_vs_t`` or ``igraph_es_t``"""
+    .data.range field in an ``igraph_vs_t`` or ``igraph_es_t``"""
 
     _fields_ = [("from", igraph_integer_t), ("to", igraph_integer_t)]
+
+
+class _igraph_vs_es_index_pair_and_directedness_t(Union):
+    """ctypes representation of an index pair and a directedness indicator,
+    typically used in the .data.path field in an ``igraph_es_t``"""
+
+    _fields_ = [
+        ("from", igraph_integer_t),
+        ("to", igraph_integer_t),
+        ("directed", igraph_bool_t),
+    ]
 
 
 class _igraph_es_data_path_t(Union):
@@ -214,9 +225,9 @@ class _igraph_vs_t_data(Union):
 
     _fields_ = [
         ("vid", igraph_integer_t),
-        ("vecptr", POINTER(igraph_vector_t)),
+        ("vecptr", POINTER(igraph_vector_int_t)),
         ("adj", _igraph_vs_es_index_mode_t),
-        ("seq", _igraph_vs_es_index_pair_t),
+        ("range", _igraph_vs_es_index_pair_t),
     ]
 
 
@@ -232,10 +243,11 @@ class _igraph_es_t_data(Union):
     _fields_ = [
         ("vid", igraph_integer_t),
         ("eid", igraph_integer_t),
-        ("vecptr", POINTER(igraph_vector_t)),
+        ("vecptr", POINTER(igraph_vector_int_t)),
         ("incident", _igraph_vs_es_index_mode_t),
-        ("seq", _igraph_vs_es_index_pair_t),
+        ("range", _igraph_vs_es_index_pair_t),
         ("path", _igraph_es_data_path_t),
+        ("between", _igraph_vs_es_index_pair_and_directedness_t),
     ]
 
 
@@ -351,7 +363,7 @@ igraph_isocompat_t = CFUNCTYPE(
 EdgeLike = int
 """Type alias for Python types that can be converted to an igraph edge ID"""
 
-EdgeSelector = Iterable[EdgeLike] | Literal["all"] | None
+EdgeSelector = Iterable[EdgeLike] | Literal["all"] | EdgeLike | None
 """Type alias for Python types that can be converted to an igraph edge
 selector.
 """
@@ -368,7 +380,7 @@ VertexLike = int
 VertexPair = Tuple[VertexLike, VertexLike]
 """A pair of objects that can both be converted into igraph vertex IDs"""
 
-VertexSelector = Iterable[VertexLike] | Literal["all"] | None
+VertexSelector = Iterable[VertexLike] | Literal["all"] | VertexLike | None
 """Type alias for Python types that can be converted to an igraph vertex
 selector.
 """
