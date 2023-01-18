@@ -6,10 +6,11 @@ import numpy.typing as npt
 from ctypes import memmove, POINTER
 from typing import Any, Iterable, List, Sequence
 
+from .enums import MatrixStorage
 from .lib import (
     igraph_es_all,
     igraph_es_none,
-    igraph_es_vector,
+    igraph_es_vector_copy,
     igraph_es_1,
     igraph_matrix_int_init_array,
     igraph_matrix_int_ncol,
@@ -39,7 +40,7 @@ from .lib import (
     igraph_vector_view,
     igraph_vs_all,
     igraph_vs_none,
-    igraph_vs_vector,
+    igraph_vs_vector_copy,
     igraph_vs_1,
 )
 from .types import (
@@ -71,7 +72,6 @@ from .wrappers import (
 __all__ = (
     "any_to_igraph_bool_t",
     "edgelike_to_igraph_integer_t",
-    "edge_indices_to_igraph_vector_int_t",
     "edge_selector_to_igraph_es_t",
     "igraph_matrix_t_to_numpy_array",
     "igraph_matrix_int_t_to_numpy_array",
@@ -81,6 +81,7 @@ __all__ = (
     "igraph_vector_t_to_numpy_array",
     "igraph_vector_bool_t_to_numpy_array",
     "igraph_vector_int_t_to_numpy_array",
+    "iterable_edge_indices_to_igraph_vector_int_t",
     "iterable_to_igraph_vector_bool_t",
     "iterable_to_igraph_vector_bool_t_view",
     "iterable_to_igraph_vector_int_t",
@@ -118,7 +119,30 @@ def edgelike_to_igraph_integer_t(edge: EdgeLike) -> igraph_integer_t:
         raise ValueError(f"{edge!r} cannot be converted to an igraph edge index")
 
 
-def edge_indices_to_igraph_vector_int_t(indices: Iterable[EdgeLike]) -> _VectorInt:
+def edge_selector_to_igraph_es_t(
+    selector: EdgeSelector, graph: _Graph
+) -> _EdgeSelector:
+    """Converts a Python object representing a selection of edges to an
+    igraph_es_t object.
+    """
+    if selector is None:
+        return _EdgeSelector.create_with(igraph_es_none)
+    elif selector == "all":
+        return _EdgeSelector.create_with(igraph_es_all)
+    elif isinstance(selector, str):
+        # TODO(ntamas): implement name lookup?
+        raise TypeError("edge selector cannot be a string")
+    elif hasattr(selector, "__iter__"):
+        indices = iterable_edge_indices_to_igraph_vector_int_t(selector)  # type: ignore
+        return _EdgeSelector.create_with(igraph_es_vector_copy, indices)
+    else:
+        index = edgelike_to_igraph_integer_t(selector)  # type: ignore
+        return _EdgeSelector.create_with(igraph_es_1, index)
+
+
+def iterable_edge_indices_to_igraph_vector_int_t(
+    indices: Iterable[EdgeLike],
+) -> _VectorInt:
     """Converts an iterable containing edge-like objects to an igraph vector
     of edge IDs.
     """
@@ -131,31 +155,17 @@ def edge_indices_to_igraph_vector_int_t(indices: Iterable[EdgeLike]) -> _VectorI
     return result
 
 
-def edge_selector_to_igraph_es_t(
-    selector: EdgeSelector, graph: _Graph
-) -> _EdgeSelector:
-    """Converts a Python object representing a selection of edges to an
-    igraph_es_t object.
-    """
-    if selector is None:
-        return _EdgeSelector.create_with(igraph_es_none)
-    elif selector == "all":
-        return _EdgeSelector.create_with(igraph_es_all)
-    elif hasattr(selector, "__iter__"):
-        indices = edge_indices_to_igraph_vector_int_t(selector)
-        return _EdgeSelector.create_with(igraph_es_vector, indices)
-    else:
-        return _EdgeSelector.create_with(igraph_es_1, selector)
-
-
 def iterable_to_igraph_vector_bool_t(items: Iterable[Any]) -> _VectorBool:
     """Converts an iterable containing Python objects to an igraph vector of
     booleans based on their truth values.
     """
-    result: _VectorBool = _VectorBool.create(0)
-    for item in items:
-        igraph_vector_bool_push_back(result, bool(item))
-    return result
+    if isinstance(items, np.ndarray):
+        return numpy_array_to_igraph_vector_bool_t(items)
+    else:
+        result: _VectorBool = _VectorBool.create(0)
+        for item in items:
+            igraph_vector_bool_push_back(result, bool(item))
+        return result
 
 
 def iterable_to_igraph_vector_bool_t_view(items: Iterable[Any]) -> _VectorBool:
@@ -293,6 +303,7 @@ def numpy_array_to_igraph_matrix_t(arr: np.ndarray) -> _Matrix:
         arr.ctypes.data_as(POINTER(igraph_real_t)),
         arr.shape[0],
         arr.shape[1],
+        MatrixStorage.COLUMN_MAJOR,
     )
 
 
@@ -304,6 +315,7 @@ def numpy_array_to_igraph_matrix_int_t(arr: np.ndarray) -> _MatrixInt:
         arr.ctypes.data_as(POINTER(igraph_integer_t)),
         arr.shape[0],
         arr.shape[1],
+        MatrixStorage.COLUMN_MAJOR,
     )
 
 
@@ -392,11 +404,15 @@ def vertex_selector_to_igraph_vs_t(
         return _VertexSelector.create_with(igraph_vs_none)
     elif selector == "all":
         return _VertexSelector.create_with(igraph_vs_all)
+    elif isinstance(selector, str):
+        # TODO(ntamas): implement name lookup?
+        raise TypeError("vertex selector cannot be a string")
     elif hasattr(selector, "__iter__"):
-        indices = vertex_indices_to_igraph_vector_int_t(selector)
-        return _VertexSelector.create_with(igraph_vs_vector, indices)
+        indices = vertex_indices_to_igraph_vector_int_t(selector)  # type: ignore
+        return _VertexSelector.create_with(igraph_vs_vector_copy, indices)
     else:
-        return _VertexSelector.create_with(igraph_vs_1, selector)
+        index = vertexlike_to_igraph_integer_t(selector)  # type: ignore
+        return _VertexSelector.create_with(igraph_vs_1, index)
 
 
 ################################################################################

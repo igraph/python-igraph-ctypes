@@ -2,9 +2,11 @@ import pytest
 
 from numpy import array
 
+from igraph_ctypes.constructors import create_empty_graph
 from igraph_ctypes._internal.conversion import (
     any_to_igraph_bool_t,
     edgelike_to_igraph_integer_t,
+    edge_selector_to_igraph_es_t,
     igraph_matrix_t_to_numpy_array,
     igraph_matrix_int_t_to_numpy_array,
     igraph_vector_t_to_list,
@@ -19,7 +21,9 @@ from igraph_ctypes._internal.conversion import (
     sequence_to_igraph_matrix_t,
     sequence_to_igraph_matrix_int_t,
     vertexlike_to_igraph_integer_t,
+    vertex_selector_to_igraph_vs_t,
 )
+from igraph_ctypes._internal.enums import EdgeSequenceType, VertexSequenceType
 from igraph_ctypes._internal.types import igraph_bool_t, igraph_integer_t
 from igraph_ctypes._internal.wrappers import (
     _Matrix,
@@ -170,3 +174,55 @@ def test_real_matrix_roundtrip():
 
     restored_array = igraph_matrix_t_to_numpy_array(converted)
     assert (restored_array == expected_array).all()
+
+
+def test_vertex_selector():
+    g = create_empty_graph(5)._instance
+
+    vs = vertex_selector_to_igraph_vs_t(None, g)
+    assert vs.unwrap().type == VertexSequenceType.NONE
+
+    vs = vertex_selector_to_igraph_vs_t("all", g)
+    assert vs.unwrap().type == VertexSequenceType.ALL
+
+    vs = vertex_selector_to_igraph_vs_t(2, g)
+    assert vs.unwrap().type == VertexSequenceType.ONE
+    assert vs.unwrap().data.vid == 2
+
+    vs = vertex_selector_to_igraph_vs_t([3, 4, 1], g)
+    assert vs.unwrap().type == VertexSequenceType.VECTOR
+    vec = vs.unwrap().data.vecptr
+    assert igraph_vector_int_t_to_list(vec) == [3, 4, 1]
+
+    with pytest.raises(ValueError):
+        vertex_selector_to_igraph_vs_t(-1, g)
+
+    with pytest.raises(ValueError):
+        vertex_selector_to_igraph_vs_t(..., g)  # type: ignore
+
+
+def test_edge_selector():
+    g = create_empty_graph(5)
+    g.add_edges([(0, 1), (1, 2), (2, 4), (4, 0)])
+    g = g._instance
+
+    es = edge_selector_to_igraph_es_t(None, g)
+    assert es.unwrap().type == EdgeSequenceType.NONE
+
+    es = edge_selector_to_igraph_es_t("all", g)
+    assert es.unwrap().type == EdgeSequenceType.ALL
+
+    es = edge_selector_to_igraph_es_t(2, g)
+    assert es.unwrap().type == EdgeSequenceType.ONE
+    assert es.unwrap().data.eid == 2
+
+    es = edge_selector_to_igraph_es_t([2, 3, 0], g)
+    assert es.unwrap().type == EdgeSequenceType.VECTOR
+    vec = es.unwrap().data.vecptr
+    assert igraph_vector_int_t_to_list(vec) == [2, 3, 0]
+
+    with pytest.raises(ValueError):
+        edge_selector_to_igraph_es_t(-1, g)
+
+    with pytest.raises(ValueError):
+        edge_selector_to_igraph_es_t(..., g)  # type: ignore
