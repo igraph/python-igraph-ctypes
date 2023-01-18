@@ -1,9 +1,12 @@
-from typing import Iterable, List, Optional, TypeVar
+from numpy.typing import NDArray
+from typing import Iterable, Optional, TypeVar
 
 from ._internal.enums import NeighborMode
 from ._internal.functions import (
     add_edges,
     add_vertices,
+    delete_edges,
+    delete_vertices,
     ecount,
     edge,
     empty,
@@ -12,7 +15,13 @@ from ._internal.functions import (
     neighbors,
     vcount,
 )
-from ._internal.types import VertexLike, VertexPair
+from ._internal.types import (
+    EdgeSelector,
+    VertexLike,
+    VertexPair,
+    VertexSelector,
+    np_type_of_igraph_integer_t,
+)
 from ._internal.wrappers import _Graph
 
 
@@ -41,6 +50,14 @@ class Graph:
 
     def add_vertices(self: C, n: int) -> C:
         add_vertices(self._instance, n)
+        return self
+
+    def delete_edges(self: C, edges: EdgeSelector) -> C:
+        delete_edges(self._instance, edges)
+        return self
+
+    def delete_vertices(self: C, vertices: VertexSelector) -> C:
+        delete_vertices(self._instance, vertices)
         return self
 
     def ecount(self) -> int:
@@ -72,7 +89,7 @@ class Graph:
 
     def neighbors(
         self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
-    ) -> List[int]:
+    ) -> NDArray[np_type_of_igraph_integer_t]:
         """Returns the list of neighbors of a vertex."""
         return neighbors(self._instance, vid, mode)
 

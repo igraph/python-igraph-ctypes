@@ -86,7 +86,7 @@ def delete_edges(graph: _Graph, edges: EdgeSelector) -> None:
     c_edges = edge_selector_to_igraph_es_t(edges, c_graph)
 
     # Call wrapped function
-    igraph_delete_edges(c_graph, c_edges)
+    igraph_delete_edges(c_graph, c_edges.unwrap())
 
 
 def delete_vertices(graph: _Graph, vertices: VertexSelector) -> None:
@@ -96,7 +96,7 @@ def delete_vertices(graph: _Graph, vertices: VertexSelector) -> None:
     c_vertices = vertex_selector_to_igraph_vs_t(vertices, c_graph)
 
     # Call wrapped function
-    igraph_delete_vertices(c_graph, c_vertices)
+    igraph_delete_vertices(c_graph, c_vertices.unwrap())
 
 
 def delete_vertices_idx(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
@@ -108,7 +108,7 @@ def delete_vertices_idx(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.ND
     c_invidx = _VectorInt.create(0)
 
     # Call wrapped function
-    igraph_delete_vertices_idx(c_graph, c_vertices, c_idx, c_invidx)
+    igraph_delete_vertices_idx(c_graph, c_vertices.unwrap(), c_idx, c_invidx)
 
     # Prepare output arguments
     idx = igraph_vector_int_t_to_numpy_array(c_idx)
@@ -182,7 +182,7 @@ def degree(graph: _Graph, loops: bool, vids: VertexSelector = "all", mode: Neigh
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_degree(c_graph, c_res, c_vids, c_mode, c_loops)
+    igraph_degree(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_vector_int_t_to_numpy_array(c_res)
@@ -218,7 +218,7 @@ def edges(graph: _Graph, eids: EdgeSelector) -> npt.NDArray[np_type_of_igraph_in
     c_edges = _VectorInt.create(0)
 
     # Call wrapped function
-    igraph_edges(c_graph, c_eids, c_edges)
+    igraph_edges(c_graph, c_eids.unwrap(), c_edges)
 
     # Prepare output arguments
     edges = igraph_vector_int_t_to_numpy_array(c_edges)
@@ -1372,7 +1372,7 @@ def distances(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector =
     c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_distances(c_graph, c_res, c_from, c_to, c_mode)
+    igraph_distances(c_graph, c_res, c_from.unwrap(), c_to.unwrap(), c_mode)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -1392,7 +1392,7 @@ def distances_cutoff(graph: _Graph, from_: VertexSelector = "all", to: VertexSel
     c_cutoff = cutoff
 
     # Call wrapped function
-    igraph_distances_cutoff(c_graph, c_res, c_from, c_to, c_mode, c_cutoff)
+    igraph_distances_cutoff(c_graph, c_res, c_from.unwrap(), c_to.unwrap(), c_mode, c_cutoff)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -1459,7 +1459,7 @@ def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = 
     c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_get_all_simple_paths(c_graph, c_res, c_from, c_to, c_cutoff, c_mode)
+    igraph_get_all_simple_paths(c_graph, c_res, c_from, c_to.unwrap(), c_cutoff, c_mode)
 
     # Prepare output arguments
     res = igraph_vector_int_t_to_numpy_array(c_res)
@@ -1533,7 +1533,7 @@ def subgraph_from_edges(graph: _Graph, eids: EdgeSelector, delete_vertices: bool
     c_delete_vertices = any_to_igraph_bool_t(delete_vertices)
 
     # Call wrapped function
-    igraph_subgraph_from_edges(c_graph, c_res, c_eids, c_delete_vertices)
+    igraph_subgraph_from_edges(c_graph, c_res, c_eids.unwrap(), c_delete_vertices)
 
     # Prepare output arguments
     res = c_res.mark_initialized()
@@ -1549,7 +1549,7 @@ def reverse_edges(graph: _Graph, eids: EdgeSelector = "all") -> None:
     c_eids = edge_selector_to_igraph_es_t(eids, c_graph)
 
     # Call wrapped function
-    igraph_reverse_edges(c_graph, c_eids)
+    igraph_reverse_edges(c_graph, c_eids.unwrap())
 
 
 def average_path_length(graph: _Graph, directed: bool = True, unconn: bool = True) -> Tuple[float, float]:
@@ -1614,7 +1614,7 @@ def ecc(graph: _Graph, eids: EdgeSelector = "all", k: int = 3, offset: bool = Fa
     c_normalize = any_to_igraph_bool_t(normalize)
 
     # Call wrapped function
-    igraph_ecc(c_graph, c_res, c_eids, c_k, c_offset, c_normalize)
+    igraph_ecc(c_graph, c_res, c_eids.unwrap(), c_k, c_offset, c_normalize)
 
     # Prepare output arguments
     res = igraph_vector_t_to_numpy_array(c_res)
@@ -1637,7 +1637,7 @@ def maxdegree(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = 
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_maxdegree(c_graph, c_res, c_vids, c_mode, c_loops)
+    igraph_maxdegree(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = c_res.value
@@ -1674,7 +1674,7 @@ def neighborhood_size(graph: _Graph, vids: VertexSelector, order: int, mode: Nei
     c_mindist = mindist
 
     # Call wrapped function
-    igraph_neighborhood_size(c_graph, c_res, c_vids, c_order, c_mode, c_mindist)
+    igraph_neighborhood_size(c_graph, c_res, c_vids.unwrap(), c_order, c_mode, c_mindist)
 
     # Prepare output arguments
     res = igraph_vector_int_t_to_numpy_array(c_res)
@@ -1714,7 +1714,7 @@ def is_loop(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_of_i
     c_es = edge_selector_to_igraph_es_t(es, c_graph)
 
     # Call wrapped function
-    igraph_is_loop(c_graph, c_res, c_es)
+    igraph_is_loop(c_graph, c_res, c_es.unwrap())
 
     # Prepare output arguments
     res = igraph_vector_bool_t_to_numpy_array(c_res)
@@ -1779,7 +1779,7 @@ def is_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_
     c_es = edge_selector_to_igraph_es_t(es, c_graph)
 
     # Call wrapped function
-    igraph_is_multiple(c_graph, c_res, c_es)
+    igraph_is_multiple(c_graph, c_res, c_es.unwrap())
 
     # Prepare output arguments
     res = igraph_vector_bool_t_to_numpy_array(c_res)
@@ -1828,7 +1828,7 @@ def count_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_ty
     c_es = edge_selector_to_igraph_es_t(es, c_graph)
 
     # Call wrapped function
-    igraph_count_multiple(c_graph, c_res, c_es)
+    igraph_count_multiple(c_graph, c_res, c_es.unwrap())
 
     # Prepare output arguments
     res = igraph_vector_int_t_to_numpy_array(c_res)
@@ -1919,7 +1919,7 @@ def is_mutual(graph: _Graph, es: EdgeSelector = "all", loops: bool = True) -> np
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_is_mutual(c_graph, c_res, c_es, c_loops)
+    igraph_is_mutual(c_graph, c_res, c_es.unwrap(), c_loops)
 
     # Prepare output arguments
     res = igraph_vector_bool_t_to_numpy_array(c_res)
@@ -2539,7 +2539,7 @@ def layout_circle(graph: _Graph, order: VertexSelector = "all") -> npt.NDArray[n
     c_order = vertex_selector_to_igraph_vs_t(order, c_graph)
 
     # Call wrapped function
-    igraph_layout_circle(c_graph, c_res, c_order)
+    igraph_layout_circle(c_graph, c_res, c_order.unwrap())
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -2769,7 +2769,7 @@ def cocitation(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np.fl
     c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
 
     # Call wrapped function
-    igraph_cocitation(c_graph, c_res, c_vids)
+    igraph_cocitation(c_graph, c_res, c_vids.unwrap())
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -2786,7 +2786,7 @@ def bibcoupling(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np.f
     c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
 
     # Call wrapped function
-    igraph_bibcoupling(c_graph, c_res, c_vids)
+    igraph_bibcoupling(c_graph, c_res, c_vids.unwrap())
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -2805,7 +2805,7 @@ def similarity_dice(graph: _Graph, vids: VertexSelector = "all", mode: NeighborM
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_similarity_dice(c_graph, c_res, c_vids, c_mode, c_loops)
+    igraph_similarity_dice(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -2824,7 +2824,7 @@ def similarity_dice_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMo
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_similarity_dice_es(c_graph, c_res, c_es, c_mode, c_loops)
+    igraph_similarity_dice_es(c_graph, c_res, c_es.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_vector_t_to_numpy_array(c_res)
@@ -2861,7 +2861,7 @@ def similarity_inverse_log_weighted(graph: _Graph, vids: VertexSelector = "all",
     c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_similarity_inverse_log_weighted(c_graph, c_res, c_vids, c_mode)
+    igraph_similarity_inverse_log_weighted(c_graph, c_res, c_vids.unwrap(), c_mode)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -2880,7 +2880,7 @@ def similarity_jaccard(graph: _Graph, vids: VertexSelector = "all", mode: Neighb
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_similarity_jaccard(c_graph, c_res, c_vids, c_mode, c_loops)
+    igraph_similarity_jaccard(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -2899,7 +2899,7 @@ def similarity_jaccard_es(graph: _Graph, es: EdgeSelector = "all", mode: Neighbo
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_similarity_jaccard_es(c_graph, c_res, c_es, c_mode, c_loops)
+    igraph_similarity_jaccard_es(c_graph, c_res, c_es.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_vector_t_to_numpy_array(c_res)
@@ -3242,7 +3242,7 @@ def adjacent_triangles(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArr
     c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
 
     # Call wrapped function
-    igraph_adjacent_triangles(c_graph, c_res, c_vids)
+    igraph_adjacent_triangles(c_graph, c_res, c_vids.unwrap())
 
     # Prepare output arguments
     res = igraph_vector_t_to_numpy_array(c_res)
@@ -3583,7 +3583,7 @@ def is_separator(graph: _Graph, candidate: VertexSelector) -> bool:
     c_res = igraph_bool_t()
 
     # Call wrapped function
-    igraph_is_separator(c_graph, c_candidate, c_res)
+    igraph_is_separator(c_graph, c_candidate.unwrap(), c_res)
 
     # Prepare output arguments
     res = c_res.value
@@ -3600,7 +3600,7 @@ def is_minimal_separator(graph: _Graph, candidate: VertexSelector) -> bool:
     c_res = igraph_bool_t()
 
     # Call wrapped function
-    igraph_is_minimal_separator(c_graph, c_candidate, c_res)
+    igraph_is_minimal_separator(c_graph, c_candidate.unwrap(), c_res)
 
     # Prepare output arguments
     res = c_res.value

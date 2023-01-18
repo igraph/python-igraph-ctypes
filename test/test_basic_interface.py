@@ -49,6 +49,31 @@ def test_add_edges_from_numpy_array():
     assert g.ecount() == 5
 
 
+def test_delete_edges_single():
+    n = 5
+    g = create_empty_graph(n)
+    g.add_edges((i, (i + 1) % n) for i in range(n))
+    eid = g.get_edge_id(2, 3)
+
+    g.delete_edges(eid)
+
+    assert g.ecount() == 4
+    assert g.get_edge_id(2, 3, error=False) == -1
+
+
+def test_delete_edges_multiple():
+    n = 5
+    g = create_empty_graph(n)
+    g.add_edges((i, (i + 1) % n) for i in range(n))
+    assert g.get_edge_id(1, 2, error=False) >= 0
+    assert g.get_edge_id(0, 4, error=False) >= 0
+    g.delete_edges([1, 4])
+
+    assert g.ecount() == 3
+    assert g.get_edge_id(1, 2, error=False) == -1
+    assert g.get_edge_id(0, 4, error=False) == -1
+
+
 def test_edge():
     n = 5
 

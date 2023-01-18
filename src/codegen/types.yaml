@@ -114,6 +114,7 @@ VERTEX_SELECTOR:
     IN: "%C% = vertex_selector_to_igraph_vs_t(%I%, %C1%)"
   DEFAULT:
     ALL: '"all"'
+  CALL: "%C%.unwrap()"
 
 EDGE:
   PY_TYPE: EdgeLike
@@ -136,6 +137,7 @@ EDGE_SELECTOR:
     IN: "%C% = edge_selector_to_igraph_es_t(%I%, %C1%)"
   DEFAULT:
     ALL: '"all"'
+  CALL: "%C%.unwrap()"
 
 NEIMODE:
   PY_TYPE: NeighborMode
