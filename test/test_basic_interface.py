@@ -74,6 +74,24 @@ def test_delete_edges_multiple():
     assert g.get_edge_id(0, 4, error=False) == -1
 
 
+def test_delete_vertices_single():
+    n = 5
+    g = create_empty_graph(n)
+
+    g.delete_vertices(3)
+
+    assert g.vcount() == n - 1
+
+
+def test_delete_vertices_multiple():
+    n = 5
+    g = create_empty_graph(n)
+
+    g.delete_vertices([0, 1, 3])
+
+    assert g.vcount() == n - 3
+
+
 def test_edge():
     n = 5
 
