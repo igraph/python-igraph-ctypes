@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from ctypes import memmove, POINTER
-from typing import Any, Iterable, List, Sequence
+from typing import Any, Iterable, List, Optional, Sequence
 
 from .enums import MatrixStorage
 from .lib import (
@@ -73,6 +73,8 @@ __all__ = (
     "any_to_igraph_bool_t",
     "edgelike_to_igraph_integer_t",
     "edge_selector_to_igraph_es_t",
+    "edge_weights_to_igraph_vector_t",
+    "edge_weights_to_igraph_vector_t_view",
     "igraph_matrix_t_to_numpy_array",
     "igraph_matrix_int_t_to_numpy_array",
     "igraph_vector_t_to_list",
@@ -138,6 +140,26 @@ def edge_selector_to_igraph_es_t(
     else:
         index = edgelike_to_igraph_integer_t(selector)  # type: ignore
         return _EdgeSelector.create_with(igraph_es_1, index)
+
+
+def edge_weights_to_igraph_vector_t(weights: Iterable[float]) -> _Vector:
+    """Converts a Python iterable of floating-point numbers to a vector of
+    edge weights.
+    """
+    return iterable_to_igraph_vector_t(weights)
+
+
+def edge_weights_to_igraph_vector_t_view(
+    weights: Optional[Iterable[float]],
+) -> Optional[_Vector]:
+    """Converts a Python iterable of floating-point numbers to a vector of
+    edge weights, possibly creating a shallow view if the input is an
+    appropriate NumPy array.
+
+    When the input is `None`, the return value will also be `None`, which is
+    interpreted by the C core of igraph as all edges having equal weight.
+    """
+    return edge_weights_to_igraph_vector_t(weights) if weights is not None else None
 
 
 def iterable_edge_indices_to_igraph_vector_int_t(

@@ -1,7 +1,9 @@
 from enum import IntEnum
 
 __all__ = (
+    "AdjacencyMode",
     "EdgeSequenceType",
+    "Loops",
     "MatrixStorage",
     "NeighborMode",
     "StarMode",
@@ -9,6 +11,18 @@ __all__ = (
     "VertexSequenceType",
     "WheelMode",
 )
+
+
+class AdjacencyMode(IntEnum):
+    """Python counterpart of an ``igraph_adjacency_t`` enum."""
+
+    DIRECTED = 0
+    UNDIRECTED = 1
+    UPPER = 2
+    LOWER = 3
+    MIN = 4
+    PLUS = 5
+    MAX = 6
 
 
 class EdgeSequenceType(IntEnum):
@@ -27,6 +41,14 @@ class EdgeSequenceType(IntEnum):
     PATH = 10
     UNUSED_WAS_MULTIPAIRS = 11
     ALL_BETWEEN = 12
+
+
+class Loops(IntEnum):
+    """Python counterpart of an ``igraph_loops_t`` enum."""
+
+    IGNORE = 0
+    TWICE = 1
+    ONCE = 2
 
 
 class MatrixStorage(IntEnum):

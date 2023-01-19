@@ -53,10 +53,22 @@ igraph_layout_gem:
   # complex default value for multiple arguments
   IGNORE: PythonCTypesTypedWrapper
 
+igraph_layout_kamada_kawai:
+  # complex default value for 'kkconst' argument
+  IGNORE: PythonCTypesTypedWrapper
+
+igraph_layout_kamada_kawai_3d:
+  # complex default value for 'kkconst' argument
+  IGNORE: PythonCTypesTypedWrapper
+
 igraph_layout_lgl:
   # complex default value for multiple arguments
   IGNORE: PythonCTypesTypedWrapper
 
 igraph_layout_star:
   # complex default value for 'center' argument
+  IGNORE: PythonCTypesTypedWrapper
+
+igraph_maximum_bipartite_matching:
+  # .Machine$double.eps as default value for 'eps' argument
   IGNORE: PythonCTypesTypedWrapper

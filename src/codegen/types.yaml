@@ -50,7 +50,7 @@ VECTOR_BOOL:
 
 INDEX_VECTOR:
   PY_TYPE: Iterable[int]
-  PY_RETURN_TYPE: npt.NDArray[np.int64]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_int_t_view(%I%)"
     INOUT: "%C% = iterable_to_igraph_vector_int_t(%I%)"
@@ -59,7 +59,7 @@ INDEX_VECTOR:
 
 MATRIX:
   PY_TYPE: MatrixLike
-  PY_RETURN_TYPE: npt.NDArray[np.float64]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
   INCONV:
     IN: "%C% = sequence_to_igraph_matrix_t_view(%I%)"
     INOUT: "%C% = sequence_to_igraph_matrix_t(%I%)"
@@ -68,7 +68,7 @@ MATRIX:
 
 MATRIX_INT:
   PY_TYPE: MatrixIntLike
-  PY_RETURN_TYPE: npt.NDArray[np.int64]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
   INCONV:
     IN: "%C% = sequence_to_igraph_matrix_int_t_view(%I%)"
     INOUT: "%C% = sequence_to_igraph_matrix_int_t(%I%)"
@@ -96,7 +96,7 @@ VERTEX:
 
 VERTEX_INDICES:
   PY_TYPE: Iterable[VertexLike]
-  PY_RETURN_TYPE: npt.NDArray[np.int64]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
   INCONV:
     IN: "%C% = iterable_vertex_indices_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
@@ -125,9 +125,9 @@ EDGE:
 
 EDGE_INDICES:
   PY_TYPE: Iterable[EdgeLike]
-  PY_RETURN_TYPE: npt.NDArray[np.int64]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
   INCONV:
-    IN: "%C% = edge_indices_to_igraph_vector_int_t(%I%)"
+    IN: "%C% = iterable_edge_indices_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
 
@@ -138,6 +138,33 @@ EDGE_SELECTOR:
   DEFAULT:
     ALL: '"all"'
   CALL: "%C%.unwrap()"
+
+EDGEWEIGHTS:
+  PY_TYPE: Iterable[float]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  INCONV:
+    IN: "%C% = edge_weights_to_igraph_vector_t_view(%I%)"
+    INOUT: "%C% = edge_weights_to_igraph_vector_t(%I%)"
+    OUT: "%C% = _Vector.create(0)"
+  OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
+
+BIPARTITE_TYPES:
+  PY_TYPE: Iterable[Any]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_bool_t]
+  INCONV:
+    IN: "%C% = iterable_to_igraph_vector_bool_t_view(%I%) if %I% is not None else None"
+    INOUT: "%C% = iterable_to_igraph_vector_bool_t(%I%) if %I% is not None else None"
+    OUT: "%C% = _VectorBool.create(0)"
+
+ADJACENCY_MODE:
+  PY_TYPE: AdjacencyMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+LOOPS:
+  PY_TYPE: Loops
+  INCONV:
+    IN: "%C% = c_int(%I%)"
 
 NEIMODE:
   PY_TYPE: NeighborMode
