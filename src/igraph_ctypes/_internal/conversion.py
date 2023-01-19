@@ -88,12 +88,12 @@ __all__ = (
     "iterable_to_igraph_vector_int_t_view",
     "iterable_to_igraph_vector_t",
     "iterable_to_igraph_vector_t_view",
+    "iterable_vertex_indices_to_igraph_vector_int_t",
     "sequence_to_igraph_matrix_int_t",
     "sequence_to_igraph_matrix_int_t_view",
     "sequence_to_igraph_matrix_t",
     "sequence_to_igraph_matrix_t_view",
     "vertexlike_to_igraph_integer_t",
-    "vertex_indices_to_igraph_vector_int_t",
     "vertex_pairs_to_igraph_vector_int_t",
     "vertex_selector_to_igraph_vs_t",
 )
@@ -216,6 +216,21 @@ def iterable_to_igraph_vector_t_view(items: Iterable[float]) -> _Vector:
     """
     # TODO(ntamas)
     return iterable_to_igraph_vector_t(items)
+
+
+def iterable_vertex_indices_to_igraph_vector_int_t(
+    indices: Iterable[VertexLike],
+) -> _VectorInt:
+    """Converts an iterable containing vertex-like objects to an igraph vector
+    of vertex IDs.
+    """
+    if isinstance(indices, np.ndarray):
+        return numpy_array_to_igraph_vector_int_t(indices)
+
+    result: _VectorInt = _VectorInt.create(0)
+    for index in indices:
+        igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(index))
+    return result
 
 
 def sequence_to_igraph_matrix_int_t(items: MatrixIntLike) -> _MatrixInt:
@@ -367,19 +382,6 @@ def vertexlike_to_igraph_integer_t(vertex: VertexLike) -> igraph_integer_t:
         raise ValueError(f"{vertex!r} cannot be converted to an igraph vertex index")
 
 
-def vertex_indices_to_igraph_vector_int_t(indices: Iterable[VertexLike]) -> _VectorInt:
-    """Converts an iterable containing vertex-like objects to an igraph vector
-    of vertex IDs.
-    """
-    if isinstance(indices, np.ndarray):
-        return numpy_array_to_igraph_vector_int_t(indices)
-
-    result: _VectorInt = _VectorInt.create(0)
-    for index in indices:
-        igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(index))
-    return result
-
-
 def vertex_pairs_to_igraph_vector_int_t(pairs: Iterable[VertexPair]) -> _VectorInt:
     """Converts an iterable containing pairs of vertex-like objects to an
     igraph vector of vertex IDs.
@@ -408,7 +410,7 @@ def vertex_selector_to_igraph_vs_t(
         # TODO(ntamas): implement name lookup?
         raise TypeError("vertex selector cannot be a string")
     elif hasattr(selector, "__iter__"):
-        indices = vertex_indices_to_igraph_vector_int_t(selector)  # type: ignore
+        indices = iterable_vertex_indices_to_igraph_vector_int_t(selector)  # type: ignore
         return _VertexSelector.create_with(igraph_vs_vector_copy, indices)
     else:
         index = vertexlike_to_igraph_integer_t(selector)  # type: ignore
