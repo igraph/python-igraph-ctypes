@@ -13,9 +13,9 @@ from ctypes import (
     c_void_p,
     POINTER,
     Structure,
-    Union,
+    Union as CUnion,
 )
-from typing import Iterable, Literal, Sequence, Tuple, Union as UnionType
+from typing import Iterable, Literal, Sequence, Tuple, Union
 
 
 def vector_fields(base_type):
@@ -188,21 +188,21 @@ class igraph_graph_list_t(Structure):
     _fields_ = vector_fields("igraph_t") + [("directed", igraph_bool_t)]
 
 
-class _igraph_vs_es_index_mode_t(Union):
+class _igraph_vs_es_index_mode_t(Structure):
     """ctypes representation of a pair of an index and a neighborhood mode,
     typically used in the .data.adj field in an ``igraph_vs_t``"""
 
     _fields_ = [("vid", igraph_integer_t), ("mode", c_int)]
 
 
-class _igraph_vs_es_index_pair_t(Union):
+class _igraph_vs_es_index_pair_t(Structure):
     """ctypes representation of an index pair, typically used in the
     .data.range field in an ``igraph_vs_t`` or ``igraph_es_t``"""
 
     _fields_ = [("from", igraph_integer_t), ("to", igraph_integer_t)]
 
 
-class _igraph_vs_es_index_pair_and_directedness_t(Union):
+class _igraph_vs_es_index_pair_and_directedness_t(Structure):
     """ctypes representation of an index pair and a directedness indicator,
     typically used in the .data.path field in an ``igraph_es_t``"""
 
@@ -213,14 +213,14 @@ class _igraph_vs_es_index_pair_and_directedness_t(Union):
     ]
 
 
-class _igraph_es_data_path_t(Union):
+class _igraph_es_data_path_t(Structure):
     """ctypes representation of a pair of a vector and a neighborhood mode,
     typically used in the .data.path field in an ``igraph_es_t``"""
 
     _fields_ = [("ptr", igraph_vector_t), ("mode", c_int)]
 
 
-class _igraph_vs_t_data(Union):
+class _igraph_vs_t_data(CUnion):
     """ctypes representation of the .data field in an ``igraph_vs_t``"""
 
     _fields_ = [
@@ -237,7 +237,7 @@ class igraph_vs_t(Structure):
     _fields_ = [("type", c_int), ("data", _igraph_vs_t_data)]
 
 
-class _igraph_es_t_data(Union):
+class _igraph_es_t_data(CUnion):
     """ctypes representation of the .data field in an ``igraph_es_t``"""
 
     _fields_ = [
@@ -368,10 +368,10 @@ EdgeSelector = Iterable[EdgeLike] | Literal["all"] | EdgeLike | None
 selector.
 """
 
-MatrixLike = UnionType[Sequence[Sequence[float]], npt.NDArray]
+MatrixLike = Union[Sequence[Sequence[float]], npt.NDArray]
 """Type alias for Python types that can be converted to an igraph matrix."""
 
-MatrixIntLike = UnionType[Sequence[Sequence[int]], npt.NDArray]
+MatrixIntLike = Union[Sequence[Sequence[int]], npt.NDArray]
 """Type alias for Python types that can be converted to an igraph integer matrix."""
 
 VertexLike = int
