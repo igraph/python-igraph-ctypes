@@ -111,10 +111,19 @@ VERTEX_INDEX_PAIRS:
 VERTEX_SELECTOR:
   PY_TYPE: VertexSelector
   INCONV:
-    IN: "%C% = vertex_selector_to_igraph_vs_t(%I%, %C1%)"
+    IN: "%C% = vertex_selector_to_igraph_vs_t(%I%, %I1%)"
   DEFAULT:
     ALL: '"all"'
   CALL: "%C%.unwrap()"
+
+VERTEX_QTY:
+  PY_TYPE: Iterable[float]
+  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  INCONV:
+    IN: "%C% = vertex_qty_to_igraph_vector_t_view(%I%, %I1%)"
+    INOUT: "%C% = vertex_qty_to_igraph_vector_t(%I%, %I1%)"
+    OUT: "%C% = _Vector.create(0)"
+  OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
 EDGE:
   PY_TYPE: EdgeLike
@@ -134,7 +143,7 @@ EDGE_INDICES:
 EDGE_SELECTOR:
   PY_TYPE: EdgeSelector
   INCONV:
-    IN: "%C% = edge_selector_to_igraph_es_t(%I%, %C1%)"
+    IN: "%C% = edge_selector_to_igraph_es_t(%I%, %I1%)"
   DEFAULT:
     ALL: '"all"'
   CALL: "%C%.unwrap()"
@@ -143,8 +152,8 @@ EDGEWEIGHTS:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
   INCONV:
-    IN: "%C% = edge_weights_to_igraph_vector_t_view(%I%)"
-    INOUT: "%C% = edge_weights_to_igraph_vector_t(%I%)"
+    IN: "%C% = edge_weights_to_igraph_vector_t_view(%I%, %I1%)"
+    INOUT: "%C% = edge_weights_to_igraph_vector_t(%I%, %I1%)"
     OUT: "%C% = _Vector.create(0)"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
@@ -173,6 +182,11 @@ NEIMODE:
 
 STAR_MODE:
   PY_TYPE: StarMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+TRANSITIVITY_MODE:
+  PY_TYPE: TransitivityMode
   INCONV:
     IN: "%C% = c_int(%I%)"
 

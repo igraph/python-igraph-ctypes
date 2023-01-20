@@ -98,6 +98,8 @@ __all__ = (
     "vertexlike_to_igraph_integer_t",
     "vertex_pairs_to_igraph_vector_int_t",
     "vertex_selector_to_igraph_vs_t",
+    "vertex_qty_to_igraph_vector_t",
+    "vertex_qty_to_igraph_vector_t_view",
 )
 
 
@@ -142,7 +144,7 @@ def edge_selector_to_igraph_es_t(
         return _EdgeSelector.create_with(igraph_es_1, index)
 
 
-def edge_weights_to_igraph_vector_t(weights: Iterable[float]) -> _Vector:
+def edge_weights_to_igraph_vector_t(weights: Iterable[float], graph: _Graph) -> _Vector:
     """Converts a Python iterable of floating-point numbers to a vector of
     edge weights.
     """
@@ -150,7 +152,7 @@ def edge_weights_to_igraph_vector_t(weights: Iterable[float]) -> _Vector:
 
 
 def edge_weights_to_igraph_vector_t_view(
-    weights: Optional[Iterable[float]],
+    weights: Optional[Iterable[float]], graph: _Graph
 ) -> Optional[_Vector]:
     """Converts a Python iterable of floating-point numbers to a vector of
     edge weights, possibly creating a shallow view if the input is an
@@ -159,7 +161,9 @@ def edge_weights_to_igraph_vector_t_view(
     When the input is `None`, the return value will also be `None`, which is
     interpreted by the C core of igraph as all edges having equal weight.
     """
-    return edge_weights_to_igraph_vector_t(weights) if weights is not None else None
+    return (
+        edge_weights_to_igraph_vector_t(weights, graph) if weights is not None else None
+    )
 
 
 def iterable_edge_indices_to_igraph_vector_int_t(
@@ -437,6 +441,28 @@ def vertex_selector_to_igraph_vs_t(
     else:
         index = vertexlike_to_igraph_integer_t(selector)  # type: ignore
         return _VertexSelector.create_with(igraph_vs_1, index)
+
+
+def vertex_qty_to_igraph_vector_t(weights: Iterable[float], graph: _Graph) -> _Vector:
+    """Converts a Python iterable of floating-point numbers to a vector of
+    vertex-related quantities.
+    """
+    return iterable_to_igraph_vector_t(weights)
+
+
+def vertex_qty_to_igraph_vector_t_view(
+    weights: Optional[Iterable[float]], graph: _Graph
+) -> Optional[_Vector]:
+    """Converts a Python iterable of floating-point numbers to a vector of
+    vertex-related quantities, possibly creating a shallow view if the input is
+    an appropriate NumPy array.
+
+    When the input is `None`, the return value will also be `None`, which is
+    interpreted by the C core of igraph as all edges having equal weight.
+    """
+    return (
+        vertex_qty_to_igraph_vector_t(weights, graph) if weights is not None else None
+    )
 
 
 ################################################################################

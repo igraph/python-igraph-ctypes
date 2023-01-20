@@ -15,3 +15,6 @@
   name of the edge attribute storing the weights?
 
 - Shall we treat the `weight` edge attribute implicitly as edge weights?
+
+- Shall we allow dicts mapping vertex names to floats to be treated as a
+  `VERTEX_QTY` abstract type?

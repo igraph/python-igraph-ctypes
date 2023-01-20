@@ -83,7 +83,7 @@ def delete_edges(graph: _Graph, edges: EdgeSelector) -> None:
     """Type-annotated wrapper for ``igraph_delete_edges``."""
     # Prepare input arguments
     c_graph = graph
-    c_edges = edge_selector_to_igraph_es_t(edges, c_graph)
+    c_edges = edge_selector_to_igraph_es_t(edges, graph)
 
     # Call wrapped function
     igraph_delete_edges(c_graph, c_edges.unwrap())
@@ -93,7 +93,7 @@ def delete_vertices(graph: _Graph, vertices: VertexSelector) -> None:
     """Type-annotated wrapper for ``igraph_delete_vertices``."""
     # Prepare input arguments
     c_graph = graph
-    c_vertices = vertex_selector_to_igraph_vs_t(vertices, c_graph)
+    c_vertices = vertex_selector_to_igraph_vs_t(vertices, graph)
 
     # Call wrapped function
     igraph_delete_vertices(c_graph, c_vertices.unwrap())
@@ -103,7 +103,7 @@ def delete_vertices_idx(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.ND
     """Type-annotated wrapper for ``igraph_delete_vertices_idx``."""
     # Prepare input arguments
     c_graph = graph
-    c_vertices = vertex_selector_to_igraph_vs_t(vertices, c_graph)
+    c_vertices = vertex_selector_to_igraph_vs_t(vertices, graph)
     c_idx = _VectorInt.create(0)
     c_invidx = _VectorInt.create(0)
 
@@ -177,7 +177,7 @@ def degree(graph: _Graph, loops: bool, vids: VertexSelector = "all", mode: Neigh
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorInt.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
@@ -214,7 +214,7 @@ def edges(graph: _Graph, eids: EdgeSelector) -> npt.NDArray[np_type_of_igraph_in
     """Type-annotated wrapper for ``igraph_edges``."""
     # Prepare input arguments
     c_graph = graph
-    c_eids = edge_selector_to_igraph_es_t(eids, c_graph)
+    c_eids = edge_selector_to_igraph_es_t(eids, graph)
     c_edges = _VectorInt.create(0)
 
     # Call wrapped function
@@ -1413,7 +1413,7 @@ def diameter_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     """Type-annotated wrapper for ``igraph_diameter_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_res = igraph_real_t()
     c_from = igraph_integer_t()
     c_to = igraph_integer_t()
@@ -1435,9 +1435,54 @@ def diameter_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     # Construct return value
     return res, from_, to, vertex_path, edge_path
 
-# igraph_closeness: no Python type known for type: VERTEX_QTY
 
-# igraph_closeness_cutoff: no Python type known for type: VERTEX_QTY
+def closeness(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t], bool]:
+    """Type-annotated wrapper for ``igraph_closeness``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_reachable_count = _VectorInt.create(0)
+    c_all_reachable = igraph_bool_t()
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_normalized = any_to_igraph_bool_t(normalized)
+
+    # Call wrapped function
+    igraph_closeness(c_graph, c_res, c_reachable_count, c_all_reachable, c_vids.unwrap(), c_mode, c_weights, c_normalized)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+    reachable_count = igraph_vector_int_t_to_numpy_array(c_reachable_count)
+    all_reachable = c_all_reachable.value
+
+    # Construct return value
+    return res, reachable_count, all_reachable
+
+
+def closeness_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t], bool]:
+    """Type-annotated wrapper for ``igraph_closeness_cutoff``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_reachable_count = _VectorInt.create(0)
+    c_all_reachable = igraph_bool_t()
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_normalized = any_to_igraph_bool_t(normalized)
+    c_cutoff = cutoff
+
+    # Call wrapped function
+    igraph_closeness_cutoff(c_graph, c_res, c_reachable_count, c_all_reachable, c_vids.unwrap(), c_mode, c_weights, c_normalized, c_cutoff)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+    reachable_count = igraph_vector_int_t_to_numpy_array(c_reachable_count)
+    all_reachable = c_all_reachable.value
+
+    # Construct return value
+    return res, reachable_count, all_reachable
 
 
 def distances(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
@@ -1445,8 +1490,8 @@ def distances(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector =
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1464,8 +1509,8 @@ def distances_cutoff(graph: _Graph, from_: VertexSelector = "all", to: VertexSel
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
     c_mode = c_int(mode)
     c_cutoff = cutoff
 
@@ -1508,7 +1553,7 @@ def get_shortest_path_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexL
     c_edges = _VectorInt.create(0)
     c_from = vertexlike_to_igraph_integer_t(from_)
     c_to = vertexlike_to_igraph_integer_t(to)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1530,7 +1575,7 @@ def get_shortest_path_dijkstra(graph: _Graph, from_: VertexLike, to: VertexLike,
     c_edges = _VectorInt.create(0)
     c_from = vertexlike_to_igraph_integer_t(from_)
     c_to = vertexlike_to_igraph_integer_t(to)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1553,9 +1598,9 @@ def distances_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSel
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1573,9 +1618,9 @@ def distances_dijkstra_cutoff(graph: _Graph, weights: Iterable[float], from_: Ve
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
     c_cutoff = cutoff
 
@@ -1600,9 +1645,9 @@ def distances_bellman_ford(graph: _Graph, weights: Iterable[float], from_: Verte
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1620,9 +1665,9 @@ def distances_johnson(graph: _Graph, weights: Iterable[float], from_: VertexSele
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_distances_johnson(c_graph, c_res, c_from.unwrap(), c_to.unwrap(), c_weights)
@@ -1644,7 +1689,7 @@ def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = 
     c_graph = graph
     c_res = _VectorInt.create(0)
     c_from = vertexlike_to_igraph_integer_t(from_)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
     c_cutoff = cutoff
     c_mode = c_int(mode)
 
@@ -1668,7 +1713,7 @@ def get_widest_path(graph: _Graph, from_: VertexLike, to: VertexLike, weights: O
     c_edges = _VectorInt.create(0)
     c_from = vertexlike_to_igraph_integer_t(from_)
     c_to = vertexlike_to_igraph_integer_t(to)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1689,9 +1734,9 @@ def widest_path_widths_dijkstra(graph: _Graph, weights: Iterable[float], from_: 
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1709,9 +1754,9 @@ def widest_path_widths_floyd_warshall(graph: _Graph, weights: Iterable[float], f
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_from = vertex_selector_to_igraph_vs_t(from_, c_graph)
-    c_to = vertex_selector_to_igraph_vs_t(to, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_from = vertex_selector_to_igraph_vs_t(from_, graph)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -1730,7 +1775,7 @@ def spanner(graph: _Graph, stretch: float, weights: Iterable[float]) -> npt.NDAr
     c_graph = graph
     c_spanner = _VectorInt.create(0)
     c_stretch = stretch
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_spanner(c_graph, c_spanner, c_stretch, c_weights)
@@ -1759,11 +1804,65 @@ def subcomponent(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMo
     # Construct return value
     return res
 
-# igraph_betweenness: no Python type known for type: VERTEX_QTY
 
-# igraph_betweenness_cutoff: no Python type known for type: VERTEX_QTY
+def betweenness(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_betweenness``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
-# igraph_betweenness_subset: no Python type known for type: VERTEX_QTY
+    # Call wrapped function
+    igraph_betweenness(c_graph, c_res, c_vids.unwrap(), c_directed, c_weights)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def betweenness_cutoff(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_betweenness_cutoff``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_cutoff = cutoff
+
+    # Call wrapped function
+    igraph_betweenness_cutoff(c_graph, c_res, c_vids.unwrap(), c_directed, c_weights, c_cutoff)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def betweenness_subset(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_betweenness_subset``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_sources = vertex_selector_to_igraph_vs_t(sources, graph)
+    c_targets = vertex_selector_to_igraph_vs_t(targets, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+
+    # Call wrapped function
+    igraph_betweenness_subset(c_graph, c_res, c_vids.unwrap(), c_directed, c_sources.unwrap(), c_targets.unwrap(), c_weights)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
@@ -1772,7 +1871,7 @@ def edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Ite
     c_graph = graph
     c_res = _Vector.create(0)
     c_directed = any_to_igraph_bool_t(directed)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_edge_betweenness(c_graph, c_res, c_directed, c_weights)
@@ -1790,7 +1889,7 @@ def edge_betweenness_cutoff(graph: _Graph, directed: bool = True, weights: Optio
     c_graph = graph
     c_res = _Vector.create(0)
     c_directed = any_to_igraph_bool_t(directed)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_cutoff = cutoff
 
     # Call wrapped function
@@ -1802,11 +1901,67 @@ def edge_betweenness_cutoff(graph: _Graph, directed: bool = True, weights: Optio
     # Construct return value
     return res
 
-# igraph_edge_betweenness_subset: no Python type known for type: VERTEX_QTY
 
-# igraph_harmonic_centrality: no Python type known for type: VERTEX_QTY
+def edge_betweenness_subset(graph: _Graph, eids: EdgeSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_edge_betweenness_subset``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_eids = edge_selector_to_igraph_es_t(eids, graph)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_sources = vertex_selector_to_igraph_vs_t(sources, graph)
+    c_targets = vertex_selector_to_igraph_vs_t(targets, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
-# igraph_harmonic_centrality_cutoff: no Python type known for type: VERTEX_QTY
+    # Call wrapped function
+    igraph_edge_betweenness_subset(c_graph, c_res, c_eids.unwrap(), c_directed, c_sources.unwrap(), c_targets.unwrap(), c_weights)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def harmonic_centrality(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_harmonic_centrality``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_normalized = any_to_igraph_bool_t(normalized)
+
+    # Call wrapped function
+    igraph_harmonic_centrality(c_graph, c_res, c_vids.unwrap(), c_mode, c_weights, c_normalized)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def harmonic_centrality_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_harmonic_centrality_cutoff``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_normalized = any_to_igraph_bool_t(normalized)
+    c_cutoff = cutoff
+
+    # Call wrapped function
+    igraph_harmonic_centrality_cutoff(c_graph, c_res, c_vids.unwrap(), c_mode, c_weights, c_normalized, c_cutoff)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 # igraph_pagerank: no Python type known for type: PAGERANKALGO
 
@@ -1824,7 +1979,7 @@ def subgraph_from_edges(graph: _Graph, eids: EdgeSelector, delete_vertices: bool
     # Prepare input arguments
     c_graph = graph
     c_res = _Graph()
-    c_eids = edge_selector_to_igraph_es_t(eids, c_graph)
+    c_eids = edge_selector_to_igraph_es_t(eids, graph)
     c_delete_vertices = any_to_igraph_bool_t(delete_vertices)
 
     # Call wrapped function
@@ -1841,7 +1996,7 @@ def reverse_edges(graph: _Graph, eids: EdgeSelector = "all") -> None:
     """Type-annotated wrapper for ``igraph_reverse_edges``."""
     # Prepare input arguments
     c_graph = graph
-    c_eids = edge_selector_to_igraph_es_t(eids, c_graph)
+    c_eids = edge_selector_to_igraph_es_t(eids, graph)
 
     # Call wrapped function
     igraph_reverse_edges(c_graph, c_eids.unwrap())
@@ -1873,7 +2028,7 @@ def average_path_length_dijkstra(graph: _Graph, weights: Optional[Iterable[float
     c_graph = graph
     c_res = igraph_real_t()
     c_unconn_pairs = igraph_real_t()
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_directed = any_to_igraph_bool_t(directed)
     c_unconn = any_to_igraph_bool_t(unconn)
 
@@ -1908,13 +2063,76 @@ def path_length_hist(graph: _Graph, directed: bool = True) -> Tuple[npt.NDArray[
 
 # igraph_simplify: no Python type known for type: EDGE_ATTRIBUTE_COMBINATION
 
-# igraph_transitivity_undirected: no Python type known for type: TRANSITIVITY_MODE
 
-# igraph_transitivity_local_undirected: no Python type known for type: TRANSITIVITY_MODE
+def transitivity_undirected(graph: _Graph, mode: TransitivityMode = TransitivityMode.NAN) -> float:
+    """Type-annotated wrapper for ``igraph_transitivity_undirected``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = igraph_real_t()
+    c_mode = c_int(mode)
 
-# igraph_transitivity_avglocal_undirected: no Python type known for type: TRANSITIVITY_MODE
+    # Call wrapped function
+    igraph_transitivity_undirected(c_graph, c_res, c_mode)
 
-# igraph_transitivity_barrat: no Python type known for type: TRANSITIVITY_MODE
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
+def transitivity_local_undirected(graph: _Graph, vids: VertexSelector = "all", mode: TransitivityMode = TransitivityMode.NAN) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_transitivity_local_undirected``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_transitivity_local_undirected(c_graph, c_res, c_vids.unwrap(), c_mode)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def transitivity_avglocal_undirected(graph: _Graph, mode: TransitivityMode = TransitivityMode.NAN) -> float:
+    """Type-annotated wrapper for ``igraph_transitivity_avglocal_undirected``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = igraph_real_t()
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_transitivity_avglocal_undirected(c_graph, c_res, c_mode)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
+def transitivity_barrat(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: TransitivityMode = TransitivityMode.NAN) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_transitivity_barrat``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_transitivity_barrat(c_graph, c_res, c_vids.unwrap(), c_weights, c_mode)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def ecc(graph: _Graph, eids: EdgeSelector = "all", k: int = 3, offset: bool = False, normalize: bool = True) -> npt.NDArray[np_type_of_igraph_real_t]:
@@ -1922,7 +2140,7 @@ def ecc(graph: _Graph, eids: EdgeSelector = "all", k: int = 3, offset: bool = Fa
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_eids = edge_selector_to_igraph_es_t(eids, c_graph)
+    c_eids = edge_selector_to_igraph_es_t(eids, graph)
     c_k = k
     c_offset = any_to_igraph_bool_t(offset)
     c_normalize = any_to_igraph_bool_t(normalize)
@@ -1944,8 +2162,8 @@ def constraint(graph: _Graph, vids: VertexSelector = "all", weights: Optional[It
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
 
     # Call wrapped function
     igraph_constraint(c_graph, c_res, c_vids.unwrap(), c_weights)
@@ -1962,7 +2180,7 @@ def maxdegree(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = 
     # Prepare input arguments
     c_graph = graph
     c_res = igraph_integer_t()
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
@@ -1998,7 +2216,7 @@ def neighborhood_size(graph: _Graph, vids: VertexSelector, order: int, mode: Nei
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorInt.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
     c_order = order
     c_mode = c_int(mode)
     c_mindist = mindist
@@ -2041,7 +2259,7 @@ def is_loop(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_of_i
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorBool.create(0)
-    c_es = edge_selector_to_igraph_es_t(es, c_graph)
+    c_es = edge_selector_to_igraph_es_t(es, graph)
 
     # Call wrapped function
     igraph_is_loop(c_graph, c_res, c_es.unwrap())
@@ -2106,7 +2324,7 @@ def is_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorBool.create(0)
-    c_es = edge_selector_to_igraph_es_t(es, c_graph)
+    c_es = edge_selector_to_igraph_es_t(es, graph)
 
     # Call wrapped function
     igraph_is_multiple(c_graph, c_res, c_es.unwrap())
@@ -2155,7 +2373,7 @@ def count_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_ty
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorInt.create(0)
-    c_es = edge_selector_to_igraph_es_t(es, c_graph)
+    c_es = edge_selector_to_igraph_es_t(es, graph)
 
     # Call wrapped function
     igraph_count_multiple(c_graph, c_res, c_es.unwrap())
@@ -2211,13 +2429,13 @@ def add_edge(graph: _Graph, from_: int, to: int) -> None:
     # Call wrapped function
     igraph_add_edge(c_graph, c_from, c_to)
 
-# igraph_eigenvector_centrality: no Python type known for type: VERTEX_QTY
+# igraph_eigenvector_centrality: no Python type known for type: ARPACKOPT
 
-# igraph_hub_score: no Python type known for type: VERTEX_QTY
+# igraph_hub_score: no Python type known for type: ARPACKOPT
 
-# igraph_authority_score: no Python type known for type: VERTEX_QTY
+# igraph_authority_score: no Python type known for type: ARPACKOPT
 
-# igraph_hub_and_authority_scores: no Python type known for type: VERTEX_QTY
+# igraph_hub_and_authority_scores: no Python type known for type: ARPACKOPT
 
 
 def unfold_tree(graph: _Graph, roots: Iterable[int], mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
@@ -2245,7 +2463,7 @@ def is_mutual(graph: _Graph, es: EdgeSelector = "all", loops: bool = True) -> np
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorBool.create(0)
-    c_es = edge_selector_to_igraph_es_t(es, c_graph)
+    c_es = edge_selector_to_igraph_es_t(es, graph)
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
@@ -2314,9 +2532,47 @@ def is_chordal(graph: _Graph, alpha: Optional[Iterable[int]] = None, alpham1: Op
     # Construct return value
     return chordal, fillin, newgraph
 
-# igraph_avg_nearest_neighbor_degree: no Python type known for type: VERTEX_QTY
 
-# igraph_strength: no Python type known for type: VERTEX_QTY
+def avg_nearest_neighbor_degree(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, neighbor_degree_mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t]]:
+    """Type-annotated wrapper for ``igraph_avg_nearest_neighbor_degree``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+    c_neighbor_degree_mode = c_int(neighbor_degree_mode)
+    c_knn = _Vector.create(0)
+    c_knnk = _Vector.create(0)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+
+    # Call wrapped function
+    igraph_avg_nearest_neighbor_degree(c_graph, c_vids.unwrap(), c_mode, c_neighbor_degree_mode, c_knn, c_knnk, c_weights)
+
+    # Prepare output arguments
+    knn = igraph_vector_t_to_numpy_array(c_knn)
+    knnk = igraph_vector_t_to_numpy_array(c_knnk)
+
+    # Construct return value
+    return knn, knnk
+
+
+def strength(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = True, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_strength``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+    c_loops = any_to_igraph_bool_t(loops)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+
+    # Call wrapped function
+    igraph_strength(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops, c_weights)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def centralization(scores: Iterable[float], theoretical_max: float = 0, normalized: bool = True) -> float:
@@ -2533,9 +2789,42 @@ def assortativity_degree(graph: _Graph, directed: bool = True) -> float:
 
 # igraph_contract_vertices: no Python type known for type: VERTEX_ATTRIBUTE_COMBINATION
 
-# igraph_eccentricity: no Python type known for type: VERTEX_QTY
 
-# igraph_eccentricity_dijkstra: no Python type known for type: VERTEX_QTY
+def eccentricity(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_eccentricity``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_eccentricity(c_graph, c_res, c_vids.unwrap(), c_mode)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def eccentricity_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_eccentricity_dijkstra``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_eccentricity_dijkstra(c_graph, c_weights, c_res, c_vids.unwrap(), c_mode)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def graph_center(graph: _Graph, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
@@ -2599,7 +2888,7 @@ def pseudo_diameter_dijkstra(graph: _Graph, start_vid: VertexLike, weights: Opti
     """Type-annotated wrapper for ``igraph_pseudo_diameter_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_diameter = igraph_real_t()
     c_start_vid = vertexlike_to_igraph_integer_t(start_vid)
     c_from = igraph_integer_t()
@@ -2618,7 +2907,23 @@ def pseudo_diameter_dijkstra(graph: _Graph, start_vid: VertexLike, weights: Opti
     # Construct return value
     return diameter, from_, to
 
-# igraph_diversity: no Python type known for type: VERTEX_QTY
+
+def diversity(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_diversity``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+
+    # Call wrapped function
+    igraph_diversity(c_graph, c_weights, c_res, c_vids.unwrap())
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 # igraph_random_walk: no Python type known for type: RWSTUCK
 
@@ -2630,7 +2935,7 @@ def global_efficiency(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     # Prepare input arguments
     c_graph = graph
     c_res = igraph_real_t()
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_directed = any_to_igraph_bool_t(directed)
 
     # Call wrapped function
@@ -2642,7 +2947,25 @@ def global_efficiency(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     # Construct return value
     return res
 
-# igraph_local_efficiency: no Python type known for type: VERTEX_QTY
+
+def local_efficiency(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, directed: bool = True, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_local_efficiency``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_local_efficiency(c_graph, c_res, c_vids.unwrap(), c_weights, c_directed, c_mode)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def average_local_efficiency(graph: _Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, mode: NeighborMode = NeighborMode.ALL) -> float:
@@ -2650,7 +2973,7 @@ def average_local_efficiency(graph: _Graph, weights: Optional[Iterable[float]] =
     # Prepare input arguments
     c_graph = graph
     c_res = igraph_real_t()
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_directed = any_to_igraph_bool_t(directed)
     c_mode = c_int(mode)
 
@@ -3074,7 +3397,7 @@ def layout_circle(graph: _Graph, order: VertexSelector = "all") -> npt.NDArray[n
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_order = vertex_selector_to_igraph_vs_t(order, c_graph)
+    c_order = vertex_selector_to_igraph_vs_t(order, graph)
 
     # Call wrapped function
     igraph_layout_circle(c_graph, c_res, c_order.unwrap())
@@ -3234,7 +3557,7 @@ def layout_sugiyama(graph: _Graph, layers: Optional[Iterable[int]] = None, hgap:
     c_hgap = hgap
     c_vgap = vgap
     c_maxiter = maxiter
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_layout_sugiyama(c_graph, c_res, c_extd_graph, c_extd_to_orig_eids, c_layers, c_hgap, c_vgap, c_maxiter, c_weights)
@@ -3341,7 +3664,7 @@ def cocitation(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_ty
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
 
     # Call wrapped function
     igraph_cocitation(c_graph, c_res, c_vids.unwrap())
@@ -3358,7 +3681,7 @@ def bibcoupling(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_t
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
 
     # Call wrapped function
     igraph_bibcoupling(c_graph, c_res, c_vids.unwrap())
@@ -3375,7 +3698,7 @@ def similarity_dice(graph: _Graph, vids: VertexSelector = "all", mode: NeighborM
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
@@ -3394,7 +3717,7 @@ def similarity_dice_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMo
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_es = edge_selector_to_igraph_es_t(es, c_graph)
+    c_es = edge_selector_to_igraph_es_t(es, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
@@ -3432,7 +3755,7 @@ def similarity_inverse_log_weighted(graph: _Graph, vids: VertexSelector = "all",
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -3450,7 +3773,7 @@ def similarity_jaccard(graph: _Graph, vids: VertexSelector = "all", mode: Neighb
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
@@ -3469,7 +3792,7 @@ def similarity_jaccard_es(graph: _Graph, es: EdgeSelector = "all", mode: Neighbo
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_es = edge_selector_to_igraph_es_t(es, c_graph)
+    c_es = edge_selector_to_igraph_es_t(es, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
@@ -3512,7 +3835,7 @@ def community_walktrap(graph: _Graph, weights: Optional[Iterable[float]] = None,
     """Type-annotated wrapper for ``igraph_community_walktrap``."""
     # Prepare input arguments
     c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_steps = steps
     c_merges = _MatrixInt.create(0)
     c_modularity = _Vector.create(0)
@@ -3541,7 +3864,7 @@ def community_edge_betweenness(graph: _Graph, directed: bool = True, weights: Op
     c_modularity = _Vector.create(0)
     c_membership = _VectorInt.create(0)
     c_directed = any_to_igraph_bool_t(directed)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
 
     # Call wrapped function
     igraph_community_edge_betweenness(c_graph, c_result, c_edge_betweenness, c_merges, c_bridges, c_modularity, c_membership, c_directed, c_weights)
@@ -3564,7 +3887,7 @@ def community_eb_get_merges(graph: _Graph, directed: bool, edges: Iterable[EdgeL
     c_graph = graph
     c_directed = any_to_igraph_bool_t(directed)
     c_edges = iterable_edge_indices_to_igraph_vector_int_t(edges)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_merges = _MatrixInt.create(0)
     c_bridges = _VectorInt.create(0)
     c_modularity = _Vector.create(0)
@@ -3587,7 +3910,7 @@ def community_fastgreedy(graph: _Graph, weights: Optional[Iterable[float]] = Non
     """Type-annotated wrapper for ``igraph_community_fastgreedy``."""
     # Prepare input arguments
     c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_merges = _MatrixInt.create(0)
     c_modularity = _Vector.create(0)
     c_membership = _VectorInt.create(0)
@@ -3648,7 +3971,7 @@ def modularity(graph: _Graph, membership: Iterable[int], weights: Optional[Itera
     # Prepare input arguments
     c_graph = graph
     c_membership = iterable_to_igraph_vector_int_t_view(membership)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_resolution = resolution
     c_directed = any_to_igraph_bool_t(directed)
     c_modularity = igraph_real_t()
@@ -3667,7 +3990,7 @@ def modularity_matrix(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     """Type-annotated wrapper for ``igraph_modularity_matrix``."""
     # Prepare input arguments
     c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_resolution = resolution
     c_modmat = _Matrix.create(0)
     c_directed = any_to_igraph_bool_t(directed)
@@ -3726,7 +4049,7 @@ def community_label_propagation(graph: _Graph, mode: NeighborMode = NeighborMode
     c_graph = graph
     c_membership = _VectorInt.create(0)
     c_mode = c_int(mode)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_initial = iterable_to_igraph_vector_int_t_view(initial) if initial is not None else None
     c_fixed = iterable_to_igraph_vector_bool_t_view(fixed) if fixed is not None else None
 
@@ -3744,7 +4067,7 @@ def community_multilevel(graph: _Graph, weights: Optional[Iterable[float]] = Non
     """Type-annotated wrapper for ``igraph_community_multilevel``."""
     # Prepare input arguments
     c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_resolution = resolution
     c_membership = _VectorInt.create(0)
     c_memberships = _MatrixInt.create(0)
@@ -3768,7 +4091,7 @@ def community_optimal_modularity(graph: _Graph, weights: Optional[Iterable[float
     c_graph = graph
     c_modularity = igraph_real_t()
     c_membership = _VectorInt.create(0)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights) if weights is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
 
     # Call wrapped function
     igraph_community_optimal_modularity(c_graph, c_modularity, c_membership, c_weights)
@@ -3857,7 +4180,7 @@ def get_stochastic(graph: _Graph, column_wise: bool = False, weights: Optional[I
     c_graph = graph
     c_res = _Matrix.create(0)
     c_column_wise = any_to_igraph_bool_t(column_wise)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_get_stochastic(c_graph, c_res, c_column_wise, c_weights)
@@ -4008,7 +4331,7 @@ def adjacent_triangles(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArr
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, c_graph)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
 
     # Call wrapped function
     igraph_adjacent_triangles(c_graph, c_res, c_vids.unwrap())
@@ -4025,7 +4348,7 @@ def local_scan_0(graph: _Graph, weights: Optional[Iterable[float]] = None, mode:
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -4044,7 +4367,7 @@ def local_scan_0_them(us: _Graph, them: _Graph, weights_them: Optional[Iterable[
     c_us = us
     c_them = them
     c_res = _Vector.create(0)
-    c_weights_them = edge_weights_to_igraph_vector_t_view(weights_them)
+    c_weights_them = edge_weights_to_igraph_vector_t_view(weights_them, them)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -4062,7 +4385,7 @@ def local_scan_1_ecount(graph: _Graph, weights: Optional[Iterable[float]] = None
     # Prepare input arguments
     c_graph = graph
     c_res = _Vector.create(0)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -4081,7 +4404,7 @@ def local_scan_1_ecount_them(us: _Graph, them: _Graph, weights_them: Optional[It
     c_us = us
     c_them = them
     c_res = _Vector.create(0)
-    c_weights_them = edge_weights_to_igraph_vector_t_view(weights_them)
+    c_weights_them = edge_weights_to_igraph_vector_t_view(weights_them, them)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -4100,7 +4423,7 @@ def local_scan_k_ecount(graph: _Graph, k: int, weights: Optional[Iterable[float]
     c_graph = graph
     c_k = k
     c_res = _Vector.create(0)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -4120,7 +4443,7 @@ def local_scan_k_ecount_them(us: _Graph, them: _Graph, k: int, weights_them: Opt
     c_them = them
     c_k = k
     c_res = _Vector.create(0)
-    c_weights_them = edge_weights_to_igraph_vector_t_view(weights_them)
+    c_weights_them = edge_weights_to_igraph_vector_t_view(weights_them, them)
     c_mode = c_int(mode)
 
     # Call wrapped function
@@ -4449,7 +4772,7 @@ def is_separator(graph: _Graph, candidate: VertexSelector) -> bool:
     """Type-annotated wrapper for ``igraph_is_separator``."""
     # Prepare input arguments
     c_graph = graph
-    c_candidate = vertex_selector_to_igraph_vs_t(candidate, c_graph)
+    c_candidate = vertex_selector_to_igraph_vs_t(candidate, graph)
     c_res = igraph_bool_t()
 
     # Call wrapped function
@@ -4466,7 +4789,7 @@ def is_minimal_separator(graph: _Graph, candidate: VertexSelector) -> bool:
     """Type-annotated wrapper for ``igraph_is_minimal_separator``."""
     # Prepare input arguments
     c_graph = graph
-    c_candidate = vertex_selector_to_igraph_vs_t(candidate, c_graph)
+    c_candidate = vertex_selector_to_igraph_vs_t(candidate, graph)
     c_res = igraph_bool_t()
 
     # Call wrapped function
@@ -4955,7 +5278,7 @@ def minimum_spanning_tree(graph: _Graph, weights: Optional[Iterable[float]] = No
     # Prepare input arguments
     c_graph = graph
     c_res = _VectorInt.create(0)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_minimum_spanning_tree(c_graph, c_res, c_weights)
@@ -4988,7 +5311,7 @@ def minimum_spanning_tree_prim(graph: _Graph, weights: Iterable[float]) -> _Grap
     # Prepare input arguments
     c_graph = graph
     c_mst = _Graph()
-    c_weights = edge_weights_to_igraph_vector_t_view(weights)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
     igraph_minimum_spanning_tree_prim(c_graph, c_mst, c_weights)
@@ -5024,9 +5347,39 @@ def random_spanning_tree(graph: _Graph, vid: Optional[VertexLike] = None) -> npt
 
 # igraph_stochastic_imitation: no Python type known for type: IMITATE_ALGORITHM
 
-# igraph_moran_process: no Python type known for type: VERTEX_QTY
 
-# igraph_roulette_wheel_imitation: no Python type known for type: VERTEX_QTY
+def moran_process(graph: _Graph, quantities: Iterable[float], strategies: Iterable[int], weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> None:
+    """Type-annotated wrapper for ``igraph_moran_process``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_quantities = vertex_qty_to_igraph_vector_t(quantities, graph)
+    c_strategies = iterable_to_igraph_vector_int_t(strategies)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_moran_process(c_graph, c_weights, c_quantities, c_strategies, c_mode)
+
+    # Prepare output arguments
+    quantities = igraph_vector_t_to_numpy_array(c_quantities)
+    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
+
+
+def roulette_wheel_imitation(graph: _Graph, vid: VertexLike, is_local: bool, quantities: Iterable[float], strategies: Iterable[int], mode: NeighborMode = NeighborMode.OUT) -> None:
+    """Type-annotated wrapper for ``igraph_roulette_wheel_imitation``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vid = vertexlike_to_igraph_integer_t(vid)
+    c_is_local = any_to_igraph_bool_t(is_local)
+    c_quantities = vertex_qty_to_igraph_vector_t_view(quantities, graph)
+    c_strategies = iterable_to_igraph_vector_int_t(strategies)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_roulette_wheel_imitation(c_graph, c_vid, c_is_local, c_quantities, c_strategies, c_mode)
+
+    # Prepare output arguments
+    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
 
 
 def convergence_degree(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t]]:

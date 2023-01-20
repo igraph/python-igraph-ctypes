@@ -7,6 +7,7 @@ __all__ = (
     "MatrixStorage",
     "NeighborMode",
     "StarMode",
+    "TransitivityMode",
     "TreeMode",
     "VertexSequenceType",
     "WheelMode",
@@ -73,6 +74,13 @@ class StarMode(IntEnum):
     IN = 1
     UNDIRECTED = 2
     MUTUAL = 3
+
+
+class TransitivityMode(IntEnum):
+    """Python counterpart of an ``igraph_transitivity_mode_t`` enum."""
+
+    NAN = 0
+    ZERO = 1
 
 
 class TreeMode(IntEnum):
