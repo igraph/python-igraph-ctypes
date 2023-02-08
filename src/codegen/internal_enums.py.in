@@ -1,0 +1,13 @@
+from enum import IntEnum
+
+
+class Loops(IntEnum):
+    """Python counterpart of an ``igraph_loops_t`` enum."""
+
+    IGNORE = 0
+    TWICE = 1
+    ONCE = 2
+
+
+# fmt: off
+# The rest of this file is generated

@@ -25,6 +25,10 @@ igraph_eigen_matrix:
 igraph_eigen_matrix_symmetric:
   IGNORE: PythonCTypes
 
+igraph_get_shortest_path_astar:
+  # igraph_astar_heuristic_func_t not handled yet
+  IGNORE: PythonCTypes, PythonCTypesTypedWrapper
+
 igraph_empty_attrs:
   # Not needed at all
   IGNORE: PythonCTypes, PythonCTypesTypedWrapper
@@ -72,3 +76,7 @@ igraph_layout_star:
 igraph_maximum_bipartite_matching:
   # .Machine$double.eps as default value for 'eps' argument
   IGNORE: PythonCTypesTypedWrapper
+
+igraph_erdos_renyi_game:
+  # Decided not to generate code for it because we have separate functions for gnm and gnp
+  IGNORE: PythonCTypes, PythonCTypesTypedWrapper

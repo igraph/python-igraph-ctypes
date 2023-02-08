@@ -572,10 +572,6 @@ igraph_barabasi_game = _lib.igraph_barabasi_game
 igraph_barabasi_game.restype = handle_igraph_error_t
 igraph_barabasi_game.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_real_t, igraph_integer_t, POINTER(igraph_vector_int_t), igraph_bool_t, igraph_real_t, igraph_bool_t, igraph_barabasi_algorithm_t, POINTER(igraph_t)]
 
-igraph_erdos_renyi_game = _lib.igraph_erdos_renyi_game
-igraph_erdos_renyi_game.restype = handle_igraph_error_t
-igraph_erdos_renyi_game.argtypes = [POINTER(igraph_t), igraph_erdos_renyi_t, igraph_integer_t, igraph_real_t, igraph_bool_t, igraph_bool_t]
-
 igraph_erdos_renyi_game_gnp = _lib.igraph_erdos_renyi_game_gnp
 igraph_erdos_renyi_game_gnp.restype = handle_igraph_error_t
 igraph_erdos_renyi_game_gnp.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_real_t, igraph_bool_t, igraph_bool_t]
@@ -782,7 +778,7 @@ igraph_distances_johnson.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t)
 
 igraph_distances_floyd_warshall = _lib.igraph_distances_floyd_warshall
 igraph_distances_floyd_warshall.restype = handle_igraph_error_t
-igraph_distances_floyd_warshall.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_t), igraph_neimode_t, igraph_floyd_warshall_algorithm_t]
+igraph_distances_floyd_warshall.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_vs_t, POINTER(igraph_vector_t), igraph_neimode_t, igraph_floyd_warshall_algorithm_t]
 
 igraph_voronoi = _lib.igraph_voronoi
 igraph_voronoi.restype = handle_igraph_error_t

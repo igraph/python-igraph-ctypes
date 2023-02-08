@@ -1,4 +1,3 @@
-import numpy as np
 import numpy.typing as npt
 
 from typing import Any, Iterable, Optional, Tuple
@@ -791,8 +790,6 @@ def turan(n: int, r: int) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer
 # igraph_weighted_sparsemat: no Python type known for type: SPARSEMAT
 
 # igraph_barabasi_game: no Python type known for type: BARABASI_ALGORITHM
-
-# igraph_erdos_renyi_game: no Python type known for type: ERDOS_RENYI_TYPE
 
 
 def erdos_renyi_game_gnp(n: int, p: float, directed: bool = False, loops: bool = False) -> _Graph:
