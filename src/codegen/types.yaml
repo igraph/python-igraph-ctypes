@@ -17,6 +17,16 @@ REAL:
   INCONV:
     OUT: "%C% = igraph_real_t()"
 
+INT:
+  PY_TYPE: int
+  INCONV:
+    OUT: "%C% = c_int()"
+
+DOUBLE:
+  PY_TYPE: float
+  INCONV:
+    OUT: "%C% = c_double()"
+
 CSTRING:
   PY_TYPE: str
 
@@ -170,6 +180,46 @@ ADJACENCY_MODE:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
+BARABASI_ALGORITHM:
+  PY_TYPE: BarabasiAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+COMMCMP:
+  PY_TYPE: CommunityComparison
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+CONNECTEDNESS:
+  PY_TYPE: Connectedness
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+DEGSEQ_MODE:
+  PY_TYPE: DegreeSequenceMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+EIGENALGO:
+  PY_TYPE: EigenAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+FAS_ALGORITHM:
+  PY_TYPE: FeedbackArcSetAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+FWALGORITHM:
+  PY_TYPE: FloydWarshallAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+IMITATE_ALGORITHM:
+  PY_TYPE: ImitateAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
 LOOPS:
   PY_TYPE: Loops
   INCONV:
@@ -180,8 +230,58 @@ NEIMODE:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
+OPTIMALITY:
+  PY_TYPE: Optimality
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+PAGERANKALGO:
+  PY_TYPE: PagerankAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+RANDOM_TREE_METHOD:
+  PY_TYPE: RandomTreeMethod
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+RECIP:
+  PY_TYPE: Reciprocity
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+REWIRING_MODE:
+  PY_TYPE: Rewiring
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+ROOTCHOICE:
+  PY_TYPE: RootChoice
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+RWSTUCK:
+  PY_TYPE: RandomWalkStuck
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+SPINCOMMUPDATE:
+  PY_TYPE: SpinglassUpdateMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+SPINGLASS_IMPLEMENTATION:
+  PY_TYPE: SpinglassImplementation
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
 STAR_MODE:
   PY_TYPE: StarMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+SUBGRAPH_IMPL:
+  PY_TYPE: SubgraphImplementation
   INCONV:
     IN: "%C% = c_int(%I%)"
 
@@ -192,6 +292,11 @@ TRANSITIVITY_MODE:
 
 TREE_MODE:
   PY_TYPE: TreeMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+VORONOI_TIEBREAKER:
+  PY_TYPE: VoronoiTiebreaker
   INCONV:
     IN: "%C% = c_int(%I%)"
 

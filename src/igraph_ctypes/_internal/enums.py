@@ -131,7 +131,7 @@ class Order(IntEnum):
     DESCENDING = 1
 
 
-class Optimal(IntEnum):
+class Optimality(IntEnum):
     """Python counterpart of an ``igraph_optimal_t`` enum."""
 
     MINIMUM = 0
@@ -213,7 +213,7 @@ class GetAdjacency(IntEnum):
     BOTH = 2
 
 
-class Degseq(IntEnum):
+class DegreeSequenceMode(IntEnum):
     """Python counterpart of an ``igraph_degseq_t`` enum."""
 
     CONFIGURATION = 0
@@ -231,7 +231,7 @@ class RealizeDegseq(IntEnum):
     INDEX = 2
 
 
-class RandomTree(IntEnum):
+class RandomTreeMethod(IntEnum):
     """Python counterpart of an ``igraph_random_tree_t`` enum."""
 
     PRUFER = 0
@@ -289,7 +289,7 @@ class VconnNei(IntEnum):
     NEGATIVE = 3
 
 
-class SpincommUpdate(IntEnum):
+class SpinglassUpdateMode(IntEnum):
     """Python counterpart of an ``igraph_spincomm_update_t`` enum."""
 
     SIMPLE = 0
@@ -343,7 +343,7 @@ class BarabasiAlgorithm(IntEnum):
     PSUMTREE_MULTIPLE = 2
 
 
-class FASAlgorithm(IntEnum):
+class FeedbackArcSetAlgorithm(IntEnum):
     """Python counterpart of an ``igraph_fas_algorithm_t`` enum."""
 
     EXACT_IP = 0
@@ -533,14 +533,14 @@ __all__ = (
     'CommunityComparison',
     'Connectedness',
     'DRLLayoutPreset',
-    'Degseq',
+    'DegreeSequenceMode',
     'EdgeIteratorType',
     'EdgeOrder',
     'EdgeSequenceType',
     'EigenAlgorithm',
     'ErdosRenyi',
     'ErrorType',
-    'FASAlgorithm',
+    'FeedbackArcSetAlgorithm',
     'FileFormat',
     'FloydWarshallAlgorithm',
     'GetAdjacency',
@@ -554,10 +554,10 @@ __all__ = (
     'MatrixStorage',
     'Multiple',
     'NeighborMode',
-    'Optimal',
+    'Optimality',
     'Order',
     'PagerankAlgorithm',
-    'RandomTree',
+    'RandomTreeMethod',
     'RandomWalkStuck',
     'RealizeDegseq',
     'Reciprocity',
@@ -565,8 +565,8 @@ __all__ = (
     'RootChoice',
     'SparseMatrixSolver',
     'SparseMatrixType',
-    'SpincommUpdate',
     'SpinglassImplementation',
+    'SpinglassUpdateMode',
     'StarMode',
     'SubgraphImplementation',
     'ToDirected',
