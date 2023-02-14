@@ -11,6 +11,7 @@ from ._internal.functions import (
     edge,
     empty,
     get_eid,
+    incident,
     is_directed,
     neighbors,
     vcount,
@@ -82,6 +83,11 @@ class Graph:
         target vertices.
         """
         return get_eid(self._instance, from_, to, directed, error)
+
+    def incident(
+        self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
+    ) -> NDArray[np_type_of_igraph_integer_t]:
+        return incident(self._instance, vid, mode)
 
     def is_directed(self) -> bool:
         """Returns whether the graph is directed."""

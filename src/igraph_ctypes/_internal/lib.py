@@ -75,7 +75,7 @@ igraph_vector_init_array.restype = handle_igraph_error_t
 igraph_vector_init_array.argtypes = [POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_integer_t]
 
 igraph_vector_view = _lib.igraph_vector_view
-igraph_vector_view.restype = handle_igraph_error_t
+igraph_vector_view.restype = POINTER(igraph_vector_t)
 igraph_vector_view.argtypes = [POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_integer_t]
 
 igraph_vector_e = _lib.igraph_vector_e
@@ -109,7 +109,7 @@ igraph_vector_int_init_array.restype = handle_igraph_error_t
 igraph_vector_int_init_array.argtypes = [POINTER(igraph_vector_int_t), POINTER(igraph_integer_t), igraph_integer_t]
 
 igraph_vector_int_view = _lib.igraph_vector_int_view
-igraph_vector_int_view.restype = handle_igraph_error_t
+igraph_vector_int_view.restype = POINTER(igraph_vector_int_t)
 igraph_vector_int_view.argtypes = [POINTER(igraph_vector_int_t), POINTER(igraph_integer_t), igraph_integer_t]
 
 igraph_vector_int_e = _lib.igraph_vector_int_e
@@ -143,7 +143,7 @@ igraph_vector_bool_init_array.restype = handle_igraph_error_t
 igraph_vector_bool_init_array.argtypes = [POINTER(igraph_vector_bool_t), POINTER(igraph_bool_t), igraph_integer_t]
 
 igraph_vector_bool_view = _lib.igraph_vector_bool_view
-igraph_vector_bool_view.restype = handle_igraph_error_t
+igraph_vector_bool_view.restype = POINTER(igraph_vector_bool_t)
 igraph_vector_bool_view.argtypes = [POINTER(igraph_vector_bool_t), POINTER(igraph_bool_t), igraph_integer_t]
 
 igraph_vector_bool_e = _lib.igraph_vector_bool_e
@@ -187,7 +187,7 @@ igraph_matrix_init_array.argtypes = [
 ]
 
 igraph_matrix_view = _lib.igraph_matrix_view
-igraph_matrix_view.restype = handle_igraph_error_t
+igraph_matrix_view.restype = POINTER(igraph_matrix_t)
 igraph_matrix_view.argtypes = [
     POINTER(igraph_matrix_t),
     POINTER(igraph_real_t),
@@ -236,7 +236,7 @@ igraph_matrix_int_init_array.argtypes = [
 ]
 
 igraph_matrix_int_view = _lib.igraph_matrix_int_view
-igraph_matrix_int_view.restype = handle_igraph_error_t
+igraph_matrix_int_view.restype = POINTER(igraph_matrix_int_t)
 igraph_matrix_int_view.argtypes = [
     POINTER(igraph_matrix_int_t),
     POINTER(igraph_integer_t),

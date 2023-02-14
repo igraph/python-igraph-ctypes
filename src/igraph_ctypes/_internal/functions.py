@@ -2366,7 +2366,23 @@ def topological_sorting(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) ->
     # Construct return value
     return res
 
-# igraph_feedback_arc_set: no Python type known for type: FAS_ALGORITHM
+
+def feedback_arc_set(graph: _Graph, weights: Optional[Iterable[float]] = None, algo: FeedbackArcSetAlgorithm = FeedbackArcSetAlgorithm.APPROX_EADES) -> npt.NDArray[np_type_of_igraph_integer_t]:
+    """Type-annotated wrapper for ``igraph_feedback_arc_set``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_result = _VectorInt.create(0)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_algo = c_int(algo)
+
+    # Call wrapped function
+    igraph_feedback_arc_set(c_graph, c_result, c_weights, c_algo)
+
+    # Prepare output arguments
+    result = igraph_vector_int_t_to_numpy_array(c_result)
+
+    # Construct return value
+    return result
 
 
 def is_loop(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_of_igraph_bool_t]:
