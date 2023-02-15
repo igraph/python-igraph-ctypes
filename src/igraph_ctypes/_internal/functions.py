@@ -99,8 +99,8 @@ def delete_vertices(graph: _Graph, vertices: VertexSelector) -> None:
     igraph_delete_vertices(c_graph, c_vertices.unwrap())
 
 
-def delete_vertices_idx(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
-    """Type-annotated wrapper for ``igraph_delete_vertices_idx``."""
+def delete_vertices_map(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_delete_vertices_map``."""
     # Prepare input arguments
     c_graph = graph
     c_vertices = vertex_selector_to_igraph_vs_t(vertices, graph)
@@ -108,7 +108,7 @@ def delete_vertices_idx(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.ND
     c_invidx = _VectorInt.create(0)
 
     # Call wrapped function
-    igraph_delete_vertices_idx(c_graph, c_vertices.unwrap(), c_idx, c_invidx)
+    igraph_delete_vertices_map(c_graph, c_vertices.unwrap(), c_idx, c_invidx)
 
     # Prepare output arguments
     idx = igraph_vector_int_t_to_numpy_array(c_idx)
@@ -1696,7 +1696,7 @@ def distances_bellman_ford(graph: _Graph, weights: Iterable[float], from_: Verte
     return res
 
 
-def distances_johnson(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_johnson(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
     """Type-annotated wrapper for ``igraph_distances_johnson``."""
     # Prepare input arguments
     c_graph = graph
@@ -1704,9 +1704,10 @@ def distances_johnson(graph: _Graph, weights: Iterable[float], from_: VertexSele
     c_from = vertex_selector_to_igraph_vs_t(from_, graph)
     c_to = vertex_selector_to_igraph_vs_t(to, graph)
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_distances_johnson(c_graph, c_res, c_from.unwrap(), c_to.unwrap(), c_weights)
+    igraph_distances_johnson(c_graph, c_res, c_from.unwrap(), c_to.unwrap(), c_weights, c_mode)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -5942,7 +5943,20 @@ def has_attribute_table() -> bool:
 
 # igraph_status: no Python type known for type: EXTRA
 
-# igraph_strerror: no Python type known for type: ERROR
+
+def strerror(igraph_errno: int) -> str:
+    """Type-annotated wrapper for ``igraph_strerror``."""
+    # Prepare input arguments
+    c_igraph_errno = igraph_errno
+
+    # Call wrapped function
+    c__result = igraph_strerror(c_igraph_errno)
+
+    # Prepare return value
+    py__result = bytes_to_str(c__result)
+
+    # Construct return value
+    return py__result
 
 
 def expand_path_to_pairs(path: Iterable[VertexLike]) -> None:
@@ -5997,7 +6011,7 @@ def version() -> Tuple[str, int, int, int]:
     igraph_version(c_version_string, c_major, c_minor, c_subminor)
 
     # Prepare output arguments
-    version_string = c_version_string.value.decode("utf-8", "replace")
+    version_string = bytes_to_str(c_version_string)
     major = c_major.value
     minor = c_minor.value
     subminor = c_subminor.value

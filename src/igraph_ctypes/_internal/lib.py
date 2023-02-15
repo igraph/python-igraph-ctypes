@@ -392,9 +392,9 @@ igraph_delete_vertices = _lib.igraph_delete_vertices
 igraph_delete_vertices.restype = handle_igraph_error_t
 igraph_delete_vertices.argtypes = [POINTER(igraph_t), igraph_vs_t]
 
-igraph_delete_vertices_idx = _lib.igraph_delete_vertices_idx
-igraph_delete_vertices_idx.restype = handle_igraph_error_t
-igraph_delete_vertices_idx.argtypes = [POINTER(igraph_t), igraph_vs_t, POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
+igraph_delete_vertices_map = _lib.igraph_delete_vertices_map
+igraph_delete_vertices_map.restype = handle_igraph_error_t
+igraph_delete_vertices_map.argtypes = [POINTER(igraph_t), igraph_vs_t, POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
 
 igraph_vcount = _lib.igraph_vcount
 igraph_vcount.restype = igraph_integer_t
@@ -774,7 +774,7 @@ igraph_distances_bellman_ford.argtypes = [POINTER(igraph_t), POINTER(igraph_matr
 
 igraph_distances_johnson = _lib.igraph_distances_johnson
 igraph_distances_johnson.restype = handle_igraph_error_t
-igraph_distances_johnson.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_vs_t, POINTER(igraph_vector_t)]
+igraph_distances_johnson.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_vs_t, POINTER(igraph_vector_t), igraph_neimode_t]
 
 igraph_distances_floyd_warshall = _lib.igraph_distances_floyd_warshall
 igraph_distances_floyd_warshall.restype = handle_igraph_error_t

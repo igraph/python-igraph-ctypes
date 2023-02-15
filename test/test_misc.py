@@ -1,4 +1,10 @@
-from igraph_ctypes._internal.functions import version
+from igraph_ctypes._internal.functions import strerror, version
+
+
+def test_strerror():
+    assert strerror(0) == "No error"
+    assert strerror(1) == "Failed"
+    assert strerror(9) == "Invalid mode"
 
 
 def test_version():

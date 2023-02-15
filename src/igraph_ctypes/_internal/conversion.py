@@ -58,6 +58,7 @@ from .types import (
     VertexPair,
     VertexSelector,
 )
+from .utils import bytes_to_str
 from .wrappers import (
     _EdgeSelector,
     _Graph,
@@ -71,6 +72,7 @@ from .wrappers import (
 
 __all__ = (
     "any_to_igraph_bool_t",
+    "bytes_to_str",
     "edgelike_to_igraph_integer_t",
     "edge_capacities_to_igraph_vector_t",
     "edge_capacities_to_igraph_vector_t_view",
@@ -107,11 +109,6 @@ __all__ = (
     "vertex_qty_to_igraph_vector_t",
     "vertex_qty_to_igraph_vector_t_view",
 )
-
-
-################################################################################
-#  Conversion from Python data types to igraph                                 #
-################################################################################
 
 
 def any_to_igraph_bool_t(obj: Any) -> igraph_bool_t:
