@@ -72,6 +72,10 @@ from .wrappers import (
 __all__ = (
     "any_to_igraph_bool_t",
     "edgelike_to_igraph_integer_t",
+    "edge_capacities_to_igraph_vector_t",
+    "edge_capacities_to_igraph_vector_t_view",
+    "edge_colors_to_igraph_vector_t",
+    "edge_colors_to_igraph_vector_t_view",
     "edge_selector_to_igraph_es_t",
     "edge_weights_to_igraph_vector_t",
     "edge_weights_to_igraph_vector_t_view",
@@ -98,6 +102,8 @@ __all__ = (
     "vertexlike_to_igraph_integer_t",
     "vertex_pairs_to_igraph_vector_int_t",
     "vertex_selector_to_igraph_vs_t",
+    "vertex_colors_to_igraph_vector_t",
+    "vertex_colors_to_igraph_vector_t_view",
     "vertex_qty_to_igraph_vector_t",
     "vertex_qty_to_igraph_vector_t_view",
 )
@@ -162,6 +168,26 @@ def edge_weights_to_igraph_vector_t_view(
     interpreted by the C core of igraph as all edges having equal weight.
     """
     return iterable_to_igraph_vector_t_view(weights) if weights is not None else None
+
+
+# Currently we handle capacities the same way as weights; this might change in
+# the future
+edge_capacities_to_igraph_vector_t = edge_weights_to_igraph_vector_t
+edge_capacities_to_igraph_vector_t_view = edge_weights_to_igraph_vector_t_view
+
+
+def edge_colors_to_igraph_vector_t(colors: Iterable[int], graph: _Graph) -> _VectorInt:
+    """Converts a Python iterable of integers to a vector of edge colors."""
+    return iterable_to_igraph_vector_int_t(colors)
+
+
+def edge_colors_to_igraph_vector_t_view(
+    colors: Iterable[int], graph: _Graph
+) -> _VectorInt:
+    """Converts a Python iterable of integers to a vector of edge colors,
+    possibly creating a shallow view if the input is an appropriate NumPy array.
+    """
+    return iterable_to_igraph_vector_int_t_view(colors)
 
 
 def iterable_edge_indices_to_igraph_vector_int_t(
@@ -514,6 +540,22 @@ def vertex_selector_to_igraph_vs_t(
         return _VertexSelector.create_with(igraph_vs_1, index)
 
 
+def vertex_colors_to_igraph_vector_t(
+    colors: Iterable[int], graph: _Graph
+) -> _VectorInt:
+    """Converts a Python iterable of integers to a vector of vertex colors."""
+    return iterable_to_igraph_vector_int_t(colors)
+
+
+def vertex_colors_to_igraph_vector_t_view(
+    colors: Iterable[int], graph: _Graph
+) -> _VectorInt:
+    """Converts a Python iterable of integers to a vector of vertex colors,
+    possibly creating a shallow view if the input is an appropriate NumPy array.
+    """
+    return iterable_to_igraph_vector_int_t_view(colors)
+
+
 def vertex_qty_to_igraph_vector_t(weights: Iterable[float], graph: _Graph) -> _Vector:
     """Converts a Python iterable of floating-point numbers to a vector of
     vertex-related quantities.
@@ -531,9 +573,7 @@ def vertex_qty_to_igraph_vector_t_view(
     When the input is `None`, the return value will also be `None`, which is
     interpreted by the C core of igraph as all edges having equal weight.
     """
-    return (
-        vertex_qty_to_igraph_vector_t(weights, graph) if weights is not None else None
-    )
+    return iterable_to_igraph_vector_t_view(weights) if weights else None
 
 
 ################################################################################
