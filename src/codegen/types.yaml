@@ -29,6 +29,10 @@ DOUBLE:
 
 CSTRING:
   PY_TYPE: str
+  INCONV:
+    IN: '%C% = %I%.encode("utf-8")'
+    OUT: "%C% = c_char_p()"
+  OUTCONV: '%I% = %C%.value.decode("utf-8", "replace")'
 
 VECTOR:
   PY_TYPE: Iterable[float]

@@ -2,7 +2,15 @@ import pytest
 
 from numpy import array, ndarray
 
-from igraph_ctypes.constructors import create_graph_from_edge_list
+from igraph_ctypes.constructors import create_famous_graph, create_graph_from_edge_list
+
+
+def test_create_famous_graph():
+    g = create_famous_graph("zachary")
+    assert not g.is_directed() and g.vcount() == 34 and g.ecount() == 78
+
+    g = create_famous_graph("petersen")
+    assert not g.is_directed() and g.vcount() == 10 and g.ecount() == 15
 
 
 @pytest.mark.parametrize(

@@ -655,11 +655,11 @@ def kautz(m: int, n: int) -> _Graph:
     return graph
 
 
-def famous(name: str = "") -> _Graph:
+def famous(name: str) -> _Graph:
     """Type-annotated wrapper for ``igraph_famous``."""
     # Prepare input arguments
     c_graph = _Graph()
-    c_name = name
+    c_name = name.encode("utf-8")
 
     # Call wrapped function
     igraph_famous(c_graph, c_name)
@@ -5844,7 +5844,7 @@ def vertex_path_from_edge_path(graph: _Graph, start: VertexLike, edge_path: Iter
 def version() -> Tuple[str, int, int, int]:
     """Type-annotated wrapper for ``igraph_version``."""
     # Prepare input arguments
-    c_version_string = None
+    c_version_string = c_char_p()
     c_major = c_int()
     c_minor = c_int()
     c_subminor = c_int()
@@ -5853,7 +5853,7 @@ def version() -> Tuple[str, int, int, int]:
     igraph_version(c_version_string, c_major, c_minor, c_subminor)
 
     # Prepare output arguments
-    version_string = c_version_string.value
+    version_string = c_version_string.value.decode("utf-8", "replace")
     major = c_major.value
     minor = c_minor.value
     subminor = c_subminor.value

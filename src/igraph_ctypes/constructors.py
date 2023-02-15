@@ -1,7 +1,7 @@
 from typing import Iterable
 
 from .graph import Graph
-from ._internal.functions import create
+from ._internal.functions import create, famous
 
 __all__ = ("create_empty_graph", "create_graph_from_edge_list")
 
@@ -14,6 +14,18 @@ def create_empty_graph(n: int, directed: bool = False) -> Graph:
         directed: whether the graph is directed
     """
     return Graph(n, directed)
+
+
+def create_famous_graph(name: str) -> Graph:
+    """Creates one of the "famous" graphs embedded into igraph by name.
+
+    See the documentation of the ``igraph_famous()`` function in igraph's C core
+    for a list of names accepted by this function.
+
+    Parameters:
+        name: the name of the graph to construct
+    """
+    return Graph(_wrap=famous(name))
 
 
 def create_graph_from_edge_list(
