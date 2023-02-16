@@ -1,8 +1,14 @@
 import pytest
 
 from numpy import array, ndarray
+from numpy.testing import assert_array_equal
 
-from igraph_ctypes.constructors import create_famous_graph, create_graph_from_edge_list
+from igraph_ctypes.constructors import (
+    create_famous_graph,
+    create_graph_from_edge_list,
+    create_square_lattice,
+)
+from igraph_ctypes._internal.functions import get_edgelist
 
 
 def test_create_famous_graph():
@@ -37,3 +43,25 @@ def test_create_graph_from_edge_list(edges, n, directed):
 
     for i, edge in enumerate(edges):
         assert list(g.edge(i)) == list(edge)
+
+
+def test_create_square_lattice():
+    g = create_square_lattice([4, 3])
+
+    assert not g.is_directed()
+    assert g.vcount() == 12 and g.ecount() == 17
+    # fmt: off
+    assert_array_equal(
+        get_edgelist(g._instance),
+        array([0, 1, 0, 4, 1, 2, 1, 5, 2, 3, 2, 6, 3, 7,
+               4, 5, 4, 8, 5, 6, 5, 9, 6, 7, 6, 10, 7, 11,
+               8, 9, 9, 10, 10, 11])
+    )
+    # fmt: on
+
+    g = create_square_lattice(
+        [4, 3], directed=True, mutual=True, periodic=[False, True]
+    )
+
+    assert g.is_directed()
+    assert g.vcount() == 12 and g.ecount() == 42

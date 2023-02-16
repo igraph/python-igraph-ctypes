@@ -54,8 +54,9 @@ VECTOR_INT:
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
 
 VECTOR_BOOL:
-  # we can convert anything into a bool
-  PY_TYPE: Iterable[Any]
+  # we can convert anything into a bool, but we declare the type as
+  # Iterable[bool] only to nudge the user towards using bools
+  PY_TYPE: Iterable[bool]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_bool_t]
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_bool_t_view(%I%)"

@@ -424,7 +424,7 @@ def wheel(n: int, mode: WheelMode = WheelMode.OUT, center: int = 0) -> _Graph:
     return graph
 
 
-def square_lattice(dimvector: Iterable[int], nei: int = 1, directed: bool = False, mutual: bool = False, periodic: Optional[Iterable[Any]] = None) -> _Graph:
+def square_lattice(dimvector: Iterable[int], nei: int = 1, directed: bool = False, mutual: bool = False, periodic: Optional[Iterable[bool]] = None) -> _Graph:
     """Type-annotated wrapper for ``igraph_square_lattice``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -4636,7 +4636,7 @@ def community_fluid_communities(graph: _Graph, no_of_communities: int) -> npt.ND
     return membership
 
 
-def community_label_propagation(graph: _Graph, mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None, initial: Optional[Iterable[int]] = None, fixed: Optional[Iterable[Any]] = None) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def community_label_propagation(graph: _Graph, mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None, initial: Optional[Iterable[int]] = None, fixed: Optional[Iterable[bool]] = None) -> npt.NDArray[np_type_of_igraph_integer_t]:
     """Type-annotated wrapper for ``igraph_community_label_propagation``."""
     # Prepare input arguments
     c_graph = graph
