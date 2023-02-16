@@ -26,15 +26,21 @@ from .lib import (
     igraph_vector_bool_push_back,
     igraph_vector_bool_size,
     igraph_vector_bool_view,
-    igraph_vector_int_e,
-    igraph_vector_int_e_ptr,
-    igraph_vector_int_init_array,
-    igraph_vector_int_push_back,
-    igraph_vector_int_size,
-    igraph_vector_int_view,
     igraph_vector_e,
     igraph_vector_e_ptr,
     igraph_vector_init_array,
+    igraph_vector_int_e,
+    igraph_vector_int_e_ptr,
+    igraph_vector_int_init_array,
+    igraph_vector_int_list_get_ptr,
+    igraph_vector_int_list_push_back,
+    igraph_vector_int_list_size,
+    igraph_vector_int_push_back,
+    igraph_vector_int_size,
+    igraph_vector_int_view,
+    igraph_vector_list_get_ptr,
+    igraph_vector_list_push_back,
+    igraph_vector_list_size,
     igraph_vector_push_back,
     igraph_vector_size,
     igraph_vector_view,
@@ -67,6 +73,8 @@ from .wrappers import (
     _Vector,
     _VectorBool,
     _VectorInt,
+    _VectorIntList,
+    _VectorList,
     _VertexSelector,
 )
 
@@ -89,7 +97,13 @@ __all__ = (
     "igraph_vector_t_to_numpy_array",
     "igraph_vector_bool_t_to_numpy_array",
     "igraph_vector_int_t_to_numpy_array",
+    "igraph_vector_int_list_t_to_list_of_numpy_array",
+    "igraph_vector_list_t_to_list_of_numpy_array",
     "iterable_edge_indices_to_igraph_vector_int_t",
+    "iterable_of_edge_index_iterable_to_igraph_vector_int_list_t",
+    "iterable_of_iterable_to_igraph_vector_int_list_t",
+    "iterable_of_iterable_to_igraph_vector_list_t",
+    "iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t",
     "iterable_to_igraph_vector_bool_t",
     "iterable_to_igraph_vector_bool_t_view",
     "iterable_to_igraph_vector_int_t",
@@ -106,8 +120,8 @@ __all__ = (
     "vertex_selector_to_igraph_vs_t",
     "vertex_colors_to_igraph_vector_t",
     "vertex_colors_to_igraph_vector_t_view",
-    "vertex_qty_to_igraph_vector_t",
-    "vertex_qty_to_igraph_vector_t_view",
+    "vertex_qtys_to_igraph_vector_t",
+    "vertex_qtys_to_igraph_vector_t_view",
 )
 
 
@@ -287,6 +301,60 @@ def iterable_vertex_indices_to_igraph_vector_int_t(
     for index in indices:
         igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(index))
     return result
+
+
+def iterable_of_iterable_to_igraph_vector_int_list_t(
+    items: Iterable[Iterable[int]],
+) -> _VectorIntList:
+    result = _VectorIntList.create(0)
+
+    # TODO:
+    #
+    # - if items is a sequence (i.e. we know its length), we could optimize the
+    #   conversion
+    # - we could re-use an already-constructed _VectorInt if we had an alternative
+    #   iterable_to_igraph_vector_int_t() that receives a _VectorInt from the
+    #   outside
+
+    for item in items:
+        vec = iterable_to_igraph_vector_int_t(item)
+        igraph_vector_int_list_push_back(result, vec)
+        vec.release()
+
+    return result
+
+
+def iterable_of_iterable_to_igraph_vector_list_t(
+    items: Iterable[Iterable[float]],
+) -> _VectorList:
+    result = _VectorList.create(0)
+
+    # TODO:
+    #
+    # - if items is a sequence (i.e. we know its length), we could optimize the
+    #   conversion
+    # - we could re-use an already-constructed _VectorInt if we had an alternative
+    #   iterable_to_igraph_vector_t() that receives a _VectorInt from the
+    #   outside
+
+    for item in items:
+        vec = iterable_to_igraph_vector_t(item)
+        igraph_vector_list_push_back(result, vec)
+        vec.release()
+
+    return result
+
+
+def iterable_of_edge_index_iterable_to_igraph_vector_int_list_t(
+    items: Iterable[Iterable[VertexLike]],
+) -> _VectorIntList:
+    return iterable_of_iterable_to_igraph_vector_int_list_t(items)
+
+
+def iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(
+    items: Iterable[Iterable[VertexLike]],
+) -> _VectorIntList:
+    return iterable_of_iterable_to_igraph_vector_int_list_t(items)
 
 
 def sequence_to_igraph_matrix_int_t(items: MatrixIntLike) -> _MatrixInt:
@@ -553,14 +621,14 @@ def vertex_colors_to_igraph_vector_t_view(
     return iterable_to_igraph_vector_int_t_view(colors)
 
 
-def vertex_qty_to_igraph_vector_t(weights: Iterable[float], graph: _Graph) -> _Vector:
+def vertex_qtys_to_igraph_vector_t(weights: Iterable[float], graph: _Graph) -> _Vector:
     """Converts a Python iterable of floating-point numbers to a vector of
     vertex-related quantities.
     """
     return iterable_to_igraph_vector_t(weights)
 
 
-def vertex_qty_to_igraph_vector_t_view(
+def vertex_qtys_to_igraph_vector_t_view(
     weights: Optional[Iterable[float]], graph: _Graph
 ) -> Optional[_Vector]:
     """Converts a Python iterable of floating-point numbers to a vector of
@@ -642,4 +710,40 @@ def igraph_vector_int_t_to_numpy_array(
     result = np.zeros(n, dtype=np_type_of_igraph_integer_t)
     if n > 0:
         memmove(result.ctypes.data, igraph_vector_int_e_ptr(vector, 0), result.nbytes)
+    return result
+
+
+def igraph_vector_list_t_to_list_of_numpy_array(
+    vector_list: _VectorList,
+) -> List[npt.NDArray[np_type_of_igraph_real_t]]:
+    n = igraph_vector_list_size(vector_list)
+    vec = _Vector()
+    result = []
+
+    for i in range(n):
+        # We are re-using the same _Vector instance to wrap different
+        # low-level igraph_vector_t instances because it's only temporary
+        # until we convert it to a NumPy array
+        ptr = igraph_vector_list_get_ptr(vector_list, i)
+        vec._set_wrapped_instance(ptr.contents)
+        result.append(igraph_vector_t_to_numpy_array(vec))
+
+    return result
+
+
+def igraph_vector_int_list_t_to_list_of_numpy_array(
+    vector_list: _VectorIntList,
+) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    n = igraph_vector_int_list_size(vector_list)
+    vec = _VectorInt()
+    result = []
+
+    for i in range(n):
+        # We are re-using the same _VectorInt instance to wrap different
+        # low-level igraph_vector_int_t instances because it's only temporary
+        # until we convert it to a NumPy array
+        ptr = igraph_vector_int_list_get_ptr(vector_list, i)
+        vec._set_wrapped_instance(ptr.contents)
+        result.append(igraph_vector_int_t_to_numpy_array(vec))
+
     return result

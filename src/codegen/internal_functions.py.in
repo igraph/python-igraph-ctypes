@@ -1,6 +1,6 @@
 import numpy.typing as npt
 
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from .conversion import *  # noqa
 from .enums import *  # noqa
@@ -17,7 +17,15 @@ from .types import (
     np_type_of_igraph_integer_t,
     np_type_of_igraph_real_t,
 )
-from .wrappers import _Graph, _Matrix, _MatrixInt, _Vector, _VectorBool, _VectorInt
+from .wrappers import (
+    _Graph,
+    _Matrix,
+    _MatrixInt,
+    _Vector,
+    _VectorBool,
+    _VectorInt,
+    _VectorIntList
+)
 
 # fmt: off
 # flake8: noqa: E743

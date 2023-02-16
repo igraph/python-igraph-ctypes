@@ -14,6 +14,10 @@ from .lib import (
     igraph_vector_bool_init,
     igraph_vector_int_destroy,
     igraph_vector_int_init,
+    igraph_vector_int_list_destroy,
+    igraph_vector_int_list_init,
+    igraph_vector_list_destroy,
+    igraph_vector_list_init,
     igraph_vs_destroy,
 )
 from .types import (
@@ -24,6 +28,8 @@ from .types import (
     igraph_vector_t,
     igraph_vector_bool_t,
     igraph_vector_int_t,
+    igraph_vector_int_list_t,
+    igraph_vector_list_t,
     igraph_vs_t,
 )
 
@@ -35,6 +41,8 @@ __all__ = (
     "_Vector",
     "_VectorBool",
     "_VectorInt",
+    "_VectorIntList",
+    "_VectorList",
     "_VertexSelector",
 )
 
@@ -102,9 +110,16 @@ class Boxed(Generic[T]):
                 self.__destructor(byref(self.__c_instance))  # type: ignore
             self.__initialized = False
 
+    def _set_wrapped_instance(self, value: T):
+        assert not self.__initialized
+        self.__c_instance = value
+
     def mark_initialized(self: C) -> C:
         self.__initialized = True
         return self
+
+    def release(self) -> None:
+        self.__initialized = False
 
     def unwrap(self) -> T:
         return self.__c_instance
@@ -193,6 +208,18 @@ _VectorInt = create_boxed(
     igraph_vector_int_t,
     constructor=igraph_vector_int_init,
     destructor=igraph_vector_int_destroy,
+)
+_VectorIntList = create_boxed(
+    "_VectorIntList",
+    igraph_vector_int_list_t,
+    constructor=igraph_vector_int_list_init,
+    destructor=igraph_vector_int_list_destroy,
+)
+_VectorList = create_boxed(
+    "_VectorList",
+    igraph_vector_list_t,
+    constructor=igraph_vector_list_init,
+    destructor=igraph_vector_list_destroy,
 )
 _VertexSelector = create_boxed(
     "_VertexSelector",

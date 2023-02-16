@@ -109,7 +109,7 @@ VERTEX:
     IN: "%C% = vertexlike_to_igraph_integer_t(%I%)"
     OUT: "%C% = igraph_integer_t(0)"
 
-VERTEX_COLOR:
+VERTEX_COLORS:
   PY_TYPE: Iterable[int]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
   INCONV:
@@ -126,6 +126,14 @@ VERTEX_INDICES:
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
 
+VERTEX_INDICES_LIST:
+  PY_TYPE: Iterable[Iterable[VertexLike]]
+  PY_RETURN_TYPE: List[npt.NDArray[np_type_of_igraph_integer_t]]
+  INCONV:
+    IN: "%C% = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(%I%)"
+    OUT: "%C% = _VectorIntList.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_list_t_to_list_of_numpy_array(%C%)"
+
 VERTEX_INDEX_PAIRS:
   PY_TYPE: Iterable[VertexPair]
   INCONV:
@@ -140,12 +148,12 @@ VERTEX_SELECTOR:
     ALL: '"all"'
   CALL: "%C%.unwrap()"
 
-VERTEX_QTY:
+VERTEX_QTYS:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
   INCONV:
-    IN: "%C% = vertex_qty_to_igraph_vector_t_view(%I%, %I1%)"
-    INOUT: "%C% = vertex_qty_to_igraph_vector_t(%I%, %I1%)"
+    IN: "%C% = vertex_qtys_to_igraph_vector_t_view(%I%, %I1%)"
+    INOUT: "%C% = vertex_qtys_to_igraph_vector_t(%I%, %I1%)"
     OUT: "%C% = _Vector.create(0)"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
@@ -156,7 +164,7 @@ EDGE:
     IN: "%C% = edgelike_to_igraph_integer_t(%I%)"
     OUT: "%C% = igraph_integer_t(0)"
 
-EDGE_COLOR:
+EDGE_COLORS:
   PY_TYPE: Iterable[int]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
   INCONV:
@@ -173,6 +181,14 @@ EDGE_INDICES:
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
 
+EDGE_INDICES_LIST:
+  PY_TYPE: Iterable[Iterable[EdgeLike]]
+  PY_RETURN_TYPE: List[npt.NDArray[np_type_of_igraph_integer_t]]
+  INCONV:
+    IN: "%C% = iterable_of_edge_index_iterable_to_igraph_vector_int_list_t(%I%)"
+    OUT: "%C% = _VectorIntList.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_list_t_to_list_of_numpy_array(%C%)"
+
 EDGE_SELECTOR:
   PY_TYPE: EdgeSelector
   INCONV:
@@ -181,7 +197,7 @@ EDGE_SELECTOR:
     ALL: '"all"'
   CALL: "%C%.unwrap()"
 
-EDGEWEIGHTS:
+EDGE_WEIGHTS:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
   INCONV:
@@ -190,7 +206,7 @@ EDGEWEIGHTS:
     OUT: "%C% = _Vector.create(0)"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
-EDGE_CAPACITY:
+EDGE_CAPACITIES:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
   INCONV:

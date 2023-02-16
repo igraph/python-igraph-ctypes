@@ -1,6 +1,6 @@
 import numpy.typing as npt
 
-from typing import Any, Iterable, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 from .conversion import *  # noqa
 from .enums import *  # noqa
@@ -17,7 +17,15 @@ from .types import (
     np_type_of_igraph_integer_t,
     np_type_of_igraph_real_t,
 )
-from .wrappers import _Graph, _Matrix, _MatrixInt, _Vector, _VectorBool, _VectorInt
+from .wrappers import (
+    _Graph,
+    _Matrix,
+    _MatrixInt,
+    _Vector,
+    _VectorBool,
+    _VectorInt,
+    _VectorIntList
+)
 
 # fmt: off
 # flake8: noqa: E743
@@ -1624,9 +1632,53 @@ def get_shortest_path_dijkstra(graph: _Graph, from_: VertexLike, to: VertexLike,
     # Construct return value
     return vertices, edges
 
-# igraph_get_shortest_paths: no Python type known for type: VERTEXSET_LIST
 
-# igraph_get_all_shortest_paths: no Python type known for type: VERTEXSET_LIST
+def get_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_get_shortest_paths``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertices = _VectorIntList.create(0)
+    c_edges = _VectorIntList.create(0)
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_mode = c_int(mode)
+    c_parents = _VectorInt.create(0)
+    c_inbound_edges = _VectorInt.create(0)
+
+    # Call wrapped function
+    igraph_get_shortest_paths(c_graph, c_vertices, c_edges, c_from, c_to.unwrap(), c_mode, c_parents, c_inbound_edges)
+
+    # Prepare output arguments
+    vertices = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertices)
+    edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_edges)
+    parents = igraph_vector_int_t_to_numpy_array(c_parents)
+    inbound_edges = igraph_vector_int_t_to_numpy_array(c_inbound_edges)
+
+    # Construct return value
+    return vertices, edges, parents, inbound_edges
+
+
+def get_all_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_get_all_shortest_paths``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertices = _VectorIntList.create(0)
+    c_edges = _VectorIntList.create(0)
+    c_nrgeo = _VectorInt.create(0)
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_get_all_shortest_paths(c_graph, c_vertices, c_edges, c_nrgeo, c_from, c_to.unwrap(), c_mode)
+
+    # Prepare output arguments
+    vertices = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertices)
+    edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_edges)
+    nrgeo = igraph_vector_int_t_to_numpy_array(c_nrgeo)
+
+    # Construct return value
+    return vertices, edges, nrgeo
 
 
 def distances_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
@@ -1669,11 +1721,81 @@ def distances_dijkstra_cutoff(graph: _Graph, weights: Iterable[float], from_: Ve
     # Construct return value
     return res
 
-# igraph_get_shortest_paths_dijkstra: no Python type known for type: VERTEXSET_LIST
 
-# igraph_get_shortest_paths_bellman_ford: no Python type known for type: VERTEXSET_LIST
+def get_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_get_shortest_paths_dijkstra``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertices = _VectorIntList.create(0)
+    c_edges = _VectorIntList.create(0)
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_mode = c_int(mode)
+    c_parents = _VectorInt.create(0)
+    c_inbound_edges = _VectorInt.create(0)
 
-# igraph_get_all_shortest_paths_dijkstra: no Python type known for type: VERTEXSET_LIST
+    # Call wrapped function
+    igraph_get_shortest_paths_dijkstra(c_graph, c_vertices, c_edges, c_from, c_to.unwrap(), c_weights, c_mode, c_parents, c_inbound_edges)
+
+    # Prepare output arguments
+    vertices = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertices)
+    edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_edges)
+    parents = igraph_vector_int_t_to_numpy_array(c_parents)
+    inbound_edges = igraph_vector_int_t_to_numpy_array(c_inbound_edges)
+
+    # Construct return value
+    return vertices, edges, parents, inbound_edges
+
+
+def get_shortest_paths_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_get_shortest_paths_bellman_ford``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertices = _VectorIntList.create(0)
+    c_edges = _VectorIntList.create(0)
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_mode = c_int(mode)
+    c_parents = _VectorInt.create(0)
+    c_inbound_edges = _VectorInt.create(0)
+
+    # Call wrapped function
+    igraph_get_shortest_paths_bellman_ford(c_graph, c_vertices, c_edges, c_from, c_to.unwrap(), c_weights, c_mode, c_parents, c_inbound_edges)
+
+    # Prepare output arguments
+    vertices = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertices)
+    edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_edges)
+    parents = igraph_vector_int_t_to_numpy_array(c_parents)
+    inbound_edges = igraph_vector_int_t_to_numpy_array(c_inbound_edges)
+
+    # Construct return value
+    return vertices, edges, parents, inbound_edges
+
+
+def get_all_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, weights: Iterable[float], to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_get_all_shortest_paths_dijkstra``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertices = _VectorIntList.create(0)
+    c_edges = _VectorIntList.create(0)
+    c_nrgeo = _VectorInt.create(0)
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_get_all_shortest_paths_dijkstra(c_graph, c_vertices, c_edges, c_nrgeo, c_from, c_to.unwrap(), c_weights, c_mode)
+
+    # Prepare output arguments
+    vertices = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertices)
+    edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_edges)
+    nrgeo = igraph_vector_int_t_to_numpy_array(c_nrgeo)
+
+    # Construct return value
+    return vertices, edges, nrgeo
 
 
 def distances_bellman_ford(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
@@ -1778,7 +1900,28 @@ def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = 
     # Construct return value
     return res
 
-# igraph_get_k_shortest_paths: no Python type known for type: VERTEXSET_LIST
+
+def get_k_shortest_paths(graph: _Graph, k: int, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]]]:
+    """Type-annotated wrapper for ``igraph_get_k_shortest_paths``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+    c_vertex_paths = _VectorIntList.create(0)
+    c_edge_paths = _VectorIntList.create(0)
+    c_k = k
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertexlike_to_igraph_integer_t(to)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_get_k_shortest_paths(c_graph, c_weights, c_vertex_paths, c_edge_paths, c_k, c_from, c_to, c_mode)
+
+    # Prepare output arguments
+    vertex_paths = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertex_paths)
+    edge_paths = igraph_vector_int_list_t_to_list_of_numpy_array(c_edge_paths)
+
+    # Construct return value
+    return vertex_paths, edge_paths
 
 
 def get_widest_path(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
@@ -1802,7 +1945,31 @@ def get_widest_path(graph: _Graph, from_: VertexLike, to: VertexLike, weights: O
     # Construct return value
     return vertices, edges
 
-# igraph_get_widest_paths: no Python type known for type: VERTEXSET_LIST
+
+def get_widest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_get_widest_paths``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertices = _VectorIntList.create(0)
+    c_edges = _VectorIntList.create(0)
+    c_from = vertexlike_to_igraph_integer_t(from_)
+    c_to = vertex_selector_to_igraph_vs_t(to, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_mode = c_int(mode)
+    c_parents = _VectorInt.create(0)
+    c_inbound_edges = _VectorInt.create(0)
+
+    # Call wrapped function
+    igraph_get_widest_paths(c_graph, c_vertices, c_edges, c_from, c_to.unwrap(), c_weights, c_mode, c_parents, c_inbound_edges)
+
+    # Prepare output arguments
+    vertices = igraph_vector_int_list_t_to_list_of_numpy_array(c_vertices)
+    edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_edges)
+    parents = igraph_vector_int_t_to_numpy_array(c_parents)
+    inbound_edges = igraph_vector_int_t_to_numpy_array(c_inbound_edges)
+
+    # Construct return value
+    return vertices, edges, parents, inbound_edges
 
 
 def widest_path_widths_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
@@ -2347,7 +2514,25 @@ def neighborhood_size(graph: _Graph, vids: VertexSelector, order: int, mode: Nei
     # Construct return value
     return res
 
-# igraph_neighborhood: no Python type known for type: VERTEXSET_LIST
+
+def neighborhood(graph: _Graph, vids: VertexSelector, order: int, mode: NeighborMode = NeighborMode.ALL, mindist: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_neighborhood``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_order = order
+    c_mode = c_int(mode)
+    c_mindist = mindist
+
+    # Call wrapped function
+    igraph_neighborhood(c_graph, c_res, c_vids.unwrap(), c_order, c_mode, c_mindist)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 # igraph_neighborhood_graphs: no Python type known for type: GRAPH_LIST
 
@@ -2562,13 +2747,13 @@ def add_edge(graph: _Graph, from_: int, to: int) -> None:
     # Call wrapped function
     igraph_add_edge(c_graph, c_from, c_to)
 
-# igraph_eigenvector_centrality: no Python type known for type: ARPACKOPT
+# igraph_eigenvector_centrality: no Python type known for type: ARPACK_OPTIONS
 
-# igraph_hub_score: no Python type known for type: ARPACKOPT
+# igraph_hub_score: no Python type known for type: ARPACK_OPTIONS
 
-# igraph_authority_score: no Python type known for type: ARPACKOPT
+# igraph_authority_score: no Python type known for type: ARPACK_OPTIONS
 
-# igraph_hub_and_authority_scores: no Python type known for type: ARPACKOPT
+# igraph_hub_and_authority_scores: no Python type known for type: ARPACK_OPTIONS
 
 
 def unfold_tree(graph: _Graph, roots: Iterable[int], mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
@@ -2843,7 +3028,7 @@ def centralization_closeness_tmax(graph: Optional[_Graph] = None, nodes: int = 0
     # Construct return value
     return res
 
-# igraph_centralization_eigenvector_centrality: no Python type known for type: ARPACKOPT
+# igraph_centralization_eigenvector_centrality: no Python type known for type: ARPACK_OPTIONS
 
 
 def centralization_eigenvector_centrality_tmax(graph: Optional[_Graph] = None, nodes: int = 0, directed: bool = False, scale: bool = True) -> float:
@@ -3452,7 +3637,29 @@ def articulation_points(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_
     # Construct return value
     return res
 
-# igraph_biconnected_components: no Python type known for type: EDGESET_LIST
+
+def biconnected_components(graph: _Graph) -> Tuple[int, List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_biconnected_components``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_no = igraph_integer_t()
+    c_tree_edges = _VectorIntList.create(0)
+    c_component_edges = _VectorIntList.create(0)
+    c_components = _VectorIntList.create(0)
+    c_articulation_points = _VectorInt.create(0)
+
+    # Call wrapped function
+    igraph_biconnected_components(c_graph, c_no, c_tree_edges, c_component_edges, c_components, c_articulation_points)
+
+    # Prepare output arguments
+    no = c_no.value
+    tree_edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_tree_edges)
+    component_edges = igraph_vector_int_list_t_to_list_of_numpy_array(c_component_edges)
+    components = igraph_vector_int_list_t_to_list_of_numpy_array(c_components)
+    articulation_points = igraph_vector_int_t_to_numpy_array(c_articulation_points)
+
+    # Construct return value
+    return no, tree_edges, component_edges, components, articulation_points
 
 
 def bridges(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
@@ -3470,7 +3677,23 @@ def bridges(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
     # Construct return value
     return res
 
-# igraph_cliques: no Python type known for type: VERTEXSET_LIST
+
+def cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_cliques``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
+    c_min_size = min_size
+    c_max_size = max_size
+
+    # Call wrapped function
+    igraph_cliques(c_graph, c_res, c_min_size, c_max_size)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 # igraph_cliques_callback: no Python type known for type: CLIQUE_FUNC
 
@@ -3492,11 +3715,41 @@ def clique_size_hist(graph: _Graph, min_size: int = 0, max_size: int = 0) -> npt
     # Construct return value
     return hist
 
-# igraph_largest_cliques: no Python type known for type: VERTEXSET_LIST
 
-# igraph_maximal_cliques: no Python type known for type: VERTEXSET_LIST
+def largest_cliques(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_largest_cliques``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
 
-# igraph_maximal_cliques_subset: no Python type known for type: VERTEXSET_LIST
+    # Call wrapped function
+    igraph_largest_cliques(c_graph, c_res)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def maximal_cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_maximal_cliques``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
+    c_min_size = min_size
+    c_max_size = max_size
+
+    # Call wrapped function
+    igraph_maximal_cliques(c_graph, c_res, c_min_size, c_max_size)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+# igraph_maximal_cliques_subset: no Python type known for type: OUTFILE
 
 # igraph_maximal_cliques_callback: no Python type known for type: CLIQUE_FUNC
 
@@ -3554,17 +3807,61 @@ def clique_number(graph: _Graph) -> int:
     # Construct return value
     return no
 
-# igraph_weighted_cliques: no Python type known for type: VERTEXWEIGHTS
+# igraph_weighted_cliques: no Python type known for type: VERTEX_WEIGHTS
 
-# igraph_largest_weighted_cliques: no Python type known for type: VERTEXWEIGHTS
+# igraph_largest_weighted_cliques: no Python type known for type: VERTEX_WEIGHTS
 
-# igraph_weighted_clique_number: no Python type known for type: VERTEXWEIGHTS
+# igraph_weighted_clique_number: no Python type known for type: VERTEX_WEIGHTS
 
-# igraph_independent_vertex_sets: no Python type known for type: VERTEXSET_LIST
 
-# igraph_largest_independent_vertex_sets: no Python type known for type: VERTEXSET_LIST
+def independent_vertex_sets(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_independent_vertex_sets``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
+    c_min_size = min_size
+    c_max_size = max_size
 
-# igraph_maximal_independent_vertex_sets: no Python type known for type: VERTEXSET_LIST
+    # Call wrapped function
+    igraph_independent_vertex_sets(c_graph, c_res, c_min_size, c_max_size)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def largest_independent_vertex_sets(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_largest_independent_vertex_sets``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_largest_independent_vertex_sets(c_graph, c_res)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def maximal_independent_vertex_sets(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_maximal_independent_vertex_sets``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_maximal_independent_vertex_sets(c_graph, c_res)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def independence_number(graph: _Graph) -> int:
@@ -4319,7 +4616,7 @@ def reindex_membership(membership: Iterable[int]) -> Tuple[npt.NDArray[np_type_o
     # Construct return value
     return new_to_old, nb_clusters
 
-# igraph_community_leading_eigenvector: no Python type known for type: ARPACKOPT
+# igraph_community_leading_eigenvector: no Python type known for type: ARPACK_OPTIONS
 
 
 def community_fluid_communities(graph: _Graph, no_of_communities: int) -> npt.NDArray[np_type_of_igraph_integer_t]:
@@ -4399,7 +4696,7 @@ def community_optimal_modularity(graph: _Graph, weights: Optional[Iterable[float
     # Construct return value
     return modularity, membership
 
-# igraph_community_leiden: no Python type known for type: VERTEXWEIGHTS
+# igraph_community_leiden: no Python type known for type: VERTEX_WEIGHTS
 
 
 def split_join_distance(comm1: Iterable[int], comm2: Iterable[int]) -> Tuple[int, int]:
@@ -4420,13 +4717,63 @@ def split_join_distance(comm1: Iterable[int], comm2: Iterable[int]) -> Tuple[int
     # Construct return value
     return distance12, distance21
 
-# igraph_community_infomap: no Python type known for type: VERTEXWEIGHTS
+# igraph_community_infomap: no Python type known for type: VERTEX_WEIGHTS
 
-# igraph_graphlets: no Python type known for type: VERTEXSET_LIST
 
-# igraph_graphlets_candidate_basis: no Python type known for type: VERTEXSET_LIST
+def graphlets(graph: _Graph, weights: Optional[Iterable[float]] = None, niter: int = 1000) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_real_t]]:
+    """Type-annotated wrapper for ``igraph_graphlets``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_cliques = _VectorIntList.create(0)
+    c_Mu = _Vector.create(0)
+    c_niter = niter
 
-# igraph_graphlets_project: no Python type known for type: VERTEXSET_LIST
+    # Call wrapped function
+    igraph_graphlets(c_graph, c_weights, c_cliques, c_Mu, c_niter)
+
+    # Prepare output arguments
+    cliques = igraph_vector_int_list_t_to_list_of_numpy_array(c_cliques)
+    Mu = igraph_vector_t_to_numpy_array(c_Mu)
+
+    # Construct return value
+    return cliques, Mu
+
+
+def graphlets_candidate_basis(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_real_t]]:
+    """Type-annotated wrapper for ``igraph_graphlets_candidate_basis``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_cliques = _VectorIntList.create(0)
+    c_thresholds = _Vector.create(0)
+
+    # Call wrapped function
+    igraph_graphlets_candidate_basis(c_graph, c_weights, c_cliques, c_thresholds)
+
+    # Prepare output arguments
+    cliques = igraph_vector_int_list_t_to_list_of_numpy_array(c_cliques)
+    thresholds = igraph_vector_t_to_numpy_array(c_thresholds)
+
+    # Construct return value
+    return cliques, thresholds
+
+
+def graphlets_project(graph: _Graph, cliques: Iterable[Iterable[VertexLike]], Muc: Iterable[float], weights: Optional[Iterable[float]] = None, startMu: bool = False, niter: int = 1000) -> None:
+    """Type-annotated wrapper for ``igraph_graphlets_project``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_cliques = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(cliques)
+    c_Muc = iterable_to_igraph_vector_t(Muc)
+    c_startMu = any_to_igraph_bool_t(startMu)
+    c_niter = niter
+
+    # Call wrapped function
+    igraph_graphlets_project(c_graph, c_weights, c_cliques, c_Muc, c_startMu, c_niter)
+
+    # Prepare output arguments
+    Muc = igraph_vector_t_to_numpy_array(c_Muc)
 
 # igraph_hrg_fit: no Python type known for type: HRG
 
@@ -4751,9 +5098,41 @@ def local_scan_k_ecount_them(us: _Graph, them: _Graph, k: int, weights_them: Opt
     # Construct return value
     return res
 
-# igraph_local_scan_neighborhood_ecount: no Python type known for type: VERTEXSET_LIST
 
-# igraph_local_scan_subset_ecount: no Python type known for type: VERTEXSET_LIST
+def local_scan_neighborhood_ecount(graph: _Graph, neighborhoods: Iterable[Iterable[VertexLike]], weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_local_scan_neighborhood_ecount``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_neighborhoods = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(neighborhoods)
+
+    # Call wrapped function
+    igraph_local_scan_neighborhood_ecount(c_graph, c_res, c_weights, c_neighborhoods)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def local_scan_subset_ecount(graph: _Graph, subsets: Iterable[Iterable[VertexLike]], weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+    """Type-annotated wrapper for ``igraph_local_scan_subset_ecount``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Vector.create(0)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_subsets = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(subsets)
+
+    # Call wrapped function
+    igraph_local_scan_subset_ecount(c_graph, c_res, c_weights, c_subsets)
+
+    # Prepare output arguments
+    res = igraph_vector_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
 
 
 def list_triangles(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
@@ -5204,9 +5583,48 @@ def dominator_tree(graph: _Graph, root: VertexLike, mode: NeighborMode = Neighbo
     # Construct return value
     return dom, domtree, leftout
 
-# igraph_all_st_cuts: no Python type known for type: EDGESET_LIST
 
-# igraph_all_st_mincuts: no Python type known for type: EDGESET_LIST
+def all_st_cuts(graph: _Graph, source: VertexLike, target: VertexLike) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]]]:
+    """Type-annotated wrapper for ``igraph_all_st_cuts``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_cuts = _VectorIntList.create(0)
+    c_partition1s = _VectorIntList.create(0)
+    c_source = vertexlike_to_igraph_integer_t(source)
+    c_target = vertexlike_to_igraph_integer_t(target)
+
+    # Call wrapped function
+    igraph_all_st_cuts(c_graph, c_cuts, c_partition1s, c_source, c_target)
+
+    # Prepare output arguments
+    cuts = igraph_vector_int_list_t_to_list_of_numpy_array(c_cuts)
+    partition1s = igraph_vector_int_list_t_to_list_of_numpy_array(c_partition1s)
+
+    # Construct return value
+    return cuts, partition1s
+
+
+def all_st_mincuts(graph: _Graph, source: VertexLike, target: VertexLike, capacity: Optional[Iterable[float]] = None) -> Tuple[float, List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]]]:
+    """Type-annotated wrapper for ``igraph_all_st_mincuts``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_value = igraph_real_t()
+    c_cuts = _VectorIntList.create(0)
+    c_partition1s = _VectorIntList.create(0)
+    c_source = vertexlike_to_igraph_integer_t(source)
+    c_target = vertexlike_to_igraph_integer_t(target)
+    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph) if capacity is not None else None
+
+    # Call wrapped function
+    igraph_all_st_mincuts(c_graph, c_value, c_cuts, c_partition1s, c_source, c_target, c_capacity)
+
+    # Prepare output arguments
+    value = c_value.value
+    cuts = igraph_vector_int_list_t_to_list_of_numpy_array(c_cuts)
+    partition1s = igraph_vector_int_list_t_to_list_of_numpy_array(c_partition1s)
+
+    # Construct return value
+    return value, cuts, partition1s
 
 
 def even_tarjan_reduction(graph: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_real_t]]:
@@ -5260,11 +5678,59 @@ def is_minimal_separator(graph: _Graph, candidate: VertexSelector) -> bool:
     # Construct return value
     return res
 
-# igraph_all_minimal_st_separators: no Python type known for type: VERTEXSET_LIST
 
-# igraph_minimum_size_separators: no Python type known for type: VERTEXSET_LIST
+def all_minimal_st_separators(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_all_minimal_st_separators``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_separators = _VectorIntList.create(0)
 
-# igraph_cohesive_blocks: no Python type known for type: VERTEXSET_LIST
+    # Call wrapped function
+    igraph_all_minimal_st_separators(c_graph, c_separators)
+
+    # Prepare output arguments
+    separators = igraph_vector_int_list_t_to_list_of_numpy_array(c_separators)
+
+    # Construct return value
+    return separators
+
+
+def minimum_size_separators(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_minimum_size_separators``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_separators = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_minimum_size_separators(c_graph, c_separators)
+
+    # Prepare output arguments
+    separators = igraph_vector_int_list_t_to_list_of_numpy_array(c_separators)
+
+    # Construct return value
+    return separators
+
+
+def cohesive_blocks(graph: _Graph) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], _Graph]:
+    """Type-annotated wrapper for ``igraph_cohesive_blocks``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_blocks = _VectorIntList.create(0)
+    c_cohesion = _VectorInt.create(0)
+    c_parent = _VectorInt.create(0)
+    c_blockTree = _Graph()
+
+    # Call wrapped function
+    igraph_cohesive_blocks(c_graph, c_blocks, c_cohesion, c_parent, c_blockTree)
+
+    # Prepare output arguments
+    blocks = igraph_vector_int_list_t_to_list_of_numpy_array(c_blocks)
+    cohesion = igraph_vector_int_t_to_numpy_array(c_cohesion)
+    parent = igraph_vector_int_t_to_numpy_array(c_parent)
+    blockTree = c_blockTree.mark_initialized()
+
+    # Construct return value
+    return blocks, cohesion, parent, blockTree
 
 
 def coreness(graph: _Graph, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
@@ -5405,9 +5871,9 @@ def permute_vertices(graph: _Graph, permutation: Iterable[int]) -> _Graph:
 
 # igraph_automorphisms: no Python type known for type: BLISSSH
 
-# igraph_automorphism_group: no Python type known for type: VERTEXSET_LIST
+# igraph_automorphism_group: no Python type known for type: BLISSSH
 
-# igraph_subisomorphic_lad: no Python type known for type: VERTEXSET_LIST
+# igraph_subisomorphic_lad: no Python type known for type: VECTOR_INT_LIST
 
 
 def simplify_and_colorize(graph: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
@@ -5664,9 +6130,44 @@ def eulerian_cycle(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_integer
     # Construct return value
     return edge_res, vertex_res
 
-# igraph_fundamental_cycles: no Python type known for type: EDGESET_LIST
 
-# igraph_minimum_cycle_basis: no Python type known for type: EDGESET_LIST
+def fundamental_cycles(graph: _Graph, bfs_cutoff: int, start: Optional[VertexLike] = None, weights: Optional[Iterable[float]] = None) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_fundamental_cycles``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_basis = _VectorIntList.create(0)
+    c_start = vertexlike_to_igraph_integer_t(start) if start is not None else None
+    c_bfs_cutoff = bfs_cutoff
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+
+    # Call wrapped function
+    igraph_fundamental_cycles(c_graph, c_basis, c_start, c_bfs_cutoff, c_weights)
+
+    # Prepare output arguments
+    basis = igraph_vector_int_list_t_to_list_of_numpy_array(c_basis)
+
+    # Construct return value
+    return basis
+
+
+def minimum_cycle_basis(graph: _Graph, bfs_cutoff: int, complete: bool, use_cycle_order: bool, weights: Optional[Iterable[float]] = None) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+    """Type-annotated wrapper for ``igraph_minimum_cycle_basis``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_basis = _VectorIntList.create(0)
+    c_bfs_cutoff = bfs_cutoff
+    c_complete = any_to_igraph_bool_t(complete)
+    c_use_cycle_order = any_to_igraph_bool_t(use_cycle_order)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+
+    # Call wrapped function
+    igraph_minimum_cycle_basis(c_graph, c_basis, c_bfs_cutoff, c_complete, c_use_cycle_order, c_weights)
+
+    # Prepare output arguments
+    basis = igraph_vector_int_list_t_to_list_of_numpy_array(c_basis)
+
+    # Construct return value
+    return basis
 
 
 def is_tree(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) -> Tuple[bool, int]:
@@ -5849,7 +6350,7 @@ def deterministic_optimal_imitation(graph: _Graph, vid: VertexLike, quantities: 
     c_graph = graph
     c_vid = vertexlike_to_igraph_integer_t(vid)
     c_optimality = c_int(optimality)
-    c_quantities = vertex_qty_to_igraph_vector_t_view(quantities, graph)
+    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
     c_strategies = iterable_to_igraph_vector_int_t(strategies)
     c_mode = c_int(mode)
 
@@ -5866,7 +6367,7 @@ def stochastic_imitation(graph: _Graph, vid: VertexLike, algo: ImitateAlgorithm,
     c_graph = graph
     c_vid = vertexlike_to_igraph_integer_t(vid)
     c_algo = c_int(algo)
-    c_quantities = vertex_qty_to_igraph_vector_t_view(quantities, graph)
+    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
     c_strategies = iterable_to_igraph_vector_int_t(strategies)
     c_mode = c_int(mode)
 
@@ -5882,7 +6383,7 @@ def moran_process(graph: _Graph, quantities: Iterable[float], strategies: Iterab
     # Prepare input arguments
     c_graph = graph
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_quantities = vertex_qty_to_igraph_vector_t(quantities, graph)
+    c_quantities = vertex_qtys_to_igraph_vector_t(quantities, graph)
     c_strategies = iterable_to_igraph_vector_int_t(strategies)
     c_mode = c_int(mode)
 
@@ -5900,7 +6401,7 @@ def roulette_wheel_imitation(graph: _Graph, vid: VertexLike, is_local: bool, qua
     c_graph = graph
     c_vid = vertexlike_to_igraph_integer_t(vid)
     c_is_local = any_to_igraph_bool_t(is_local)
-    c_quantities = vertex_qty_to_igraph_vector_t_view(quantities, graph)
+    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
     c_strategies = iterable_to_igraph_vector_int_t(strategies)
     c_mode = c_int(mode)
 

@@ -15,6 +15,10 @@ from igraph_ctypes._internal.conversion import (
     igraph_vector_bool_t_to_numpy_array,
     igraph_vector_int_t_to_list,
     igraph_vector_int_t_to_numpy_array,
+    igraph_vector_int_list_t_to_list_of_numpy_array,
+    igraph_vector_list_t_to_list_of_numpy_array,
+    iterable_of_iterable_to_igraph_vector_list_t,
+    iterable_of_iterable_to_igraph_vector_int_list_t,
     iterable_to_igraph_vector_bool_t,
     iterable_to_igraph_vector_int_t,
     iterable_to_igraph_vector_t,
@@ -28,9 +32,11 @@ from igraph_ctypes._internal.types import igraph_bool_t, igraph_integer_t
 from igraph_ctypes._internal.wrappers import (
     _Matrix,
     _MatrixInt,
+    _Vector,
     _VectorBool,
     _VectorInt,
-    _Vector,
+    _VectorIntList,
+    _VectorList,
 )
 
 
@@ -174,6 +180,42 @@ def test_real_matrix_roundtrip():
 
     restored_array = igraph_matrix_t_to_numpy_array(converted)
     assert (restored_array == expected_array).all()
+
+
+def test_int_vector_list_roundtrip():
+    input = [
+        [0, 1, 2, 3, 4],
+        [10, 11, 12, 13],
+        [20, 21, 22],
+        [30, 31],
+    ]
+
+    converted = iterable_of_iterable_to_igraph_vector_int_list_t(input)
+    assert isinstance(converted, _VectorIntList)
+
+    restored_items = igraph_vector_int_list_t_to_list_of_numpy_array(converted)
+    assert len(restored_items) == len(input)
+
+    for original_item, restored_item in zip(input, restored_items):
+        assert (array(original_item) == restored_item).all()
+
+
+def test_vector_list_roundtrip():
+    input = [
+        [0.123, 1.456, 2.345, 3.443, 4.814],
+        [10, 11, 12, 13.234],
+        [20, 21, 22],
+        [30, 31, 32, 33.7653],
+    ]
+
+    converted = iterable_of_iterable_to_igraph_vector_list_t(input)
+    assert isinstance(converted, _VectorList)
+
+    restored_items = igraph_vector_list_t_to_list_of_numpy_array(converted)
+    assert len(restored_items) == len(input)
+
+    for original_item, restored_item in zip(input, restored_items):
+        assert (array(original_item) == restored_item).all()
 
 
 def test_vertex_selector():
