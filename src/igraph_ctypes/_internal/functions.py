@@ -6,10 +6,13 @@ from .conversion import *  # noqa
 from .enums import *  # noqa
 from .lib import *  # noqa
 from .types import (
+    BoolArray,
     EdgeLike,
     EdgeSelector,
+    IntArray,
     MatrixLike,
     MatrixIntLike,
+    RealArray,
     VertexLike,
     VertexPair,
     VertexSelector,
@@ -107,7 +110,7 @@ def delete_vertices(graph: _Graph, vertices: VertexSelector) -> None:
     igraph_delete_vertices(c_graph, c_vertices.unwrap())
 
 
-def delete_vertices_map(graph: _Graph, vertices: VertexSelector) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def delete_vertices_map(graph: _Graph, vertices: VertexSelector) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_delete_vertices_map``."""
     # Prepare input arguments
     c_graph = graph
@@ -150,7 +153,7 @@ def ecount(graph: _Graph) -> int:
     return c__result
 
 
-def neighbors(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def neighbors(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_neighbors``."""
     # Prepare input arguments
     c_graph = graph
@@ -180,7 +183,7 @@ def is_directed(graph: _Graph) -> bool:
     return c__result
 
 
-def degree(graph: _Graph, loops: bool, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def degree(graph: _Graph, loops: bool, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_degree``."""
     # Prepare input arguments
     c_graph = graph
@@ -218,7 +221,7 @@ def edge(graph: _Graph, eid: int) -> Tuple[int, int]:
     return from_, to
 
 
-def edges(graph: _Graph, eids: EdgeSelector) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def edges(graph: _Graph, eids: EdgeSelector) -> IntArray:
     """Type-annotated wrapper for ``igraph_edges``."""
     # Prepare input arguments
     c_graph = graph
@@ -255,7 +258,7 @@ def get_eid(graph: _Graph, from_: VertexLike, to: VertexLike, directed: bool = T
     return eid
 
 
-def get_eids(graph: _Graph, pairs: Iterable[VertexPair], directed: bool = True, error: bool = True) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def get_eids(graph: _Graph, pairs: Iterable[VertexPair], directed: bool = True, error: bool = True) -> IntArray:
     """Type-annotated wrapper for ``igraph_get_eids``."""
     # Prepare input arguments
     c_graph = graph
@@ -274,7 +277,7 @@ def get_eids(graph: _Graph, pairs: Iterable[VertexPair], directed: bool = True, 
     return eids
 
 
-def get_all_eids_between(graph: _Graph, from_: VertexLike, to: VertexLike, directed: bool = True) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def get_all_eids_between(graph: _Graph, from_: VertexLike, to: VertexLike, directed: bool = True) -> IntArray:
     """Type-annotated wrapper for ``igraph_get_all_eids_between``."""
     # Prepare input arguments
     c_graph = graph
@@ -293,7 +296,7 @@ def get_all_eids_between(graph: _Graph, from_: VertexLike, to: VertexLike, direc
     return eids
 
 
-def incident(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def incident(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_incident``."""
     # Prepare input arguments
     c_graph = graph
@@ -368,7 +371,7 @@ def adjacency(adjmatrix: MatrixLike, mode: AdjacencyMode = AdjacencyMode.DIRECTE
 # igraph_sparse_weighted_adjacency: no Python type known for type: SPARSEMAT
 
 
-def weighted_adjacency(adjmatrix: MatrixLike, mode: AdjacencyMode = AdjacencyMode.DIRECTED, loops: Loops = Loops.ONCE) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_real_t]]:
+def weighted_adjacency(adjmatrix: MatrixLike, mode: AdjacencyMode = AdjacencyMode.DIRECTED, loops: Loops = Loops.ONCE) -> Tuple[_Graph, RealArray]:
     """Type-annotated wrapper for ``igraph_weighted_adjacency``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -700,7 +703,7 @@ def lcf_vector(n: int, shifts: Iterable[int], repeats: int = 1) -> _Graph:
 # igraph_adjlist: no Python type known for type: ADJLIST
 
 
-def full_bipartite(n1: int, n2: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_bool_t]]:
+def full_bipartite(n1: int, n2: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, BoolArray]:
     """Type-annotated wrapper for ``igraph_full_bipartite``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -721,7 +724,7 @@ def full_bipartite(n1: int, n2: int, directed: bool = False, mode: NeighborMode 
     return graph, types
 
 
-def full_multipartite(n: Iterable[int], directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def full_multipartite(n: Iterable[int], directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_full_multipartite``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -778,7 +781,7 @@ def generalized_petersen(n: int, k: int) -> _Graph:
     return graph
 
 
-def turan(n: int, r: int) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def turan(n: int, r: int) -> Tuple[_Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_turan``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -973,7 +976,7 @@ def recent_degree_aging_game(nodes: int, m: int = 1, outseq: Optional[Iterable[i
     return graph
 
 
-def callaway_traits_game(nodes: int, types: int, type_dist: Iterable[float], pref_matrix: MatrixLike, edges_per_step: int = 1, directed: bool = False) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def callaway_traits_game(nodes: int, types: int, type_dist: Iterable[float], pref_matrix: MatrixLike, edges_per_step: int = 1, directed: bool = False) -> Tuple[_Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_callaway_traits_game``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -996,7 +999,7 @@ def callaway_traits_game(nodes: int, types: int, type_dist: Iterable[float], pre
     return graph, node_type_vec
 
 
-def establishment_game(nodes: int, types: int, type_dist: Iterable[float], pref_matrix: MatrixLike, k: int = 1, directed: bool = True) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def establishment_game(nodes: int, types: int, type_dist: Iterable[float], pref_matrix: MatrixLike, k: int = 1, directed: bool = True) -> Tuple[_Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_establishment_game``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -1019,7 +1022,7 @@ def establishment_game(nodes: int, types: int, type_dist: Iterable[float], pref_
     return graph, node_type_vec
 
 
-def grg_game(nodes: int, radius: float, torus: bool = False) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t]]:
+def grg_game(nodes: int, radius: float, torus: bool = False) -> Tuple[_Graph, RealArray, RealArray]:
     """Type-annotated wrapper for ``igraph_grg_game``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -1041,7 +1044,7 @@ def grg_game(nodes: int, radius: float, torus: bool = False) -> Tuple[_Graph, np
     return graph, x, y
 
 
-def preference_game(nodes: int, types: int, type_dist: Iterable[float], pref_matrix: MatrixLike, fixed_sizes: bool = False, directed: bool = False, loops: bool = False) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def preference_game(nodes: int, types: int, type_dist: Iterable[float], pref_matrix: MatrixLike, fixed_sizes: bool = False, directed: bool = False, loops: bool = False) -> Tuple[_Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_preference_game``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -1065,7 +1068,7 @@ def preference_game(nodes: int, types: int, type_dist: Iterable[float], pref_mat
     return graph, node_type_vec
 
 
-def asymmetric_preference_game(nodes: int, out_types: int, in_types: int, type_dist_matrix: MatrixLike, pref_matrix: MatrixLike, loops: bool = False) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def asymmetric_preference_game(nodes: int, out_types: int, in_types: int, type_dist_matrix: MatrixLike, pref_matrix: MatrixLike, loops: bool = False) -> Tuple[_Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_asymmetric_preference_game``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -1354,7 +1357,7 @@ def dot_product_game(vecs: MatrixLike, directed: bool = False) -> _Graph:
     return graph
 
 
-def sample_sphere_surface(dim: int, n: int = 1, radius: float = 1, positive: bool = True) -> npt.NDArray[np_type_of_igraph_real_t]:
+def sample_sphere_surface(dim: int, n: int = 1, radius: float = 1, positive: bool = True) -> RealArray:
     """Type-annotated wrapper for ``igraph_sample_sphere_surface``."""
     # Prepare input arguments
     c_dim = dim
@@ -1373,7 +1376,7 @@ def sample_sphere_surface(dim: int, n: int = 1, radius: float = 1, positive: boo
     return res
 
 
-def sample_sphere_volume(dim: int, n: int = 1, radius: float = 1, positive: bool = True) -> npt.NDArray[np_type_of_igraph_real_t]:
+def sample_sphere_volume(dim: int, n: int = 1, radius: float = 1, positive: bool = True) -> RealArray:
     """Type-annotated wrapper for ``igraph_sample_sphere_volume``."""
     # Prepare input arguments
     c_dim = dim
@@ -1392,7 +1395,7 @@ def sample_sphere_volume(dim: int, n: int = 1, radius: float = 1, positive: bool
     return res
 
 
-def sample_dirichlet(n: int, alpha: Iterable[float]) -> npt.NDArray[np_type_of_igraph_real_t]:
+def sample_dirichlet(n: int, alpha: Iterable[float]) -> RealArray:
     """Type-annotated wrapper for ``igraph_sample_dirichlet``."""
     # Prepare input arguments
     c_n = n
@@ -1427,7 +1430,7 @@ def are_connected(graph: _Graph, v1: VertexLike, v2: VertexLike) -> bool:
     return res
 
 
-def diameter(graph: _Graph, directed: bool = True, unconnected: bool = True) -> Tuple[float, int, int, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def diameter(graph: _Graph, directed: bool = True, unconnected: bool = True) -> Tuple[float, int, int, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_diameter``."""
     # Prepare input arguments
     c_graph = graph
@@ -1453,7 +1456,7 @@ def diameter(graph: _Graph, directed: bool = True, unconnected: bool = True) -> 
     return res, from_, to, vertex_path, edge_path
 
 
-def diameter_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, unconnected: bool = True) -> Tuple[float, int, int, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def diameter_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, unconnected: bool = True) -> Tuple[float, int, int, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_diameter_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -1480,7 +1483,7 @@ def diameter_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     return res, from_, to, vertex_path, edge_path
 
 
-def closeness(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t], bool]:
+def closeness(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> Tuple[RealArray, IntArray, bool]:
     """Type-annotated wrapper for ``igraph_closeness``."""
     # Prepare input arguments
     c_graph = graph
@@ -1504,7 +1507,7 @@ def closeness(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = 
     return res, reachable_count, all_reachable
 
 
-def closeness_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t], bool]:
+def closeness_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> Tuple[RealArray, IntArray, bool]:
     """Type-annotated wrapper for ``igraph_closeness_cutoff``."""
     # Prepare input arguments
     c_graph = graph
@@ -1529,7 +1532,7 @@ def closeness_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: Neighbor
     return res, reachable_count, all_reachable
 
 
-def distances(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances``."""
     # Prepare input arguments
     c_graph = graph
@@ -1548,7 +1551,7 @@ def distances(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector =
     return res
 
 
-def distances_cutoff(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_cutoff(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, cutoff: float = -1) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances_cutoff``."""
     # Prepare input arguments
     c_graph = graph
@@ -1568,7 +1571,7 @@ def distances_cutoff(graph: _Graph, from_: VertexSelector = "all", to: VertexSel
     return res
 
 
-def get_shortest_path(graph: _Graph, from_: VertexLike, to: VertexLike, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_shortest_path(graph: _Graph, from_: VertexLike, to: VertexLike, mode: NeighborMode = NeighborMode.OUT) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_shortest_path``."""
     # Prepare input arguments
     c_graph = graph
@@ -1589,7 +1592,7 @@ def get_shortest_path(graph: _Graph, from_: VertexLike, to: VertexLike, mode: Ne
     return vertices, edges
 
 
-def get_shortest_path_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_shortest_path_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_shortest_path_bellman_ford``."""
     # Prepare input arguments
     c_graph = graph
@@ -1611,7 +1614,7 @@ def get_shortest_path_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexL
     return vertices, edges
 
 
-def get_shortest_path_dijkstra(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_shortest_path_dijkstra(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_shortest_path_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -1633,7 +1636,7 @@ def get_shortest_path_dijkstra(graph: _Graph, from_: VertexLike, to: VertexLike,
     return vertices, edges
 
 
-def get_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray], IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_shortest_paths``."""
     # Prepare input arguments
     c_graph = graph
@@ -1658,7 +1661,7 @@ def get_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "a
     return vertices, edges, parents, inbound_edges
 
 
-def get_all_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_all_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray], IntArray]:
     """Type-annotated wrapper for ``igraph_get_all_shortest_paths``."""
     # Prepare input arguments
     c_graph = graph
@@ -1681,7 +1684,7 @@ def get_all_shortest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector,
     return vertices, edges, nrgeo
 
 
-def distances_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -1701,7 +1704,7 @@ def distances_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSel
     return res
 
 
-def distances_dijkstra_cutoff(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_dijkstra_cutoff(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, cutoff: float = -1) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances_dijkstra_cutoff``."""
     # Prepare input arguments
     c_graph = graph
@@ -1722,7 +1725,7 @@ def distances_dijkstra_cutoff(graph: _Graph, weights: Iterable[float], from_: Ve
     return res
 
 
-def get_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray], IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_shortest_paths_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -1748,7 +1751,7 @@ def get_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, to: VertexSele
     return vertices, edges, parents, inbound_edges
 
 
-def get_shortest_paths_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_shortest_paths_bellman_ford(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray], IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_shortest_paths_bellman_ford``."""
     # Prepare input arguments
     c_graph = graph
@@ -1774,7 +1777,7 @@ def get_shortest_paths_bellman_ford(graph: _Graph, from_: VertexLike, to: Vertex
     return vertices, edges, parents, inbound_edges
 
 
-def get_all_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, weights: Iterable[float], to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_all_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, weights: Iterable[float], to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray], IntArray]:
     """Type-annotated wrapper for ``igraph_get_all_shortest_paths_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -1798,7 +1801,7 @@ def get_all_shortest_paths_dijkstra(graph: _Graph, from_: VertexLike, weights: I
     return vertices, edges, nrgeo
 
 
-def distances_bellman_ford(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_bellman_ford(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances_bellman_ford``."""
     # Prepare input arguments
     c_graph = graph
@@ -1818,7 +1821,7 @@ def distances_bellman_ford(graph: _Graph, weights: Iterable[float], from_: Verte
     return res
 
 
-def distances_johnson(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_johnson(graph: _Graph, from_: VertexSelector = "all", to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances_johnson``."""
     # Prepare input arguments
     c_graph = graph
@@ -1838,7 +1841,7 @@ def distances_johnson(graph: _Graph, from_: VertexSelector = "all", to: VertexSe
     return res
 
 
-def distances_floyd_warshall(graph: _Graph, method: FloydWarshallAlgorithm, from_: VertexSelector = "all", to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def distances_floyd_warshall(graph: _Graph, method: FloydWarshallAlgorithm, from_: VertexSelector = "all", to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_distances_floyd_warshall``."""
     # Prepare input arguments
     c_graph = graph
@@ -1859,7 +1862,7 @@ def distances_floyd_warshall(graph: _Graph, method: FloydWarshallAlgorithm, from
     return res
 
 
-def voronoi(graph: _Graph, generators: Iterable[VertexLike], weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, tiebreaker: VoronoiTiebreaker = VoronoiTiebreaker.RANDOM) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t]]:
+def voronoi(graph: _Graph, generators: Iterable[VertexLike], weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, tiebreaker: VoronoiTiebreaker = VoronoiTiebreaker.RANDOM) -> Tuple[IntArray, RealArray]:
     """Type-annotated wrapper for ``igraph_voronoi``."""
     # Prepare input arguments
     c_graph = graph
@@ -1881,7 +1884,7 @@ def voronoi(graph: _Graph, generators: Iterable[VertexLike], weights: Optional[I
     return membership, distances
 
 
-def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", cutoff: int = -1, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", cutoff: int = -1, mode: NeighborMode = NeighborMode.OUT) -> IntArray:
     """Type-annotated wrapper for ``igraph_get_all_simple_paths``."""
     # Prepare input arguments
     c_graph = graph
@@ -1901,7 +1904,7 @@ def get_all_simple_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = 
     return res
 
 
-def get_k_shortest_paths(graph: _Graph, k: int, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]]]:
+def get_k_shortest_paths(graph: _Graph, k: int, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray]]:
     """Type-annotated wrapper for ``igraph_get_k_shortest_paths``."""
     # Prepare input arguments
     c_graph = graph
@@ -1924,7 +1927,7 @@ def get_k_shortest_paths(graph: _Graph, k: int, from_: VertexLike, to: VertexLik
     return vertex_paths, edge_paths
 
 
-def get_widest_path(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_widest_path(graph: _Graph, from_: VertexLike, to: VertexLike, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_widest_path``."""
     # Prepare input arguments
     c_graph = graph
@@ -1946,7 +1949,7 @@ def get_widest_path(graph: _Graph, from_: VertexLike, to: VertexLike, weights: O
     return vertices, edges
 
 
-def get_widest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_widest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> Tuple[List[IntArray], List[IntArray], IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_widest_paths``."""
     # Prepare input arguments
     c_graph = graph
@@ -1972,7 +1975,7 @@ def get_widest_paths(graph: _Graph, from_: VertexLike, to: VertexSelector = "all
     return vertices, edges, parents, inbound_edges
 
 
-def widest_path_widths_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def widest_path_widths_dijkstra(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_widest_path_widths_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -1992,7 +1995,7 @@ def widest_path_widths_dijkstra(graph: _Graph, weights: Iterable[float], from_: 
     return res
 
 
-def widest_path_widths_floyd_warshall(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def widest_path_widths_floyd_warshall(graph: _Graph, weights: Iterable[float], from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_widest_path_widths_floyd_warshall``."""
     # Prepare input arguments
     c_graph = graph
@@ -2012,7 +2015,7 @@ def widest_path_widths_floyd_warshall(graph: _Graph, weights: Iterable[float], f
     return res
 
 
-def spanner(graph: _Graph, stretch: float, weights: Iterable[float]) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def spanner(graph: _Graph, stretch: float, weights: Iterable[float]) -> IntArray:
     """Type-annotated wrapper for ``igraph_spanner``."""
     # Prepare input arguments
     c_graph = graph
@@ -2030,7 +2033,7 @@ def spanner(graph: _Graph, stretch: float, weights: Iterable[float]) -> npt.NDAr
     return spanner
 
 
-def subcomponent(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def subcomponent(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_subcomponent``."""
     # Prepare input arguments
     c_graph = graph
@@ -2048,7 +2051,7 @@ def subcomponent(graph: _Graph, vid: VertexLike, mode: NeighborMode = NeighborMo
     return res
 
 
-def betweenness(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def betweenness(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_betweenness``."""
     # Prepare input arguments
     c_graph = graph
@@ -2067,7 +2070,7 @@ def betweenness(graph: _Graph, vids: VertexSelector = "all", directed: bool = Tr
     return res
 
 
-def betweenness_cutoff(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+def betweenness_cutoff(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None, cutoff: float = -1) -> RealArray:
     """Type-annotated wrapper for ``igraph_betweenness_cutoff``."""
     # Prepare input arguments
     c_graph = graph
@@ -2087,7 +2090,7 @@ def betweenness_cutoff(graph: _Graph, vids: VertexSelector = "all", directed: bo
     return res
 
 
-def betweenness_subset(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def betweenness_subset(graph: _Graph, vids: VertexSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_betweenness_subset``."""
     # Prepare input arguments
     c_graph = graph
@@ -2108,7 +2111,7 @@ def betweenness_subset(graph: _Graph, vids: VertexSelector = "all", directed: bo
     return res
 
 
-def edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_edge_betweenness``."""
     # Prepare input arguments
     c_graph = graph
@@ -2126,7 +2129,7 @@ def edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Ite
     return res
 
 
-def edge_betweenness_cutoff(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+def edge_betweenness_cutoff(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None, cutoff: float = -1) -> RealArray:
     """Type-annotated wrapper for ``igraph_edge_betweenness_cutoff``."""
     # Prepare input arguments
     c_graph = graph
@@ -2145,7 +2148,7 @@ def edge_betweenness_cutoff(graph: _Graph, directed: bool = True, weights: Optio
     return res
 
 
-def edge_betweenness_subset(graph: _Graph, eids: EdgeSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def edge_betweenness_subset(graph: _Graph, eids: EdgeSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_edge_betweenness_subset``."""
     # Prepare input arguments
     c_graph = graph
@@ -2166,7 +2169,7 @@ def edge_betweenness_subset(graph: _Graph, eids: EdgeSelector = "all", directed:
     return res
 
 
-def harmonic_centrality(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def harmonic_centrality(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_harmonic_centrality``."""
     # Prepare input arguments
     c_graph = graph
@@ -2186,7 +2189,7 @@ def harmonic_centrality(graph: _Graph, vids: VertexSelector = "all", mode: Neigh
     return res
 
 
-def harmonic_centrality_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> npt.NDArray[np_type_of_igraph_real_t]:
+def harmonic_centrality_cutoff(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> RealArray:
     """Type-annotated wrapper for ``igraph_harmonic_centrality_cutoff``."""
     # Prepare input arguments
     c_graph = graph
@@ -2311,7 +2314,7 @@ def average_path_length_dijkstra(graph: _Graph, weights: Optional[Iterable[float
     return res, unconn_pairs
 
 
-def path_length_hist(graph: _Graph, directed: bool = True) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], float]:
+def path_length_hist(graph: _Graph, directed: bool = True) -> Tuple[RealArray, float]:
     """Type-annotated wrapper for ``igraph_path_length_hist``."""
     # Prepare input arguments
     c_graph = graph
@@ -2349,7 +2352,7 @@ def transitivity_undirected(graph: _Graph, mode: TransitivityMode = Transitivity
     return res
 
 
-def transitivity_local_undirected(graph: _Graph, vids: VertexSelector = "all", mode: TransitivityMode = TransitivityMode.NAN) -> npt.NDArray[np_type_of_igraph_real_t]:
+def transitivity_local_undirected(graph: _Graph, vids: VertexSelector = "all", mode: TransitivityMode = TransitivityMode.NAN) -> RealArray:
     """Type-annotated wrapper for ``igraph_transitivity_local_undirected``."""
     # Prepare input arguments
     c_graph = graph
@@ -2384,7 +2387,7 @@ def transitivity_avglocal_undirected(graph: _Graph, mode: TransitivityMode = Tra
     return res
 
 
-def transitivity_barrat(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: TransitivityMode = TransitivityMode.NAN) -> npt.NDArray[np_type_of_igraph_real_t]:
+def transitivity_barrat(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, mode: TransitivityMode = TransitivityMode.NAN) -> RealArray:
     """Type-annotated wrapper for ``igraph_transitivity_barrat``."""
     # Prepare input arguments
     c_graph = graph
@@ -2403,7 +2406,7 @@ def transitivity_barrat(graph: _Graph, vids: VertexSelector = "all", weights: Op
     return res
 
 
-def ecc(graph: _Graph, eids: EdgeSelector = "all", k: int = 3, offset: bool = False, normalize: bool = True) -> npt.NDArray[np_type_of_igraph_real_t]:
+def ecc(graph: _Graph, eids: EdgeSelector = "all", k: int = 3, offset: bool = False, normalize: bool = True) -> RealArray:
     """Type-annotated wrapper for ``igraph_ecc``."""
     # Prepare input arguments
     c_graph = graph
@@ -2441,7 +2444,7 @@ def reciprocity(graph: _Graph, ignore_loops: bool = True, mode: Reciprocity = Re
     return res
 
 
-def constraint(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def constraint(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_constraint``."""
     # Prepare input arguments
     c_graph = graph
@@ -2495,7 +2498,7 @@ def density(graph: _Graph, loops: bool = False) -> float:
     return res
 
 
-def neighborhood_size(graph: _Graph, vids: VertexSelector, order: int, mode: NeighborMode = NeighborMode.ALL, mindist: int = 0) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def neighborhood_size(graph: _Graph, vids: VertexSelector, order: int, mode: NeighborMode = NeighborMode.ALL, mindist: int = 0) -> IntArray:
     """Type-annotated wrapper for ``igraph_neighborhood_size``."""
     # Prepare input arguments
     c_graph = graph
@@ -2515,7 +2518,7 @@ def neighborhood_size(graph: _Graph, vids: VertexSelector, order: int, mode: Nei
     return res
 
 
-def neighborhood(graph: _Graph, vids: VertexSelector, order: int, mode: NeighborMode = NeighborMode.ALL, mindist: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def neighborhood(graph: _Graph, vids: VertexSelector, order: int, mode: NeighborMode = NeighborMode.ALL, mindist: int = 0) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_neighborhood``."""
     # Prepare input arguments
     c_graph = graph
@@ -2537,7 +2540,7 @@ def neighborhood(graph: _Graph, vids: VertexSelector, order: int, mode: Neighbor
 # igraph_neighborhood_graphs: no Python type known for type: GRAPH_LIST
 
 
-def topological_sorting(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def topological_sorting(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) -> IntArray:
     """Type-annotated wrapper for ``igraph_topological_sorting``."""
     # Prepare input arguments
     c_graph = graph
@@ -2554,7 +2557,7 @@ def topological_sorting(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) ->
     return res
 
 
-def feedback_arc_set(graph: _Graph, weights: Optional[Iterable[float]] = None, algo: FeedbackArcSetAlgorithm = FeedbackArcSetAlgorithm.APPROX_EADES) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def feedback_arc_set(graph: _Graph, weights: Optional[Iterable[float]] = None, algo: FeedbackArcSetAlgorithm = FeedbackArcSetAlgorithm.APPROX_EADES) -> IntArray:
     """Type-annotated wrapper for ``igraph_feedback_arc_set``."""
     # Prepare input arguments
     c_graph = graph
@@ -2572,7 +2575,7 @@ def feedback_arc_set(graph: _Graph, weights: Optional[Iterable[float]] = None, a
     return result
 
 
-def is_loop(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_of_igraph_bool_t]:
+def is_loop(graph: _Graph, es: EdgeSelector = "all") -> BoolArray:
     """Type-annotated wrapper for ``igraph_is_loop``."""
     # Prepare input arguments
     c_graph = graph
@@ -2637,7 +2640,7 @@ def is_simple(graph: _Graph) -> bool:
     return res
 
 
-def is_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_of_igraph_bool_t]:
+def is_multiple(graph: _Graph, es: EdgeSelector = "all") -> BoolArray:
     """Type-annotated wrapper for ``igraph_is_multiple``."""
     # Prepare input arguments
     c_graph = graph
@@ -2686,7 +2689,7 @@ def has_multiple(graph: _Graph) -> bool:
     return res
 
 
-def count_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_type_of_igraph_integer_t]:
+def count_multiple(graph: _Graph, es: EdgeSelector = "all") -> IntArray:
     """Type-annotated wrapper for ``igraph_count_multiple``."""
     # Prepare input arguments
     c_graph = graph
@@ -2703,7 +2706,7 @@ def count_multiple(graph: _Graph, es: EdgeSelector = "all") -> npt.NDArray[np_ty
     return res
 
 
-def girth(graph: _Graph) -> Tuple[float, npt.NDArray[np_type_of_igraph_integer_t]]:
+def girth(graph: _Graph) -> Tuple[float, IntArray]:
     """Type-annotated wrapper for ``igraph_girth``."""
     # Prepare input arguments
     c_graph = graph
@@ -2756,7 +2759,7 @@ def add_edge(graph: _Graph, from_: int, to: int) -> None:
 # igraph_hub_and_authority_scores: no Python type known for type: ARPACK_OPTIONS
 
 
-def unfold_tree(graph: _Graph, roots: Iterable[int], mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def unfold_tree(graph: _Graph, roots: Iterable[int], mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_unfold_tree``."""
     # Prepare input arguments
     c_graph = graph
@@ -2776,7 +2779,7 @@ def unfold_tree(graph: _Graph, roots: Iterable[int], mode: NeighborMode = Neighb
     return tree, vertex_index
 
 
-def is_mutual(graph: _Graph, es: EdgeSelector = "all", loops: bool = True) -> npt.NDArray[np_type_of_igraph_bool_t]:
+def is_mutual(graph: _Graph, es: EdgeSelector = "all", loops: bool = True) -> BoolArray:
     """Type-annotated wrapper for ``igraph_is_mutual``."""
     # Prepare input arguments
     c_graph = graph
@@ -2811,7 +2814,7 @@ def has_mutual(graph: _Graph, loops: bool = True) -> bool:
     return res
 
 
-def maximum_cardinality_search(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def maximum_cardinality_search(graph: _Graph) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_maximum_cardinality_search``."""
     # Prepare input arguments
     c_graph = graph
@@ -2829,7 +2832,7 @@ def maximum_cardinality_search(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_ig
     return alpha, alpham1
 
 
-def is_chordal(graph: _Graph, alpha: Optional[Iterable[int]] = None, alpham1: Optional[Iterable[VertexLike]] = None) -> Tuple[bool, npt.NDArray[np_type_of_igraph_integer_t], _Graph]:
+def is_chordal(graph: _Graph, alpha: Optional[Iterable[int]] = None, alpham1: Optional[Iterable[VertexLike]] = None) -> Tuple[bool, IntArray, _Graph]:
     """Type-annotated wrapper for ``igraph_is_chordal``."""
     # Prepare input arguments
     c_graph = graph
@@ -2851,7 +2854,7 @@ def is_chordal(graph: _Graph, alpha: Optional[Iterable[int]] = None, alpham1: Op
     return chordal, fillin, newgraph
 
 
-def avg_nearest_neighbor_degree(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, neighbor_degree_mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t]]:
+def avg_nearest_neighbor_degree(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, neighbor_degree_mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None) -> Tuple[RealArray, RealArray]:
     """Type-annotated wrapper for ``igraph_avg_nearest_neighbor_degree``."""
     # Prepare input arguments
     c_graph = graph
@@ -2873,7 +2876,7 @@ def avg_nearest_neighbor_degree(graph: _Graph, vids: VertexSelector = "all", mod
     return knn, knnk
 
 
-def strength(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = True, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def strength(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_strength``."""
     # Prepare input arguments
     c_graph = graph
@@ -2907,7 +2910,7 @@ def centralization(scores: Iterable[float], theoretical_max: float = 0, normaliz
     return c__result
 
 
-def centralization_degree(graph: _Graph, mode: NeighborMode = NeighborMode.ALL, loops: bool = True, normalized: bool = True) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], float, float]:
+def centralization_degree(graph: _Graph, mode: NeighborMode = NeighborMode.ALL, loops: bool = True, normalized: bool = True) -> Tuple[RealArray, float, float]:
     """Type-annotated wrapper for ``igraph_centralization_degree``."""
     # Prepare input arguments
     c_graph = graph
@@ -2949,7 +2952,7 @@ def centralization_degree_tmax(loops: bool, graph: Optional[_Graph] = None, node
     return res
 
 
-def centralization_betweenness(graph: _Graph, directed: bool = True, normalized: bool = True) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], float, float]:
+def centralization_betweenness(graph: _Graph, directed: bool = True, normalized: bool = True) -> Tuple[RealArray, float, float]:
     """Type-annotated wrapper for ``igraph_centralization_betweenness``."""
     # Prepare input arguments
     c_graph = graph
@@ -2989,7 +2992,7 @@ def centralization_betweenness_tmax(graph: Optional[_Graph] = None, nodes: int =
     return res
 
 
-def centralization_closeness(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, normalized: bool = True) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], float, float]:
+def centralization_closeness(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, normalized: bool = True) -> Tuple[RealArray, float, float]:
     """Type-annotated wrapper for ``igraph_centralization_closeness``."""
     # Prepare input arguments
     c_graph = graph
@@ -3108,7 +3111,7 @@ def assortativity_degree(graph: _Graph, directed: bool = True) -> float:
 # igraph_contract_vertices: no Python type known for type: VERTEX_ATTRIBUTE_COMBINATION
 
 
-def eccentricity(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+def eccentricity(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> RealArray:
     """Type-annotated wrapper for ``igraph_eccentricity``."""
     # Prepare input arguments
     c_graph = graph
@@ -3126,7 +3129,7 @@ def eccentricity(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode
     return res
 
 
-def eccentricity_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+def eccentricity_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> RealArray:
     """Type-annotated wrapper for ``igraph_eccentricity_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
@@ -3145,7 +3148,7 @@ def eccentricity_dijkstra(graph: _Graph, weights: Optional[Iterable[float]] = No
     return res
 
 
-def graph_center(graph: _Graph, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def graph_center(graph: _Graph, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_graph_center``."""
     # Prepare input arguments
     c_graph = graph
@@ -3226,7 +3229,7 @@ def pseudo_diameter_dijkstra(graph: _Graph, start_vid: VertexLike, weights: Opti
     return diameter, from_, to
 
 
-def diversity(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+def diversity(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all") -> RealArray:
     """Type-annotated wrapper for ``igraph_diversity``."""
     # Prepare input arguments
     c_graph = graph
@@ -3244,7 +3247,7 @@ def diversity(graph: _Graph, weights: Optional[Iterable[float]] = None, vids: Ve
     return res
 
 
-def random_walk(graph: _Graph, start: VertexLike, steps: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, stuck: RandomWalkStuck = RandomWalkStuck.RETURN) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def random_walk(graph: _Graph, start: VertexLike, steps: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, stuck: RandomWalkStuck = RandomWalkStuck.RETURN) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_random_walk``."""
     # Prepare input arguments
     c_graph = graph
@@ -3267,7 +3270,7 @@ def random_walk(graph: _Graph, start: VertexLike, steps: int, weights: Optional[
     return vertices, edges
 
 
-def random_edge_walk(graph: _Graph, start: VertexLike, steps: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, stuck: RandomWalkStuck = RandomWalkStuck.RETURN) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def random_edge_walk(graph: _Graph, start: VertexLike, steps: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, stuck: RandomWalkStuck = RandomWalkStuck.RETURN) -> IntArray:
     """Type-annotated wrapper for ``igraph_random_edge_walk``."""
     # Prepare input arguments
     c_graph = graph
@@ -3306,7 +3309,7 @@ def global_efficiency(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     return res
 
 
-def local_efficiency(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, directed: bool = True, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_efficiency(graph: _Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, directed: bool = True, mode: NeighborMode = NeighborMode.ALL) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_efficiency``."""
     # Prepare input arguments
     c_graph = graph
@@ -3361,7 +3364,7 @@ def transitive_closure_dag(graph: _Graph) -> _Graph:
     return closure
 
 
-def trussness(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def trussness(graph: _Graph) -> IntArray:
     """Type-annotated wrapper for ``igraph_trussness``."""
     # Prepare input arguments
     c_graph = graph
@@ -3383,7 +3386,7 @@ def trussness(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
 # igraph_bfs: no Python type known for type: BFS_FUNC
 
 
-def bfs_simple(graph: _Graph, root: VertexLike, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def bfs_simple(graph: _Graph, root: VertexLike, mode: NeighborMode = NeighborMode.OUT) -> Tuple[IntArray, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_bfs_simple``."""
     # Prepare input arguments
     c_graph = graph
@@ -3430,7 +3433,7 @@ def bipartite_projection_size(graph: _Graph, types: Optional[Iterable[Any]] = No
     return vcount1, ecount1, vcount2, ecount2
 
 
-def bipartite_projection(graph: _Graph, types: Optional[Iterable[Any]] = None, probe1: int = -1) -> Tuple[_Graph, _Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def bipartite_projection(graph: _Graph, types: Optional[Iterable[Any]] = None, probe1: int = -1) -> Tuple[_Graph, _Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_bipartite_projection``."""
     # Prepare input arguments
     c_graph = graph
@@ -3472,7 +3475,7 @@ def create_bipartite(types: Iterable[Any], edges: Iterable[int], directed: bool 
     return graph
 
 
-def incidence(incidence: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_bool_t]]:
+def incidence(incidence: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> Tuple[_Graph, BoolArray]:
     """Type-annotated wrapper for ``igraph_incidence``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -3493,7 +3496,7 @@ def incidence(incidence: MatrixLike, directed: bool = False, mode: NeighborMode 
     return graph, types
 
 
-def get_incidence(graph: _Graph, types: Optional[Iterable[Any]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def get_incidence(graph: _Graph, types: Optional[Iterable[Any]] = None) -> Tuple[RealArray, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_incidence``."""
     # Prepare input arguments
     c_graph = graph
@@ -3514,7 +3517,7 @@ def get_incidence(graph: _Graph, types: Optional[Iterable[Any]] = None) -> Tuple
     return res, row_ids, col_ids
 
 
-def is_bipartite(graph: _Graph) -> Tuple[bool, npt.NDArray[np_type_of_igraph_bool_t]]:
+def is_bipartite(graph: _Graph) -> Tuple[bool, BoolArray]:
     """Type-annotated wrapper for ``igraph_is_bipartite``."""
     # Prepare input arguments
     c_graph = graph
@@ -3532,7 +3535,7 @@ def is_bipartite(graph: _Graph) -> Tuple[bool, npt.NDArray[np_type_of_igraph_boo
     return res, type
 
 
-def bipartite_game_gnp(n1: int, n2: int, p: float, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_bool_t]]:
+def bipartite_game_gnp(n1: int, n2: int, p: float, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, BoolArray]:
     """Type-annotated wrapper for ``igraph_bipartite_game_gnp``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -3554,7 +3557,7 @@ def bipartite_game_gnp(n1: int, n2: int, p: float, directed: bool = False, mode:
     return graph, types
 
 
-def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_bool_t]]:
+def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[_Graph, BoolArray]:
     """Type-annotated wrapper for ``igraph_bipartite_game_gnm``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -3582,7 +3585,7 @@ def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: N
 # igraph_get_laplacian_sparse: no Python type known for type: SPARSEMAT
 
 
-def connected_components(graph: _Graph, mode: Connectedness = Connectedness.WEAK) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], int]:
+def connected_components(graph: _Graph, mode: Connectedness = Connectedness.WEAK) -> Tuple[IntArray, IntArray, int]:
     """Type-annotated wrapper for ``igraph_connected_components``."""
     # Prepare input arguments
     c_graph = graph
@@ -3622,7 +3625,7 @@ def is_connected(graph: _Graph, mode: Connectedness = Connectedness.WEAK) -> boo
 # igraph_decompose: no Python type known for type: GRAPH_LIST
 
 
-def articulation_points(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def articulation_points(graph: _Graph) -> IntArray:
     """Type-annotated wrapper for ``igraph_articulation_points``."""
     # Prepare input arguments
     c_graph = graph
@@ -3638,7 +3641,7 @@ def articulation_points(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_
     return res
 
 
-def biconnected_components(graph: _Graph) -> Tuple[int, List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t]]:
+def biconnected_components(graph: _Graph) -> Tuple[int, List[IntArray], List[IntArray], List[IntArray], IntArray]:
     """Type-annotated wrapper for ``igraph_biconnected_components``."""
     # Prepare input arguments
     c_graph = graph
@@ -3662,7 +3665,7 @@ def biconnected_components(graph: _Graph) -> Tuple[int, List[npt.NDArray[np_type
     return no, tree_edges, component_edges, components, articulation_points
 
 
-def bridges(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def bridges(graph: _Graph) -> IntArray:
     """Type-annotated wrapper for ``igraph_bridges``."""
     # Prepare input arguments
     c_graph = graph
@@ -3678,7 +3681,7 @@ def bridges(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
     return res
 
 
-def cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_cliques``."""
     # Prepare input arguments
     c_graph = graph
@@ -3698,7 +3701,7 @@ def cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDA
 # igraph_cliques_callback: no Python type known for type: CLIQUE_FUNC
 
 
-def clique_size_hist(graph: _Graph, min_size: int = 0, max_size: int = 0) -> npt.NDArray[np_type_of_igraph_real_t]:
+def clique_size_hist(graph: _Graph, min_size: int = 0, max_size: int = 0) -> RealArray:
     """Type-annotated wrapper for ``igraph_clique_size_hist``."""
     # Prepare input arguments
     c_graph = graph
@@ -3716,7 +3719,7 @@ def clique_size_hist(graph: _Graph, min_size: int = 0, max_size: int = 0) -> npt
     return hist
 
 
-def largest_cliques(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def largest_cliques(graph: _Graph) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_largest_cliques``."""
     # Prepare input arguments
     c_graph = graph
@@ -3732,7 +3735,7 @@ def largest_cliques(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer
     return res
 
 
-def maximal_cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def maximal_cliques(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_maximal_cliques``."""
     # Prepare input arguments
     c_graph = graph
@@ -3774,7 +3777,7 @@ def maximal_cliques_count(graph: _Graph, min_size: int = 0, max_size: int = 0) -
 # igraph_maximal_cliques_file: no Python type known for type: OUTFILE
 
 
-def maximal_cliques_hist(graph: _Graph, min_size: int = 0, max_size: int = 0) -> npt.NDArray[np_type_of_igraph_real_t]:
+def maximal_cliques_hist(graph: _Graph, min_size: int = 0, max_size: int = 0) -> RealArray:
     """Type-annotated wrapper for ``igraph_maximal_cliques_hist``."""
     # Prepare input arguments
     c_graph = graph
@@ -3814,7 +3817,7 @@ def clique_number(graph: _Graph) -> int:
 # igraph_weighted_clique_number: no Python type known for type: VERTEX_WEIGHTS
 
 
-def independent_vertex_sets(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def independent_vertex_sets(graph: _Graph, min_size: int = 0, max_size: int = 0) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_independent_vertex_sets``."""
     # Prepare input arguments
     c_graph = graph
@@ -3832,7 +3835,7 @@ def independent_vertex_sets(graph: _Graph, min_size: int = 0, max_size: int = 0)
     return res
 
 
-def largest_independent_vertex_sets(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def largest_independent_vertex_sets(graph: _Graph) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_largest_independent_vertex_sets``."""
     # Prepare input arguments
     c_graph = graph
@@ -3848,7 +3851,7 @@ def largest_independent_vertex_sets(graph: _Graph) -> List[npt.NDArray[np_type_o
     return res
 
 
-def maximal_independent_vertex_sets(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def maximal_independent_vertex_sets(graph: _Graph) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_maximal_independent_vertex_sets``."""
     # Prepare input arguments
     c_graph = graph
@@ -3880,7 +3883,7 @@ def independence_number(graph: _Graph) -> int:
     return no
 
 
-def layout_random(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_random(graph: _Graph) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_random``."""
     # Prepare input arguments
     c_graph = graph
@@ -3896,7 +3899,7 @@ def layout_random(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
     return res
 
 
-def layout_circle(graph: _Graph, order: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_circle(graph: _Graph, order: VertexSelector = "all") -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_circle``."""
     # Prepare input arguments
     c_graph = graph
@@ -3913,7 +3916,7 @@ def layout_circle(graph: _Graph, order: VertexSelector = "all") -> npt.NDArray[n
     return res
 
 
-def layout_grid(graph: _Graph, width: int = 0) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_grid(graph: _Graph, width: int = 0) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_grid``."""
     # Prepare input arguments
     c_graph = graph
@@ -3930,7 +3933,7 @@ def layout_grid(graph: _Graph, width: int = 0) -> npt.NDArray[np_type_of_igraph_
     return res
 
 
-def layout_grid_3d(graph: _Graph, width: int = 0, height: int = 0) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_grid_3d(graph: _Graph, width: int = 0, height: int = 0) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_grid_3d``."""
     # Prepare input arguments
     c_graph = graph
@@ -3950,7 +3953,7 @@ def layout_grid_3d(graph: _Graph, width: int = 0, height: int = 0) -> npt.NDArra
 # igraph_layout_fruchterman_reingold: no Python type known for type: LAYOUT_GRID
 
 
-def layout_reingold_tilford(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, roots: Optional[Iterable[VertexLike]] = None, rootlevel: Optional[Iterable[int]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_reingold_tilford(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, roots: Optional[Iterable[VertexLike]] = None, rootlevel: Optional[Iterable[int]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_reingold_tilford``."""
     # Prepare input arguments
     c_graph = graph
@@ -3969,7 +3972,7 @@ def layout_reingold_tilford(graph: _Graph, mode: NeighborMode = NeighborMode.OUT
     return res
 
 
-def layout_reingold_tilford_circular(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, roots: Optional[Iterable[VertexLike]] = None, rootlevel: Optional[Iterable[int]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_reingold_tilford_circular(graph: _Graph, mode: NeighborMode = NeighborMode.OUT, roots: Optional[Iterable[VertexLike]] = None, rootlevel: Optional[Iterable[int]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_reingold_tilford_circular``."""
     # Prepare input arguments
     c_graph = graph
@@ -3988,7 +3991,7 @@ def layout_reingold_tilford_circular(graph: _Graph, mode: NeighborMode = Neighbo
     return res
 
 
-def roots_for_tree_layout(graph: _Graph, heuristic: RootChoice, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def roots_for_tree_layout(graph: _Graph, heuristic: RootChoice, mode: NeighborMode = NeighborMode.OUT) -> IntArray:
     """Type-annotated wrapper for ``igraph_roots_for_tree_layout``."""
     # Prepare input arguments
     c_graph = graph
@@ -4006,7 +4009,7 @@ def roots_for_tree_layout(graph: _Graph, heuristic: RootChoice, mode: NeighborMo
     return roots
 
 
-def layout_random_3d(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_random_3d(graph: _Graph) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_random_3d``."""
     # Prepare input arguments
     c_graph = graph
@@ -4022,7 +4025,7 @@ def layout_random_3d(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
     return res
 
 
-def layout_sphere(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_sphere(graph: _Graph) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_sphere``."""
     # Prepare input arguments
     c_graph = graph
@@ -4066,7 +4069,7 @@ def layout_graphopt(graph: _Graph, res: MatrixLike, niter: int = 500, node_charg
 # igraph_layout_merge_dla: no Python type known for type: GRAPH_PTR_LIST
 
 
-def layout_sugiyama(graph: _Graph, layers: Optional[Iterable[int]] = None, hgap: float = 1, vgap: float = 1, maxiter: int = 100, weights: Optional[Iterable[float]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], _Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def layout_sugiyama(graph: _Graph, layers: Optional[Iterable[int]] = None, hgap: float = 1, vgap: float = 1, maxiter: int = 100, weights: Optional[Iterable[float]] = None) -> Tuple[RealArray, _Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_layout_sugiyama``."""
     # Prepare input arguments
     c_graph = graph
@@ -4091,7 +4094,7 @@ def layout_sugiyama(graph: _Graph, layers: Optional[Iterable[int]] = None, hgap:
     return res, extd_graph, extd_to_orig_eids
 
 
-def layout_mds(graph: _Graph, dist: Optional[MatrixLike] = None, dim: int = 2) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_mds(graph: _Graph, dist: Optional[MatrixLike] = None, dim: int = 2) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_mds``."""
     # Prepare input arguments
     c_graph = graph
@@ -4109,7 +4112,7 @@ def layout_mds(graph: _Graph, dist: Optional[MatrixLike] = None, dim: int = 2) -
     return res
 
 
-def layout_bipartite(graph: _Graph, types: Optional[Iterable[Any]] = None, hgap: float = 1, vgap: float = 1, maxiter: int = 100) -> npt.NDArray[np_type_of_igraph_real_t]:
+def layout_bipartite(graph: _Graph, types: Optional[Iterable[Any]] = None, hgap: float = 1, vgap: float = 1, maxiter: int = 100) -> RealArray:
     """Type-annotated wrapper for ``igraph_layout_bipartite``."""
     # Prepare input arguments
     c_graph = graph
@@ -4179,7 +4182,7 @@ def layout_umap_compute_weights(graph: _Graph, distances: Iterable[float], weigh
     weights = igraph_vector_t_to_numpy_array(c_weights)
 
 
-def cocitation(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+def cocitation(graph: _Graph, vids: VertexSelector = "all") -> RealArray:
     """Type-annotated wrapper for ``igraph_cocitation``."""
     # Prepare input arguments
     c_graph = graph
@@ -4196,7 +4199,7 @@ def cocitation(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_ty
     return res
 
 
-def bibcoupling(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+def bibcoupling(graph: _Graph, vids: VertexSelector = "all") -> RealArray:
     """Type-annotated wrapper for ``igraph_bibcoupling``."""
     # Prepare input arguments
     c_graph = graph
@@ -4213,7 +4216,7 @@ def bibcoupling(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_t
     return res
 
 
-def similarity_dice(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_dice(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_dice``."""
     # Prepare input arguments
     c_graph = graph
@@ -4232,7 +4235,7 @@ def similarity_dice(graph: _Graph, vids: VertexSelector = "all", mode: NeighborM
     return res
 
 
-def similarity_dice_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_dice_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_dice_es``."""
     # Prepare input arguments
     c_graph = graph
@@ -4251,7 +4254,7 @@ def similarity_dice_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMo
     return res
 
 
-def similarity_dice_pairs(graph: _Graph, pairs: Iterable[VertexPair], mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_dice_pairs(graph: _Graph, pairs: Iterable[VertexPair], mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_dice_pairs``."""
     # Prepare input arguments
     c_graph = graph
@@ -4270,7 +4273,7 @@ def similarity_dice_pairs(graph: _Graph, pairs: Iterable[VertexPair], mode: Neig
     return res
 
 
-def similarity_inverse_log_weighted(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_inverse_log_weighted(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_inverse_log_weighted``."""
     # Prepare input arguments
     c_graph = graph
@@ -4288,7 +4291,7 @@ def similarity_inverse_log_weighted(graph: _Graph, vids: VertexSelector = "all",
     return res
 
 
-def similarity_jaccard(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_jaccard(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_jaccard``."""
     # Prepare input arguments
     c_graph = graph
@@ -4307,7 +4310,7 @@ def similarity_jaccard(graph: _Graph, vids: VertexSelector = "all", mode: Neighb
     return res
 
 
-def similarity_jaccard_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_jaccard_es(graph: _Graph, es: EdgeSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_jaccard_es``."""
     # Prepare input arguments
     c_graph = graph
@@ -4326,7 +4329,7 @@ def similarity_jaccard_es(graph: _Graph, es: EdgeSelector = "all", mode: Neighbo
     return res
 
 
-def similarity_jaccard_pairs(graph: _Graph, pairs: Iterable[VertexPair], mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> npt.NDArray[np_type_of_igraph_real_t]:
+def similarity_jaccard_pairs(graph: _Graph, pairs: Iterable[VertexPair], mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_jaccard_pairs``."""
     # Prepare input arguments
     c_graph = graph
@@ -4363,7 +4366,7 @@ def compare_communities(comm1: Iterable[int], comm2: Iterable[int], method: Comm
     return res
 
 
-def community_spinglass(graph: _Graph, weights: Optional[Iterable[float]] = None, spins: int = 25, parupdate: bool = False, starttemp: float = 1, stoptemp: float = 0.01, coolfact: float = 0.99, update_rule: SpinglassUpdateMode = SpinglassUpdateMode.CONFIG, gamma: float = 1.0, implementation: SpinglassImplementation = SpinglassImplementation.ORIG, lambda_: float = 1.0) -> Tuple[float, float, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_spinglass(graph: _Graph, weights: Optional[Iterable[float]] = None, spins: int = 25, parupdate: bool = False, starttemp: float = 1, stoptemp: float = 0.01, coolfact: float = 0.99, update_rule: SpinglassUpdateMode = SpinglassUpdateMode.CONFIG, gamma: float = 1.0, implementation: SpinglassImplementation = SpinglassImplementation.ORIG, lambda_: float = 1.0) -> Tuple[float, float, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_spinglass``."""
     # Prepare input arguments
     c_graph = graph
@@ -4395,7 +4398,7 @@ def community_spinglass(graph: _Graph, weights: Optional[Iterable[float]] = None
     return modularity, temperature, membership, csize
 
 
-def community_spinglass_single(graph: _Graph, vertex: int, weights: Optional[Iterable[float]] = None, spins: int = 25, update_rule: SpinglassUpdateMode = SpinglassUpdateMode.CONFIG, gamma: float = 1.0) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], float, float, int, int]:
+def community_spinglass_single(graph: _Graph, vertex: int, weights: Optional[Iterable[float]] = None, spins: int = 25, update_rule: SpinglassUpdateMode = SpinglassUpdateMode.CONFIG, gamma: float = 1.0) -> Tuple[IntArray, float, float, int, int]:
     """Type-annotated wrapper for ``igraph_community_spinglass_single``."""
     # Prepare input arguments
     c_graph = graph
@@ -4424,7 +4427,7 @@ def community_spinglass_single(graph: _Graph, vertex: int, weights: Optional[Ite
     return community, cohesion, adhesion, inner_links, outer_links
 
 
-def community_walktrap(graph: _Graph, weights: Optional[Iterable[float]] = None, steps: int = 4) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_walktrap(graph: _Graph, weights: Optional[Iterable[float]] = None, steps: int = 4) -> Tuple[IntArray, RealArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_walktrap``."""
     # Prepare input arguments
     c_graph = graph
@@ -4446,7 +4449,7 @@ def community_walktrap(graph: _Graph, weights: Optional[Iterable[float]] = None,
     return merges, modularity, membership
 
 
-def community_edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_edge_betweenness(graph: _Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> Tuple[IntArray, RealArray, IntArray, IntArray, RealArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_edge_betweenness``."""
     # Prepare input arguments
     c_graph = graph
@@ -4474,7 +4477,7 @@ def community_edge_betweenness(graph: _Graph, directed: bool = True, weights: Op
     return result, edge_betweenness, merges, bridges, modularity, membership
 
 
-def community_eb_get_merges(graph: _Graph, directed: bool, edges: Iterable[EdgeLike], weights: Optional[Iterable[float]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_eb_get_merges(graph: _Graph, directed: bool, edges: Iterable[EdgeLike], weights: Optional[Iterable[float]] = None) -> Tuple[IntArray, IntArray, RealArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_eb_get_merges``."""
     # Prepare input arguments
     c_graph = graph
@@ -4499,7 +4502,7 @@ def community_eb_get_merges(graph: _Graph, directed: bool, edges: Iterable[EdgeL
     return merges, bridges, modularity, membership
 
 
-def community_fastgreedy(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_fastgreedy(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[IntArray, RealArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_fastgreedy``."""
     # Prepare input arguments
     c_graph = graph
@@ -4520,7 +4523,7 @@ def community_fastgreedy(graph: _Graph, weights: Optional[Iterable[float]] = Non
     return merges, modularity, membership
 
 
-def community_to_membership(merges: MatrixIntLike, nodes: int, steps: int) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_to_membership(merges: MatrixIntLike, nodes: int, steps: int) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_to_membership``."""
     # Prepare input arguments
     c_merges = sequence_to_igraph_matrix_int_t_view(merges)
@@ -4540,7 +4543,7 @@ def community_to_membership(merges: MatrixIntLike, nodes: int, steps: int) -> Tu
     return membership, csize
 
 
-def le_community_to_membership(merges: MatrixIntLike, steps: int, membership: Iterable[int]) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def le_community_to_membership(merges: MatrixIntLike, steps: int, membership: Iterable[int]) -> IntArray:
     """Type-annotated wrapper for ``igraph_le_community_to_membership``."""
     # Prepare input arguments
     c_merges = sequence_to_igraph_matrix_int_t_view(merges)
@@ -4579,7 +4582,7 @@ def modularity(graph: _Graph, membership: Iterable[int], weights: Optional[Itera
     return modularity
 
 
-def modularity_matrix(graph: _Graph, weights: Optional[Iterable[float]] = None, resolution: float = 1.0, directed: bool = True) -> npt.NDArray[np_type_of_igraph_real_t]:
+def modularity_matrix(graph: _Graph, weights: Optional[Iterable[float]] = None, resolution: float = 1.0, directed: bool = True) -> RealArray:
     """Type-annotated wrapper for ``igraph_modularity_matrix``."""
     # Prepare input arguments
     c_graph = graph
@@ -4598,7 +4601,7 @@ def modularity_matrix(graph: _Graph, weights: Optional[Iterable[float]] = None, 
     return modmat
 
 
-def reindex_membership(membership: Iterable[int]) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], int]:
+def reindex_membership(membership: Iterable[int]) -> Tuple[IntArray, int]:
     """Type-annotated wrapper for ``igraph_reindex_membership``."""
     # Prepare input arguments
     c_membership = iterable_to_igraph_vector_int_t(membership)
@@ -4619,7 +4622,7 @@ def reindex_membership(membership: Iterable[int]) -> Tuple[npt.NDArray[np_type_o
 # igraph_community_leading_eigenvector: no Python type known for type: ARPACK_OPTIONS
 
 
-def community_fluid_communities(graph: _Graph, no_of_communities: int) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def community_fluid_communities(graph: _Graph, no_of_communities: int) -> IntArray:
     """Type-annotated wrapper for ``igraph_community_fluid_communities``."""
     # Prepare input arguments
     c_graph = graph
@@ -4636,7 +4639,7 @@ def community_fluid_communities(graph: _Graph, no_of_communities: int) -> npt.ND
     return membership
 
 
-def community_label_propagation(graph: _Graph, mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None, initial: Optional[Iterable[int]] = None, fixed: Optional[Iterable[bool]] = None) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def community_label_propagation(graph: _Graph, mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None, initial: Optional[Iterable[int]] = None, fixed: Optional[Iterable[bool]] = None) -> IntArray:
     """Type-annotated wrapper for ``igraph_community_label_propagation``."""
     # Prepare input arguments
     c_graph = graph
@@ -4656,7 +4659,7 @@ def community_label_propagation(graph: _Graph, mode: NeighborMode = NeighborMode
     return membership
 
 
-def community_multilevel(graph: _Graph, weights: Optional[Iterable[float]] = None, resolution: float = 1.0) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t]]:
+def community_multilevel(graph: _Graph, weights: Optional[Iterable[float]] = None, resolution: float = 1.0) -> Tuple[IntArray, IntArray, RealArray]:
     """Type-annotated wrapper for ``igraph_community_multilevel``."""
     # Prepare input arguments
     c_graph = graph
@@ -4678,7 +4681,7 @@ def community_multilevel(graph: _Graph, weights: Optional[Iterable[float]] = Non
     return membership, memberships, modularity
 
 
-def community_optimal_modularity(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[float, npt.NDArray[np_type_of_igraph_integer_t]]:
+def community_optimal_modularity(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[float, IntArray]:
     """Type-annotated wrapper for ``igraph_community_optimal_modularity``."""
     # Prepare input arguments
     c_graph = graph
@@ -4720,7 +4723,7 @@ def split_join_distance(comm1: Iterable[int], comm2: Iterable[int]) -> Tuple[int
 # igraph_community_infomap: no Python type known for type: VERTEX_WEIGHTS
 
 
-def graphlets(graph: _Graph, weights: Optional[Iterable[float]] = None, niter: int = 1000) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_real_t]]:
+def graphlets(graph: _Graph, weights: Optional[Iterable[float]] = None, niter: int = 1000) -> Tuple[List[IntArray], RealArray]:
     """Type-annotated wrapper for ``igraph_graphlets``."""
     # Prepare input arguments
     c_graph = graph
@@ -4740,7 +4743,7 @@ def graphlets(graph: _Graph, weights: Optional[Iterable[float]] = None, niter: i
     return cliques, Mu
 
 
-def graphlets_candidate_basis(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_real_t]]:
+def graphlets_candidate_basis(graph: _Graph, weights: Optional[Iterable[float]] = None) -> Tuple[List[IntArray], RealArray]:
     """Type-annotated wrapper for ``igraph_graphlets_candidate_basis``."""
     # Prepare input arguments
     c_graph = graph
@@ -4800,7 +4803,7 @@ def graphlets_project(graph: _Graph, cliques: Iterable[Iterable[VertexLike]], Mu
 # igraph_get_adjacency_sparse: no Python type known for type: SPARSEMAT
 
 
-def get_edgelist(graph: _Graph, bycol: bool = False) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def get_edgelist(graph: _Graph, bycol: bool = False) -> IntArray:
     """Type-annotated wrapper for ``igraph_get_edgelist``."""
     # Prepare input arguments
     c_graph = graph
@@ -4817,7 +4820,7 @@ def get_edgelist(graph: _Graph, bycol: bool = False) -> npt.NDArray[np_type_of_i
     return res
 
 
-def get_stochastic(graph: _Graph, column_wise: bool = False, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def get_stochastic(graph: _Graph, column_wise: bool = False, weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_get_stochastic``."""
     # Prepare input arguments
     c_graph = graph
@@ -4877,7 +4880,7 @@ def get_stochastic(graph: _Graph, column_wise: bool = False, weights: Optional[I
 # igraph_write_graph_dot: no Python type known for type: OUTFILE
 
 
-def motifs_randesu(graph: _Graph, cut_prob: Iterable[float], size: int = 3) -> npt.NDArray[np_type_of_igraph_real_t]:
+def motifs_randesu(graph: _Graph, cut_prob: Iterable[float], size: int = 3) -> RealArray:
     """Type-annotated wrapper for ``igraph_motifs_randesu``."""
     # Prepare input arguments
     c_graph = graph
@@ -4953,7 +4956,7 @@ def dyad_census(graph: _Graph) -> Tuple[float, float, float]:
     return mut, asym, null
 
 
-def triad_census(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
+def triad_census(graph: _Graph) -> RealArray:
     """Type-annotated wrapper for ``igraph_triad_census``."""
     # Prepare input arguments
     c_graph = graph
@@ -4969,7 +4972,7 @@ def triad_census(graph: _Graph) -> npt.NDArray[np_type_of_igraph_real_t]:
     return res
 
 
-def adjacent_triangles(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArray[np_type_of_igraph_real_t]:
+def adjacent_triangles(graph: _Graph, vids: VertexSelector = "all") -> RealArray:
     """Type-annotated wrapper for ``igraph_adjacent_triangles``."""
     # Prepare input arguments
     c_graph = graph
@@ -4986,7 +4989,7 @@ def adjacent_triangles(graph: _Graph, vids: VertexSelector = "all") -> npt.NDArr
     return res
 
 
-def local_scan_0(graph: _Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_0(graph: _Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_0``."""
     # Prepare input arguments
     c_graph = graph
@@ -5004,7 +5007,7 @@ def local_scan_0(graph: _Graph, weights: Optional[Iterable[float]] = None, mode:
     return res
 
 
-def local_scan_0_them(us: _Graph, them: _Graph, weights_them: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_0_them(us: _Graph, them: _Graph, weights_them: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_0_them``."""
     # Prepare input arguments
     c_us = us
@@ -5023,7 +5026,7 @@ def local_scan_0_them(us: _Graph, them: _Graph, weights_them: Optional[Iterable[
     return res
 
 
-def local_scan_1_ecount(graph: _Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_1_ecount(graph: _Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_1_ecount``."""
     # Prepare input arguments
     c_graph = graph
@@ -5041,7 +5044,7 @@ def local_scan_1_ecount(graph: _Graph, weights: Optional[Iterable[float]] = None
     return res
 
 
-def local_scan_1_ecount_them(us: _Graph, them: _Graph, weights_them: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_1_ecount_them(us: _Graph, them: _Graph, weights_them: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_1_ecount_them``."""
     # Prepare input arguments
     c_us = us
@@ -5060,7 +5063,7 @@ def local_scan_1_ecount_them(us: _Graph, them: _Graph, weights_them: Optional[It
     return res
 
 
-def local_scan_k_ecount(graph: _Graph, k: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_k_ecount(graph: _Graph, k: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_k_ecount``."""
     # Prepare input arguments
     c_graph = graph
@@ -5079,7 +5082,7 @@ def local_scan_k_ecount(graph: _Graph, k: int, weights: Optional[Iterable[float]
     return res
 
 
-def local_scan_k_ecount_them(us: _Graph, them: _Graph, k: int, weights_them: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_k_ecount_them(us: _Graph, them: _Graph, k: int, weights_them: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_k_ecount_them``."""
     # Prepare input arguments
     c_us = us
@@ -5099,7 +5102,7 @@ def local_scan_k_ecount_them(us: _Graph, them: _Graph, k: int, weights_them: Opt
     return res
 
 
-def local_scan_neighborhood_ecount(graph: _Graph, neighborhoods: Iterable[Iterable[VertexLike]], weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_neighborhood_ecount(graph: _Graph, neighborhoods: Iterable[Iterable[VertexLike]], weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_neighborhood_ecount``."""
     # Prepare input arguments
     c_graph = graph
@@ -5117,7 +5120,7 @@ def local_scan_neighborhood_ecount(graph: _Graph, neighborhoods: Iterable[Iterab
     return res
 
 
-def local_scan_subset_ecount(graph: _Graph, subsets: Iterable[Iterable[VertexLike]], weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_real_t]:
+def local_scan_subset_ecount(graph: _Graph, subsets: Iterable[Iterable[VertexLike]], weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_local_scan_subset_ecount``."""
     # Prepare input arguments
     c_graph = graph
@@ -5135,7 +5138,7 @@ def local_scan_subset_ecount(graph: _Graph, subsets: Iterable[Iterable[VertexLik
     return res
 
 
-def list_triangles(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def list_triangles(graph: _Graph) -> IntArray:
     """Type-annotated wrapper for ``igraph_list_triangles``."""
     # Prepare input arguments
     c_graph = graph
@@ -5170,7 +5173,7 @@ def disjoint_union(left: _Graph, right: _Graph) -> _Graph:
 # igraph_disjoint_union_many: no Python type known for type: GRAPH_PTR_LIST
 
 
-def union(left: _Graph, right: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def union(left: _Graph, right: _Graph) -> Tuple[_Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_union``."""
     # Prepare input arguments
     c_res = _Graph()
@@ -5193,7 +5196,7 @@ def union(left: _Graph, right: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_i
 # igraph_union_many: no Python type known for type: GRAPH_PTR_LIST
 
 
-def intersection(left: _Graph, right: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def intersection(left: _Graph, right: _Graph) -> Tuple[_Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_intersection``."""
     # Prepare input arguments
     c_res = _Graph()
@@ -5250,7 +5253,7 @@ def complementer(graph: _Graph, loops: bool = False) -> _Graph:
     return res
 
 
-def compose(g1: _Graph, g2: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def compose(g1: _Graph, g2: _Graph) -> Tuple[_Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_compose``."""
     # Prepare input arguments
     c_res = _Graph()
@@ -5271,7 +5274,7 @@ def compose(g1: _Graph, g2: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igra
     return res, edge_map1, edge_map2
 
 
-def induced_subgraph_map(graph: _Graph, vids: VertexSelector, impl: SubgraphImplementation) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def induced_subgraph_map(graph: _Graph, vids: VertexSelector, impl: SubgraphImplementation) -> Tuple[_Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_induced_subgraph_map``."""
     # Prepare input arguments
     c_graph = graph
@@ -5293,7 +5296,7 @@ def induced_subgraph_map(graph: _Graph, vids: VertexSelector, impl: SubgraphImpl
     return res, map, invmap
 
 
-def gomory_hu_tree(graph: _Graph, capacity: Optional[Iterable[float]] = None) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_real_t]]:
+def gomory_hu_tree(graph: _Graph, capacity: Optional[Iterable[float]] = None) -> Tuple[_Graph, RealArray]:
     """Type-annotated wrapper for ``igraph_gomory_hu_tree``."""
     # Prepare input arguments
     c_graph = graph
@@ -5333,7 +5336,7 @@ def mincut_value(graph: _Graph, capacity: Optional[Iterable[float]] = None) -> f
     return res
 
 
-def st_mincut(graph: _Graph, source: VertexLike, target: VertexLike, capacity: Optional[Iterable[float]] = None) -> Tuple[float, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def st_mincut(graph: _Graph, source: VertexLike, target: VertexLike, capacity: Optional[Iterable[float]] = None) -> Tuple[float, IntArray, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_st_mincut``."""
     # Prepare input arguments
     c_graph = graph
@@ -5377,7 +5380,7 @@ def st_mincut_value(graph: _Graph, source: VertexLike, target: VertexLike, capac
     return res
 
 
-def mincut(graph: _Graph, capacity: Optional[Iterable[float]] = None) -> Tuple[float, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def mincut(graph: _Graph, capacity: Optional[Iterable[float]] = None) -> Tuple[float, IntArray, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_mincut``."""
     # Prepare input arguments
     c_graph = graph
@@ -5400,7 +5403,7 @@ def mincut(graph: _Graph, capacity: Optional[Iterable[float]] = None) -> Tuple[f
     return value, partition1, partition2, cut
 
 
-def residual_graph(graph: _Graph, capacity: Iterable[float], flow: Iterable[float]) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_real_t]]:
+def residual_graph(graph: _Graph, capacity: Iterable[float], flow: Iterable[float]) -> Tuple[_Graph, RealArray]:
     """Type-annotated wrapper for ``igraph_residual_graph``."""
     # Prepare input arguments
     c_graph = graph
@@ -5562,7 +5565,7 @@ def cohesion(graph: _Graph, checks: bool = True) -> int:
     return res
 
 
-def dominator_tree(graph: _Graph, root: VertexLike, mode: NeighborMode = NeighborMode.OUT) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], _Graph, npt.NDArray[np_type_of_igraph_integer_t]]:
+def dominator_tree(graph: _Graph, root: VertexLike, mode: NeighborMode = NeighborMode.OUT) -> Tuple[IntArray, _Graph, IntArray]:
     """Type-annotated wrapper for ``igraph_dominator_tree``."""
     # Prepare input arguments
     c_graph = graph
@@ -5584,7 +5587,7 @@ def dominator_tree(graph: _Graph, root: VertexLike, mode: NeighborMode = Neighbo
     return dom, domtree, leftout
 
 
-def all_st_cuts(graph: _Graph, source: VertexLike, target: VertexLike) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]]]:
+def all_st_cuts(graph: _Graph, source: VertexLike, target: VertexLike) -> Tuple[List[IntArray], List[IntArray]]:
     """Type-annotated wrapper for ``igraph_all_st_cuts``."""
     # Prepare input arguments
     c_graph = graph
@@ -5604,7 +5607,7 @@ def all_st_cuts(graph: _Graph, source: VertexLike, target: VertexLike) -> Tuple[
     return cuts, partition1s
 
 
-def all_st_mincuts(graph: _Graph, source: VertexLike, target: VertexLike, capacity: Optional[Iterable[float]] = None) -> Tuple[float, List[npt.NDArray[np_type_of_igraph_integer_t]], List[npt.NDArray[np_type_of_igraph_integer_t]]]:
+def all_st_mincuts(graph: _Graph, source: VertexLike, target: VertexLike, capacity: Optional[Iterable[float]] = None) -> Tuple[float, List[IntArray], List[IntArray]]:
     """Type-annotated wrapper for ``igraph_all_st_mincuts``."""
     # Prepare input arguments
     c_graph = graph
@@ -5627,7 +5630,7 @@ def all_st_mincuts(graph: _Graph, source: VertexLike, target: VertexLike, capaci
     return value, cuts, partition1s
 
 
-def even_tarjan_reduction(graph: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_real_t]]:
+def even_tarjan_reduction(graph: _Graph) -> Tuple[_Graph, RealArray]:
     """Type-annotated wrapper for ``igraph_even_tarjan_reduction``."""
     # Prepare input arguments
     c_graph = graph
@@ -5679,7 +5682,7 @@ def is_minimal_separator(graph: _Graph, candidate: VertexSelector) -> bool:
     return res
 
 
-def all_minimal_st_separators(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def all_minimal_st_separators(graph: _Graph) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_all_minimal_st_separators``."""
     # Prepare input arguments
     c_graph = graph
@@ -5695,7 +5698,7 @@ def all_minimal_st_separators(graph: _Graph) -> List[npt.NDArray[np_type_of_igra
     return separators
 
 
-def minimum_size_separators(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def minimum_size_separators(graph: _Graph) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_minimum_size_separators``."""
     # Prepare input arguments
     c_graph = graph
@@ -5711,7 +5714,7 @@ def minimum_size_separators(graph: _Graph) -> List[npt.NDArray[np_type_of_igraph
     return separators
 
 
-def cohesive_blocks(graph: _Graph) -> Tuple[List[npt.NDArray[np_type_of_igraph_integer_t]], npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t], _Graph]:
+def cohesive_blocks(graph: _Graph) -> Tuple[List[IntArray], IntArray, IntArray, _Graph]:
     """Type-annotated wrapper for ``igraph_cohesive_blocks``."""
     # Prepare input arguments
     c_graph = graph
@@ -5733,7 +5736,7 @@ def cohesive_blocks(graph: _Graph) -> Tuple[List[npt.NDArray[np_type_of_igraph_i
     return blocks, cohesion, parent, blockTree
 
 
-def coreness(graph: _Graph, mode: NeighborMode = NeighborMode.ALL) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def coreness(graph: _Graph, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_coreness``."""
     # Prepare input arguments
     c_graph = graph
@@ -5876,7 +5879,7 @@ def permute_vertices(graph: _Graph, permutation: Iterable[int]) -> _Graph:
 # igraph_subisomorphic_lad: no Python type known for type: VECTOR_INT_LIST
 
 
-def simplify_and_colorize(graph: _Graph) -> Tuple[_Graph, npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def simplify_and_colorize(graph: _Graph) -> Tuple[_Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_simplify_and_colorize``."""
     # Prepare input arguments
     c_graph = graph
@@ -5959,7 +5962,7 @@ def is_maximal_matching(graph: _Graph, matching: Iterable[int], types: Optional[
 # igraph_sir: no Python type known for type: SIR_LIST
 
 
-def running_mean(data: Iterable[float], binwidth: int) -> npt.NDArray[np_type_of_igraph_real_t]:
+def running_mean(data: Iterable[float], binwidth: int) -> RealArray:
     """Type-annotated wrapper for ``igraph_running_mean``."""
     # Prepare input arguments
     c_data = iterable_to_igraph_vector_t_view(data)
@@ -5976,7 +5979,7 @@ def running_mean(data: Iterable[float], binwidth: int) -> npt.NDArray[np_type_of
     return res
 
 
-def random_sample(l: int, h: int, length: int) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def random_sample(l: int, h: int, length: int) -> IntArray:
     """Type-annotated wrapper for ``igraph_random_sample``."""
     # Prepare input arguments
     c_res = _VectorInt.create(0)
@@ -5994,7 +5997,7 @@ def random_sample(l: int, h: int, length: int) -> npt.NDArray[np_type_of_igraph_
     return res
 
 
-def convex_hull(data: MatrixLike) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_real_t]]:
+def convex_hull(data: MatrixLike) -> Tuple[IntArray, RealArray]:
     """Type-annotated wrapper for ``igraph_convex_hull``."""
     # Prepare input arguments
     c_data = sequence_to_igraph_matrix_t_view(data)
@@ -6060,7 +6063,7 @@ def cmp_epsilon(a: float, b: float, eps: float) -> int:
 # igraph_eigen_matrix_symmetric: no Python type known for type: SPARSEMAT
 
 
-def solve_lsap(c: MatrixLike, n: int) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def solve_lsap(c: MatrixLike, n: int) -> IntArray:
     """Type-annotated wrapper for ``igraph_solve_lsap``."""
     # Prepare input arguments
     c_c = sequence_to_igraph_matrix_t_view(c)
@@ -6095,7 +6098,7 @@ def is_eulerian(graph: _Graph) -> Tuple[bool, bool]:
     return has_path, has_cycle
 
 
-def eulerian_path(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def eulerian_path(graph: _Graph) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_eulerian_path``."""
     # Prepare input arguments
     c_graph = graph
@@ -6113,7 +6116,7 @@ def eulerian_path(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_integer_
     return edge_res, vertex_res
 
 
-def eulerian_cycle(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_integer_t], npt.NDArray[np_type_of_igraph_integer_t]]:
+def eulerian_cycle(graph: _Graph) -> Tuple[IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_eulerian_cycle``."""
     # Prepare input arguments
     c_graph = graph
@@ -6131,7 +6134,7 @@ def eulerian_cycle(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_integer
     return edge_res, vertex_res
 
 
-def fundamental_cycles(graph: _Graph, bfs_cutoff: int, start: Optional[VertexLike] = None, weights: Optional[Iterable[float]] = None) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def fundamental_cycles(graph: _Graph, bfs_cutoff: int, start: Optional[VertexLike] = None, weights: Optional[Iterable[float]] = None) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_fundamental_cycles``."""
     # Prepare input arguments
     c_graph = graph
@@ -6150,7 +6153,7 @@ def fundamental_cycles(graph: _Graph, bfs_cutoff: int, start: Optional[VertexLik
     return basis
 
 
-def minimum_cycle_basis(graph: _Graph, bfs_cutoff: int, complete: bool, use_cycle_order: bool, weights: Optional[Iterable[float]] = None) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+def minimum_cycle_basis(graph: _Graph, bfs_cutoff: int, complete: bool, use_cycle_order: bool, weights: Optional[Iterable[float]] = None) -> List[IntArray]:
     """Type-annotated wrapper for ``igraph_minimum_cycle_basis``."""
     # Prepare input arguments
     c_graph = graph
@@ -6189,7 +6192,7 @@ def is_tree(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) -> Tuple[bool,
     return res, root
 
 
-def is_forest(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) -> Tuple[bool, npt.NDArray[np_type_of_igraph_integer_t]]:
+def is_forest(graph: _Graph, mode: NeighborMode = NeighborMode.OUT) -> Tuple[bool, IntArray]:
     """Type-annotated wrapper for ``igraph_is_forest``."""
     # Prepare input arguments
     c_graph = graph
@@ -6224,7 +6227,7 @@ def from_prufer(prufer: Iterable[int]) -> _Graph:
     return graph
 
 
-def to_prufer(graph: _Graph) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def to_prufer(graph: _Graph) -> IntArray:
     """Type-annotated wrapper for ``igraph_to_prufer``."""
     # Prepare input arguments
     c_graph = graph
@@ -6257,7 +6260,7 @@ def tree_from_parent_vector(parents: Iterable[int], type: TreeMode = TreeMode.OU
     return graph
 
 
-def minimum_spanning_tree(graph: _Graph, weights: Optional[Iterable[float]] = None) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def minimum_spanning_tree(graph: _Graph, weights: Optional[Iterable[float]] = None) -> IntArray:
     """Type-annotated wrapper for ``igraph_minimum_spanning_tree``."""
     # Prepare input arguments
     c_graph = graph
@@ -6307,7 +6310,7 @@ def minimum_spanning_tree_prim(graph: _Graph, weights: Iterable[float]) -> _Grap
     return mst
 
 
-def random_spanning_tree(graph: _Graph, vid: Optional[VertexLike] = None) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def random_spanning_tree(graph: _Graph, vid: Optional[VertexLike] = None) -> IntArray:
     """Type-annotated wrapper for ``igraph_random_spanning_tree``."""
     # Prepare input arguments
     c_graph = graph
@@ -6412,7 +6415,7 @@ def roulette_wheel_imitation(graph: _Graph, vid: VertexLike, is_local: bool, qua
     strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
 
 
-def convergence_degree(graph: _Graph) -> Tuple[npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t], npt.NDArray[np_type_of_igraph_real_t]]:
+def convergence_degree(graph: _Graph) -> Tuple[RealArray, RealArray, RealArray]:
     """Type-annotated wrapper for ``igraph_convergence_degree``."""
     # Prepare input arguments
     c_graph = graph
@@ -6481,7 +6484,7 @@ def invalidate_cache(graph: _Graph) -> None:
     igraph_invalidate_cache(c_graph)
 
 
-def vertex_path_from_edge_path(graph: _Graph, start: VertexLike, edge_path: Iterable[EdgeLike], mode: NeighborMode = NeighborMode.OUT) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def vertex_path_from_edge_path(graph: _Graph, start: VertexLike, edge_path: Iterable[EdgeLike], mode: NeighborMode = NeighborMode.OUT) -> IntArray:
     """Type-annotated wrapper for ``igraph_vertex_path_from_edge_path``."""
     # Prepare input arguments
     c_graph = graph

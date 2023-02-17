@@ -37,7 +37,7 @@ CSTRING:
 
 VECTOR:
   PY_TYPE: Iterable[float]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  PY_RETURN_TYPE: RealArray
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_t_view(%I%)"
     INOUT: "%C% = iterable_to_igraph_vector_t(%I%)"
@@ -46,7 +46,7 @@ VECTOR:
 
 VECTOR_INT:
   PY_TYPE: Iterable[int]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_int_t_view(%I%)"
     INOUT: "%C% = iterable_to_igraph_vector_int_t(%I%)"
@@ -57,7 +57,7 @@ VECTOR_BOOL:
   # we can convert anything into a bool, but we declare the type as
   # Iterable[bool] only to nudge the user towards using bools
   PY_TYPE: Iterable[bool]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_bool_t]
+  PY_RETURN_TYPE: BoolArray
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_bool_t_view(%I%)"
     INOUT: "%C% = iterable_to_igraph_vector_bool_t(%I%)"
@@ -66,7 +66,7 @@ VECTOR_BOOL:
 
 INDEX_VECTOR:
   PY_TYPE: Iterable[int]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_int_t_view(%I%)"
     INOUT: "%C% = iterable_to_igraph_vector_int_t(%I%)"
@@ -75,7 +75,7 @@ INDEX_VECTOR:
 
 MATRIX:
   PY_TYPE: MatrixLike
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  PY_RETURN_TYPE: RealArray
   INCONV:
     IN: "%C% = sequence_to_igraph_matrix_t_view(%I%)"
     INOUT: "%C% = sequence_to_igraph_matrix_t(%I%)"
@@ -84,7 +84,7 @@ MATRIX:
 
 MATRIX_INT:
   PY_TYPE: MatrixIntLike
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = sequence_to_igraph_matrix_int_t_view(%I%)"
     INOUT: "%C% = sequence_to_igraph_matrix_int_t(%I%)"
@@ -112,7 +112,7 @@ VERTEX:
 
 VERTEX_COLORS:
   PY_TYPE: Iterable[int]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = vertex_colors_to_igraph_vector_int_t_view(%I%, %I1%)"
     INOUT: "%C% = vertex_colors_to_igraph_vector_int_t(%I%, %I1%)"
@@ -121,7 +121,7 @@ VERTEX_COLORS:
 
 VERTEX_INDICES:
   PY_TYPE: Iterable[VertexLike]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = iterable_vertex_indices_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
@@ -129,7 +129,7 @@ VERTEX_INDICES:
 
 VERTEX_INDICES_LIST:
   PY_TYPE: Iterable[Iterable[VertexLike]]
-  PY_RETURN_TYPE: List[npt.NDArray[np_type_of_igraph_integer_t]]
+  PY_RETURN_TYPE: List[IntArray]
   INCONV:
     IN: "%C% = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(%I%)"
     OUT: "%C% = _VectorIntList.create(0)"
@@ -151,7 +151,7 @@ VERTEX_SELECTOR:
 
 VERTEX_QTYS:
   PY_TYPE: Iterable[float]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  PY_RETURN_TYPE: RealArray
   INCONV:
     IN: "%C% = vertex_qtys_to_igraph_vector_t_view(%I%, %I1%)"
     INOUT: "%C% = vertex_qtys_to_igraph_vector_t(%I%, %I1%)"
@@ -167,7 +167,7 @@ EDGE:
 
 EDGE_COLORS:
   PY_TYPE: Iterable[int]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = edge_colors_to_igraph_vector_int_t_view(%I%, %I1%)"
     INOUT: "%C% = edge_colors_to_igraph_vector_int_t(%I%, %I1%)"
@@ -176,7 +176,7 @@ EDGE_COLORS:
 
 EDGE_INDICES:
   PY_TYPE: Iterable[EdgeLike]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_integer_t]
+  PY_RETURN_TYPE: IntArray
   INCONV:
     IN: "%C% = iterable_edge_indices_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
@@ -184,7 +184,7 @@ EDGE_INDICES:
 
 EDGE_INDICES_LIST:
   PY_TYPE: Iterable[Iterable[EdgeLike]]
-  PY_RETURN_TYPE: List[npt.NDArray[np_type_of_igraph_integer_t]]
+  PY_RETURN_TYPE: List[IntArray]
   INCONV:
     IN: "%C% = iterable_of_edge_index_iterable_to_igraph_vector_int_list_t(%I%)"
     OUT: "%C% = _VectorIntList.create(0)"
@@ -200,7 +200,7 @@ EDGE_SELECTOR:
 
 EDGE_WEIGHTS:
   PY_TYPE: Iterable[float]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  PY_RETURN_TYPE: RealArray
   INCONV:
     IN: "%C% = edge_weights_to_igraph_vector_t_view(%I%, %I1%)"
     INOUT: "%C% = edge_weights_to_igraph_vector_t(%I%, %I1%)"
@@ -209,7 +209,7 @@ EDGE_WEIGHTS:
 
 EDGE_CAPACITIES:
   PY_TYPE: Iterable[float]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_real_t]
+  PY_RETURN_TYPE: RealArray
   INCONV:
     IN: "%C% = edge_capacities_to_igraph_vector_t_view(%I%, %I1%)"
     INOUT: "%C% = edge_capacities_to_igraph_vector_t(%I%, %I1%)"
@@ -218,7 +218,7 @@ EDGE_CAPACITIES:
 
 BIPARTITE_TYPES:
   PY_TYPE: Iterable[Any]
-  PY_RETURN_TYPE: npt.NDArray[np_type_of_igraph_bool_t]
+  PY_RETURN_TYPE: BoolArray
   INCONV:
     IN: "%C% = iterable_to_igraph_vector_bool_t_view(%I%) if %I% is not None else None"
     INOUT: "%C% = iterable_to_igraph_vector_bool_t(%I%) if %I% is not None else None"

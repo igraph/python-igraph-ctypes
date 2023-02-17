@@ -1,7 +1,14 @@
 from numpy.typing import NDArray
 from typing import Iterable, Optional, TypeVar
 
-from ._internal.enums import NeighborMode
+from .enums import NeighborMode
+from .types import (
+    EdgeSelector,
+    VertexLike,
+    VertexPair,
+    VertexSelector,
+)
+
 from ._internal.functions import (
     add_edges,
     add_vertices,
@@ -16,13 +23,7 @@ from ._internal.functions import (
     neighbors,
     vcount,
 )
-from ._internal.types import (
-    EdgeSelector,
-    VertexLike,
-    VertexPair,
-    VertexSelector,
-    np_type_of_igraph_integer_t,
-)
+from ._internal.types import np_type_of_igraph_integer_t
 from ._internal.wrappers import _Graph
 
 
@@ -103,6 +104,7 @@ class Graph:
         """Returns the number of vertices in the graph."""
         return vcount(self._instance)
 
+    @property
     def _as_parameter_(self) -> _Graph:
         """ctypes hook function that extracts the low-level ctypes wrapper object
         from the graph.

@@ -56,10 +56,13 @@ from .types import (
     np_type_of_igraph_bool_t,
     np_type_of_igraph_integer_t,
     np_type_of_igraph_real_t,
+    BoolArray,
     EdgeLike,
     EdgeSelector,
+    IntArray,
     MatrixLike,
     MatrixIntLike,
+    RealArray,
     VertexLike,
     VertexPair,
     VertexSelector,
@@ -661,9 +664,7 @@ def igraph_vector_int_t_to_list(vector: _VectorInt) -> List[int]:
     return [int(igraph_vector_int_e(vector, i)) for i in range(n)]
 
 
-def igraph_matrix_t_to_numpy_array(
-    matrix: _Matrix,
-) -> npt.NDArray[np_type_of_igraph_real_t]:
+def igraph_matrix_t_to_numpy_array(matrix: _Matrix) -> RealArray:
     shape = igraph_matrix_nrow(matrix), igraph_matrix_ncol(matrix)
     result = np.zeros(shape, dtype=np_type_of_igraph_real_t)
     if result.size > 0:
@@ -671,9 +672,7 @@ def igraph_matrix_t_to_numpy_array(
     return result
 
 
-def igraph_matrix_int_t_to_numpy_array(
-    matrix: _MatrixInt,
-) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def igraph_matrix_int_t_to_numpy_array(matrix: _MatrixInt) -> IntArray:
     shape = igraph_matrix_int_nrow(matrix), igraph_matrix_int_ncol(matrix)
     result = np.zeros(shape, dtype=np_type_of_igraph_integer_t)
     if result.size > 0:
@@ -683,9 +682,7 @@ def igraph_matrix_int_t_to_numpy_array(
     return result
 
 
-def igraph_vector_t_to_numpy_array(
-    vector: _Vector,
-) -> npt.NDArray[np_type_of_igraph_real_t]:
+def igraph_vector_t_to_numpy_array(vector: _Vector) -> RealArray:
     n = igraph_vector_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_real_t)
     if n > 0:
@@ -693,9 +690,7 @@ def igraph_vector_t_to_numpy_array(
     return result
 
 
-def igraph_vector_bool_t_to_numpy_array(
-    vector: _VectorBool,
-) -> npt.NDArray[np_type_of_igraph_bool_t]:
+def igraph_vector_bool_t_to_numpy_array(vector: _VectorBool) -> BoolArray:
     n = igraph_vector_bool_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_bool_t)
     if n > 0:
@@ -703,9 +698,7 @@ def igraph_vector_bool_t_to_numpy_array(
     return result
 
 
-def igraph_vector_int_t_to_numpy_array(
-    vector: _VectorInt,
-) -> npt.NDArray[np_type_of_igraph_integer_t]:
+def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> IntArray:
     n = igraph_vector_int_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_integer_t)
     if n > 0:
@@ -715,7 +708,7 @@ def igraph_vector_int_t_to_numpy_array(
 
 def igraph_vector_list_t_to_list_of_numpy_array(
     vector_list: _VectorList,
-) -> List[npt.NDArray[np_type_of_igraph_real_t]]:
+) -> List[RealArray]:
     n = igraph_vector_list_size(vector_list)
     vec = _Vector()
     result = []
@@ -733,7 +726,7 @@ def igraph_vector_list_t_to_list_of_numpy_array(
 
 def igraph_vector_int_list_t_to_list_of_numpy_array(
     vector_list: _VectorIntList,
-) -> List[npt.NDArray[np_type_of_igraph_integer_t]]:
+) -> List[IntArray]:
     n = igraph_vector_int_list_size(vector_list)
     vec = _VectorInt()
     result = []

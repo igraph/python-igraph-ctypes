@@ -6,10 +6,13 @@ from .conversion import *  # noqa
 from .enums import *  # noqa
 from .lib import *  # noqa
 from .types import (
+    BoolArray,
     EdgeLike,
     EdgeSelector,
+    IntArray,
     MatrixLike,
     MatrixIntLike,
+    RealArray,
     VertexLike,
     VertexPair,
     VertexSelector,

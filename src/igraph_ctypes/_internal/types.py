@@ -368,6 +368,15 @@ EdgeSelector = Iterable[EdgeLike] | Literal["all"] | EdgeLike | None
 selector.
 """
 
+BoolArray = npt.NDArray[np_type_of_igraph_bool_t]
+"""Type alias for NumPy arrays containing igraph booleans"""
+
+IntArray = npt.NDArray[np_type_of_igraph_integer_t]
+"""Type alias for NumPy arrays containing igraph integers"""
+
+RealArray = npt.NDArray[np_type_of_igraph_real_t]
+"""Type alias for NumPy arrays containing igraph reals"""
+
 MatrixLike = Union[Sequence[Sequence[float]], npt.NDArray]
 """Type alias for Python types that can be converted to an igraph matrix."""
 
