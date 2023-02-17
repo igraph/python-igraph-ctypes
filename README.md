@@ -29,6 +29,12 @@ things may break randomly, or they may not even work.
 4. Run `poetry run pytest` to run the unit tests, or `poetry run python` to run
    a Python interpreter where you can `import igraph_ctypes`
 
+## Benchmarking
+
+Benchmarks will be placed in `benchmarks` and they will compare the "old",
+official Python interface of igraph with this new implementation. To run the
+benchmarks, type `poetry run richbench benchmarks`.
+
 ## Caveats
 
 - Apparently you'll need to ensure that the igraph shared library is built

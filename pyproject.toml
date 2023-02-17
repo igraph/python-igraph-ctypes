@@ -15,6 +15,10 @@ numpy = "^1.23.3"
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
 
+[tool.poetry.group.dev.dependencies]
+richbench = "^1.0.3"
+igraph = "^0.10.4"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
