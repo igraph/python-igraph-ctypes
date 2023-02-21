@@ -1,9 +1,11 @@
-from random import randint
+from random import randint, seed
 
 from igraph import Graph as LegacyGraph
 
 from igraph_ctypes.constructors import create_square_lattice
 from igraph_ctypes.paths import get_shortest_path
+
+seed(42)
 
 n, k = 1000, 100
 
@@ -11,8 +13,8 @@ sources = [randint(0, n - 1) for _ in range(k)]
 targets = [randint(0, n - 1) for _ in range(k)]
 pairs = list(zip(sources, targets))
 
-old_g = LegacyGraph.Lattice([n, n])
-new_g = create_square_lattice([n, n])
+old_g = LegacyGraph.Lattice([n, n], directed=False, circular=False)
+new_g = create_square_lattice([n, n], directed=False, periodic=False)
 
 
 def with_old_igraph():
