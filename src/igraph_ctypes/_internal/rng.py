@@ -4,7 +4,12 @@ from numpy.random import Generator, PCG64
 from typing import Callable, Optional
 
 from .lib import igraph_rng_set_default
-from .types import igraph_rng_type_t, np_type_of_igraph_uint_t
+from .types import (
+    igraph_rng_type_t,
+    np_type_of_igraph_integer_t,
+    np_type_of_igraph_real_t,
+    np_type_of_igraph_uint_t,
+)
 from .wrappers import _RNG
 
 __all__ = ("NumPyRNG",)
@@ -32,6 +37,10 @@ class NumPyRNG:
             destroy=igraph_rng_type_t.TYPES["destroy"](self._rng_destroy),
             seed=igraph_rng_type_t.TYPES["seed"](self._rng_seed),
             get=igraph_rng_type_t.TYPES["get"](self._rng_get),
+            get_int=igraph_rng_type_t.TYPES["get_int"](self._rng_get_int),
+            get_real=igraph_rng_type_t.TYPES["get_real"](self._rng_get_real),
+            get_norm=igraph_rng_type_t.TYPES["get_norm"](self._rng_get_norm),
+            # TODO(ntamas): get_geom, get_binom, get_exp, get_gamma, get_pois
         )
         self._rng = _RNG.create(pointer(self._rng_type))
         self._rng.unwrap().is_seeded = True
@@ -56,6 +65,17 @@ class NumPyRNG:
         return self._generator.integers(
             0, 0xFFFFFFFFFFFFFFFF, dtype=np_type_of_igraph_uint_t, endpoint=True
         )
+
+    def _rng_get_int(self, _state, lo, hi):
+        return self._generator.integers(
+            lo, hi, dtype=np_type_of_igraph_integer_t, endpoint=True
+        )
+
+    def _rng_get_real(self, _state):
+        return self._generator.random(dtype=np_type_of_igraph_real_t)
+
+    def _rng_get_norm(self, _state):
+        return self._generator.normal()
 
     def attach(self) -> Callable[[], None]:
         """Attaches this RNG instance as igraph's default RNG.

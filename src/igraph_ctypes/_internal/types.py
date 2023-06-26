@@ -365,6 +365,20 @@ class igraph_rng_type_t(Structure):
         "destroy": CFUNCTYPE(None, igraph_rng_state_t),
         "seed": CFUNCTYPE(igraph_error_t, igraph_rng_state_t, igraph_uint_t),
         "get": CFUNCTYPE(igraph_uint_t, igraph_rng_state_t),
+        "get_int": CFUNCTYPE(
+            igraph_integer_t, igraph_rng_state_t, igraph_integer_t, igraph_integer_t
+        ),
+        "get_real": CFUNCTYPE(igraph_real_t, igraph_rng_state_t),
+        "get_norm": CFUNCTYPE(igraph_real_t, igraph_rng_state_t),
+        "get_geom": CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t),
+        "get_binom": CFUNCTYPE(
+            igraph_real_t, igraph_rng_state_t, igraph_integer_t, igraph_real_t
+        ),
+        "get_exp": CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t),
+        "get_gamma": CFUNCTYPE(
+            igraph_real_t, igraph_rng_state_t, igraph_real_t, igraph_real_t
+        ),
+        "get_pois": CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t),
     }
 
     _fields_ = [
@@ -374,27 +388,14 @@ class igraph_rng_type_t(Structure):
         ("destroy", TYPES["destroy"]),
         ("seed", TYPES["seed"]),
         ("get", TYPES["get"]),
-        (
-            "get_int",
-            CFUNCTYPE(
-                igraph_integer_t, igraph_rng_state_t, igraph_integer_t, igraph_integer_t
-            ),
-        ),
-        ("get_real", CFUNCTYPE(igraph_real_t, igraph_rng_state_t)),
-        ("get_norm", CFUNCTYPE(igraph_real_t, igraph_rng_state_t)),
-        ("get_geom", CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t)),
-        (
-            "get_binom",
-            CFUNCTYPE(
-                igraph_real_t, igraph_rng_state_t, igraph_integer_t, igraph_real_t
-            ),
-        ),
-        ("get_exp", CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t)),
-        (
-            "get_gamma",
-            CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t, igraph_real_t),
-        ),
-        ("get_pois", CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t)),
+        ("get_int", TYPES["get_int"]),
+        ("get_real", TYPES["get_real"]),
+        ("get_norm", TYPES["get_norm"]),
+        ("get_geom", TYPES["get_geom"]),
+        ("get_binom", TYPES["get_binom"]),
+        ("get_exp", TYPES["get_exp"]),
+        ("get_gamma", TYPES["get_gamma"]),
+        ("get_pois", TYPES["get_pois"]),
     ]
 
 
