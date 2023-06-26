@@ -10,7 +10,10 @@ from ctypes import (
     c_int64,
     c_long,
     c_ulong,
+    c_uint8,
+    c_uint64,
     c_void_p,
+    py_object,
     POINTER,
     Structure,
     Union as CUnion,
@@ -38,11 +41,15 @@ igraph_integer_t = (
     c_int64  # TODO(ntamas): this depends on whether igraph is 32-bit or 64-bit
 )
 igraph_real_t = c_double
+igraph_uint_t = (
+    c_uint64  # TODO(ntamas): this depends on whether igraph is 32-bit or 64-bit
+)
 
 # TODO(ntamas): these depend on whether igraph is 32-bit or 64-bit
 np_type_of_igraph_bool_t = np.bool_
 np_type_of_igraph_integer_t = np.int64
 np_type_of_igraph_real_t = np.float64
+np_type_of_igraph_uint_t = np.uint64
 
 
 class FILE(Structure):
@@ -344,6 +351,60 @@ class igraph_plfit_result_t(Structure):
         ("L", igraph_real_t),
         ("D", igraph_real_t),
         ("data", POINTER(igraph_vector_t)),
+    ]
+
+
+igraph_rng_state_t = py_object
+
+
+class igraph_rng_type_t(Structure):
+    """ctypes representation of an ``igraph_rng_type_t`` object"""
+
+    TYPES = {
+        "init": CFUNCTYPE(igraph_error_t, POINTER(igraph_rng_state_t)),
+        "destroy": CFUNCTYPE(None, igraph_rng_state_t),
+        "seed": CFUNCTYPE(igraph_error_t, igraph_rng_state_t, igraph_uint_t),
+        "get": CFUNCTYPE(igraph_uint_t, igraph_rng_state_t),
+    }
+
+    _fields_ = [
+        ("name", c_char_p),
+        ("bits", c_uint8),
+        ("init", TYPES["init"]),
+        ("destroy", TYPES["destroy"]),
+        ("seed", TYPES["seed"]),
+        ("get", TYPES["get"]),
+        (
+            "get_int",
+            CFUNCTYPE(
+                igraph_integer_t, igraph_rng_state_t, igraph_integer_t, igraph_integer_t
+            ),
+        ),
+        ("get_real", CFUNCTYPE(igraph_real_t, igraph_rng_state_t)),
+        ("get_norm", CFUNCTYPE(igraph_real_t, igraph_rng_state_t)),
+        ("get_geom", CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t)),
+        (
+            "get_binom",
+            CFUNCTYPE(
+                igraph_real_t, igraph_rng_state_t, igraph_integer_t, igraph_real_t
+            ),
+        ),
+        ("get_exp", CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t)),
+        (
+            "get_gamma",
+            CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t, igraph_real_t),
+        ),
+        ("get_pois", CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t)),
+    ]
+
+
+class igraph_rng_t(Structure):
+    """ctypes representation of an ``igraph_rng_t`` object"""
+
+    _fields_ = [
+        ("type", POINTER(igraph_rng_type_t)),
+        ("state", igraph_rng_state_t),
+        ("is_seeded", igraph_bool_t),
     ]
 
 

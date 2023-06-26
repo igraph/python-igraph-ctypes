@@ -8,6 +8,8 @@ from .lib import (
     igraph_matrix_init,
     igraph_matrix_int_destroy,
     igraph_matrix_int_init,
+    igraph_rng_init,
+    igraph_rng_destroy,
     igraph_vector_destroy,
     igraph_vector_init,
     igraph_vector_bool_destroy,
@@ -25,6 +27,7 @@ from .types import (
     igraph_es_t,
     igraph_matrix_t,
     igraph_matrix_int_t,
+    igraph_rng_t,
     igraph_vector_t,
     igraph_vector_bool_t,
     igraph_vector_int_t,
@@ -38,6 +41,7 @@ __all__ = (
     "_Graph",
     "_Matrix",
     "_MatrixInt",
+    "_RNG",
     "_Vector",
     "_VectorBool",
     "_VectorInt",
@@ -236,3 +240,14 @@ _EdgeSelector = create_boxed(
     igraph_es_t,
     destructor=igraph_es_destroy,
 )
+
+
+class _RNG(
+    create_boxed(
+        "_RNG",
+        igraph_rng_t,
+        constructor=igraph_rng_init,
+        destructor=igraph_rng_destroy,
+    )
+):
+    pass

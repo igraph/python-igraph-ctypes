@@ -40,6 +40,8 @@ from .types import (
     igraph_maxflow_stats_t,
     igraph_isocompat_t,
     igraph_plfit_result_t,
+    igraph_rng_t,
+    igraph_rng_type_t,
 )
 
 
@@ -355,6 +357,23 @@ igraph_es_vector_copy.argtypes = [POINTER(igraph_es_t), POINTER(igraph_vector_in
 igraph_es_destroy = _lib.igraph_es_destroy
 igraph_es_destroy.restype = None
 igraph_es_destroy.argtypes = [c_void_p]
+
+# Random number generators
+
+igraph_rng_init = _lib.igraph_rng_init
+igraph_rng_init.restype = handle_igraph_error_t
+igraph_rng_init.argtypes = [POINTER(igraph_rng_t), POINTER(igraph_rng_type_t)]
+
+igraph_rng_destroy = _lib.igraph_rng_destroy
+igraph_rng_destroy.restype = None
+igraph_rng_destroy.argtypes = [c_void_p]
+
+igraph_rng_default = _lib.igraph_rng_default
+igraph_rng_default.restype = POINTER(igraph_rng_t)
+
+igraph_rng_set_default = _lib.igraph_rng_set_default
+igraph_rng_set_default.restype = POINTER(igraph_rng_t)
+igraph_rng_set_default.argtypes = [POINTER(igraph_rng_t)]
 
 # Graph type
 
