@@ -40,7 +40,11 @@ class NumPyRNG:
             get_int=igraph_rng_type_t.TYPES["get_int"](self._rng_get_int),
             get_real=igraph_rng_type_t.TYPES["get_real"](self._rng_get_real),
             get_norm=igraph_rng_type_t.TYPES["get_norm"](self._rng_get_norm),
-            # TODO(ntamas): get_geom, get_binom, get_exp, get_gamma, get_pois
+            get_geom=igraph_rng_type_t.TYPES["get_geom"](self._rng_get_geom),
+            get_binom=igraph_rng_type_t.TYPES["get_binom"](self._rng_get_binom),
+            get_exp=igraph_rng_type_t.TYPES["get_exp"](self._rng_get_exp),
+            get_gamma=igraph_rng_type_t.TYPES["get_gamma"](self._rng_get_gamma),
+            get_pois=igraph_rng_type_t.TYPES["get_pois"](self._rng_get_pois),
         )
         self._rng = _RNG.create(pointer(self._rng_type))
         self._rng.unwrap().is_seeded = True
@@ -76,6 +80,23 @@ class NumPyRNG:
 
     def _rng_get_norm(self, _state):
         return self._generator.normal()
+
+    def _rng_get_geom(self, _state, p):
+        # NumPy uses 1-based return values, igraph assumes 0-based
+        return self._generator.geometric(p) - 1
+
+    def _rng_get_binom(self, _state, n, p):
+        return self._generator.binomial(n, p)
+
+    def _rng_get_exp(self, _state, rate):
+        # NumPy uses the scale parameter, igraph supplies the rate parameter
+        return self._generator.exponential(1 / rate)
+
+    def _rng_get_gamma(self, _state, shape, scale):
+        return self._generator.gamma(shape, scale)
+
+    def _rng_get_pois(self, _state, rate):
+        return self._generator.poisson(rate)
 
     def attach(self) -> Callable[[], None]:
         """Attaches this RNG instance as igraph's default RNG.
