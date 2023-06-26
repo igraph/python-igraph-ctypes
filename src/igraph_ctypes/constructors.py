@@ -1,11 +1,12 @@
-from typing import Iterable, Optional, Union
+from typing import Iterable, Union
 
 from .graph import Graph
-from ._internal.functions import create, famous, square_lattice
+from ._internal.functions import create, famous, grg_game, square_lattice
 
 __all__ = (
     "create_empty_graph",
     "create_famous_graph",
+    "create_geometric_random_graph",
     "create_graph_from_edge_list",
     "create_square_lattice",
 )
@@ -75,3 +76,14 @@ def create_square_lattice(
     return Graph(
         _wrap=square_lattice(dimvector, nei, directed, mutual, periodic_per_dim)
     )
+
+
+def create_geometric_random_graph(n: int, radius: float, torus: bool = False):
+    """Creates a geometric random graph.
+
+    Parameters:
+        n: the number of vertices in the graph
+        radius: connection distance; two vertices will be connected if they are
+            closer to each other than this threshold
+    """
+    return Graph(_wrap=grg_game(n, radius, torus)[0])

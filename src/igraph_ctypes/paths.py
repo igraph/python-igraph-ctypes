@@ -2,17 +2,23 @@
 
 from typing import Iterable, Optional
 
-from .enums import NeighborMode
+from .enums import Connectedness, NeighborMode
 from .graph import Graph
 from .types import IntArray, VertexLike
 
 from ._internal.functions import (
+    connected_components,
     get_shortest_path,
     get_shortest_path_bellman_ford,
     get_shortest_path_dijkstra,
 )
 
 __all__ = ("shortest_path",)
+
+
+def components(graph: Graph, mode: Connectedness = Connectedness.WEAK):
+    membership, _, _ = connected_components(graph, mode)
+    return membership
 
 
 def shortest_path(
