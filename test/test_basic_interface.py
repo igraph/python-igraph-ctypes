@@ -1,4 +1,5 @@
 from numpy import array
+from pytest import raises
 
 from igraph_ctypes._internal.enums import NeighborMode
 from igraph_ctypes.constructors import create_empty_graph
@@ -129,11 +130,8 @@ def test_get_eid_directed():
         assert g.get_edge_id((i + 1) % n, i, error=False) == -1
         assert g.get_edge_id((i + 1) % n, i, directed=False) == i
 
-        # TODO(ntamas): does not work yet, error handler must be implemented
-        """
-        with raises(match="no such edge"):
+        with raises(RuntimeError, match="no such edge"):
             assert g.get_edge_id((i + 1) % n, i) == i
-        """
 
 
 def test_get_eid_undirected():

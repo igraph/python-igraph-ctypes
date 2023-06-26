@@ -409,6 +409,8 @@ class igraph_rng_t(Structure):
     ]
 
 
+igraph_error_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int, igraph_error_t)
+
 igraph_isocompat_t = CFUNCTYPE(
     igraph_bool_t,
     POINTER(igraph_t),
