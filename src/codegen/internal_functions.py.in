@@ -27,7 +27,7 @@ from .wrappers import (
     _Vector,
     _VectorBool,
     _VectorInt,
-    _VectorIntList
+    _VectorIntList,
 )
 
 # fmt: off

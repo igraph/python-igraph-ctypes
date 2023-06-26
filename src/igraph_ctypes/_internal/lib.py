@@ -622,7 +622,7 @@ igraph_erdos_renyi_game_gnp.argtypes = [POINTER(igraph_t), igraph_integer_t, igr
 
 igraph_erdos_renyi_game_gnm = _lib.igraph_erdos_renyi_game_gnm
 igraph_erdos_renyi_game_gnm.restype = handle_igraph_error_t
-igraph_erdos_renyi_game_gnm.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_bool_t]
+igraph_erdos_renyi_game_gnm.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_bool_t, igraph_bool_t]
 
 igraph_degree_sequence_game = _lib.igraph_degree_sequence_game
 igraph_degree_sequence_game.restype = handle_igraph_error_t
@@ -1212,13 +1212,13 @@ igraph_create_bipartite = _lib.igraph_create_bipartite
 igraph_create_bipartite.restype = handle_igraph_error_t
 igraph_create_bipartite.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_vector_int_t), igraph_bool_t]
 
-igraph_incidence = _lib.igraph_incidence
-igraph_incidence.restype = handle_igraph_error_t
-igraph_incidence.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_matrix_t), igraph_bool_t, igraph_neimode_t, igraph_bool_t]
+igraph_biadjacency = _lib.igraph_biadjacency
+igraph_biadjacency.restype = handle_igraph_error_t
+igraph_biadjacency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_matrix_t), igraph_bool_t, igraph_neimode_t, igraph_bool_t]
 
-igraph_get_incidence = _lib.igraph_get_incidence
-igraph_get_incidence.restype = handle_igraph_error_t
-igraph_get_incidence.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
+igraph_get_biadjacency = _lib.igraph_get_biadjacency
+igraph_get_biadjacency.restype = handle_igraph_error_t
+igraph_get_biadjacency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
 
 igraph_is_bipartite = _lib.igraph_is_bipartite
 igraph_is_bipartite.restype = handle_igraph_error_t
@@ -1450,7 +1450,7 @@ igraph_bibcoupling.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igra
 
 igraph_similarity_dice = _lib.igraph_similarity_dice
 igraph_similarity_dice.restype = handle_igraph_error_t
-igraph_similarity_dice.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_neimode_t, igraph_bool_t]
+igraph_similarity_dice.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_vs_t, igraph_neimode_t, igraph_bool_t]
 
 igraph_similarity_dice_es = _lib.igraph_similarity_dice_es
 igraph_similarity_dice_es.restype = handle_igraph_error_t
@@ -1466,7 +1466,7 @@ igraph_similarity_inverse_log_weighted.argtypes = [POINTER(igraph_t), POINTER(ig
 
 igraph_similarity_jaccard = _lib.igraph_similarity_jaccard
 igraph_similarity_jaccard.restype = handle_igraph_error_t
-igraph_similarity_jaccard.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_neimode_t, igraph_bool_t]
+igraph_similarity_jaccard.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_vs_t, igraph_vs_t, igraph_neimode_t, igraph_bool_t]
 
 igraph_similarity_jaccard_es = _lib.igraph_similarity_jaccard_es
 igraph_similarity_jaccard_es.restype = handle_igraph_error_t
@@ -1580,10 +1580,6 @@ igraph_hrg_game = _lib.igraph_hrg_game
 igraph_hrg_game.restype = handle_igraph_error_t
 igraph_hrg_game.argtypes = [POINTER(igraph_t), POINTER(igraph_hrg_t)]
 
-igraph_hrg_dendrogram = _lib.igraph_hrg_dendrogram
-igraph_hrg_dendrogram.restype = handle_igraph_error_t
-igraph_hrg_dendrogram.argtypes = [POINTER(igraph_t), POINTER(igraph_hrg_t)]
-
 igraph_hrg_consensus = _lib.igraph_hrg_consensus
 igraph_hrg_consensus.restype = handle_igraph_error_t
 igraph_hrg_consensus.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_t), POINTER(igraph_hrg_t), igraph_bool_t, igraph_integer_t]
@@ -1603,6 +1599,10 @@ igraph_hrg_resize.argtypes = [POINTER(igraph_hrg_t), igraph_integer_t]
 igraph_hrg_size = _lib.igraph_hrg_size
 igraph_hrg_size.restype = igraph_integer_t
 igraph_hrg_size.argtypes = [POINTER(igraph_hrg_t)]
+
+igraph_from_hrg_dendrogram = _lib.igraph_from_hrg_dendrogram
+igraph_from_hrg_dendrogram.restype = handle_igraph_error_t
+igraph_from_hrg_dendrogram.argtypes = [POINTER(igraph_t), POINTER(igraph_hrg_t), POINTER(igraph_vector_t)]
 
 igraph_get_adjacency = _lib.igraph_get_adjacency
 igraph_get_adjacency.restype = handle_igraph_error_t

@@ -168,7 +168,8 @@ def create_boxed(
                 initialized = False
             elif not isinstance(instance, cls_outer):
                 raise TypeError(
-                    f"{name} must wrap an object of type {cls_outer!r}, got {type(instance)!r}"
+                    f"{name} must wrap an object of type {cls_outer!r}, "
+                    f"got {type(instance)!r}"
                 )
             else:
                 initialized = True
@@ -178,7 +179,11 @@ def create_boxed(
     return BoxedClass
 
 
-_Graph = create_boxed("_Graph", igraph_t, destructor=igraph_destroy)
+# This trickery is needed to ensure that Pyright does to trip up on _Graph annotations
+class _Graph(create_boxed("_Graph", igraph_t, destructor=igraph_destroy)):
+    pass
+
+
 _Matrix = create_boxed(
     "_Matrix",
     igraph_matrix_t,

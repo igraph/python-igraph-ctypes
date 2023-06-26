@@ -27,7 +27,7 @@ from .wrappers import (
     _Vector,
     _VectorBool,
     _VectorInt,
-    _VectorIntList
+    _VectorIntList,
 )
 
 # fmt: off
@@ -845,7 +845,7 @@ def erdos_renyi_game_gnp(n: int, p: float, directed: bool = False, loops: bool =
     return graph
 
 
-def erdos_renyi_game_gnm(n: int, m: int, directed: bool = False, loops: bool = False) -> _Graph:
+def erdos_renyi_game_gnm(n: int, m: int, directed: bool = False, loops: bool = False, multiple: bool = False) -> _Graph:
     """Type-annotated wrapper for ``igraph_erdos_renyi_game_gnm``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -853,9 +853,10 @@ def erdos_renyi_game_gnm(n: int, m: int, directed: bool = False, loops: bool = F
     c_m = m
     c_directed = any_to_igraph_bool_t(directed)
     c_loops = any_to_igraph_bool_t(loops)
+    c_multiple = any_to_igraph_bool_t(multiple)
 
     # Call wrapped function
-    igraph_erdos_renyi_game_gnm(c_graph, c_n, c_m, c_directed, c_loops)
+    igraph_erdos_renyi_game_gnm(c_graph, c_n, c_m, c_directed, c_loops, c_multiple)
 
     # Prepare output arguments
     graph = c_graph.mark_initialized()
@@ -3475,8 +3476,8 @@ def create_bipartite(types: Iterable[Any], edges: Iterable[int], directed: bool 
     return graph
 
 
-def incidence(incidence: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> Tuple[_Graph, BoolArray]:
-    """Type-annotated wrapper for ``igraph_incidence``."""
+def biadjacency(incidence: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> Tuple[_Graph, BoolArray]:
+    """Type-annotated wrapper for ``igraph_biadjacency``."""
     # Prepare input arguments
     c_graph = _Graph()
     c_types = _VectorBool.create(0)
@@ -3486,7 +3487,7 @@ def incidence(incidence: MatrixLike, directed: bool = False, mode: NeighborMode 
     c_multiple = any_to_igraph_bool_t(multiple)
 
     # Call wrapped function
-    igraph_incidence(c_graph, c_types, c_incidence, c_directed, c_mode, c_multiple)
+    igraph_biadjacency(c_graph, c_types, c_incidence, c_directed, c_mode, c_multiple)
 
     # Prepare output arguments
     graph = c_graph.mark_initialized()
@@ -3496,8 +3497,8 @@ def incidence(incidence: MatrixLike, directed: bool = False, mode: NeighborMode 
     return graph, types
 
 
-def get_incidence(graph: _Graph, types: Optional[Iterable[Any]] = None) -> Tuple[RealArray, IntArray, IntArray]:
-    """Type-annotated wrapper for ``igraph_get_incidence``."""
+def get_biadjacency(graph: _Graph, types: Optional[Iterable[Any]] = None) -> Tuple[RealArray, IntArray, IntArray]:
+    """Type-annotated wrapper for ``igraph_get_biadjacency``."""
     # Prepare input arguments
     c_graph = graph
     c_types = iterable_to_igraph_vector_bool_t_view(types) if types is not None else None
@@ -3506,7 +3507,7 @@ def get_incidence(graph: _Graph, types: Optional[Iterable[Any]] = None) -> Tuple
     c_col_ids = _VectorInt.create(0)
 
     # Call wrapped function
-    igraph_get_incidence(c_graph, c_types, c_res, c_row_ids, c_col_ids)
+    igraph_get_biadjacency(c_graph, c_types, c_res, c_row_ids, c_col_ids)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -4216,17 +4217,18 @@ def bibcoupling(graph: _Graph, vids: VertexSelector = "all") -> RealArray:
     return res
 
 
-def similarity_dice(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
+def similarity_dice(graph: _Graph, vit_from: VertexSelector = "all", vit_to: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_dice``."""
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_vit_from = vertex_selector_to_igraph_vs_t(vit_from, graph)
+    c_vit_to = vertex_selector_to_igraph_vs_t(vit_to, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_similarity_dice(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops)
+    igraph_similarity_dice(c_graph, c_res, c_vit_from.unwrap(), c_vit_to.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -4291,17 +4293,18 @@ def similarity_inverse_log_weighted(graph: _Graph, vids: VertexSelector = "all",
     return res
 
 
-def similarity_jaccard(graph: _Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
+def similarity_jaccard(graph: _Graph, vit_from: VertexSelector = "all", vit_to: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = False) -> RealArray:
     """Type-annotated wrapper for ``igraph_similarity_jaccard``."""
     # Prepare input arguments
     c_graph = graph
     c_res = _Matrix.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_vit_from = vertex_selector_to_igraph_vs_t(vit_from, graph)
+    c_vit_to = vertex_selector_to_igraph_vs_t(vit_to, graph)
     c_mode = c_int(mode)
     c_loops = any_to_igraph_bool_t(loops)
 
     # Call wrapped function
-    igraph_similarity_jaccard(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops)
+    igraph_similarity_jaccard(c_graph, c_res, c_vit_from.unwrap(), c_vit_to.unwrap(), c_mode, c_loops)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -4786,8 +4789,6 @@ def graphlets_project(graph: _Graph, cliques: Iterable[Iterable[VertexLike]], Mu
 
 # igraph_hrg_game: no Python type known for type: HRG
 
-# igraph_hrg_dendrogram: no Python type known for type: HRG
-
 # igraph_hrg_consensus: no Python type known for type: HRG
 
 # igraph_hrg_predict: no Python type known for type: HRG
@@ -4797,6 +4798,8 @@ def graphlets_project(graph: _Graph, cliques: Iterable[Iterable[VertexLike]], Mu
 # igraph_hrg_resize: no Python type known for type: HRG
 
 # igraph_hrg_size: no Python type known for type: HRG
+
+# igraph_from_hrg_dendrogram: no Python type known for type: HRG
 
 # igraph_get_adjacency: no Python type known for type: GETADJACENCY
 
