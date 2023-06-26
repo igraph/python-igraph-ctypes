@@ -17,16 +17,20 @@ old_g = LegacyGraph.Lattice([n, n], directed=False, circular=False)
 new_g = create_square_lattice([n, n], directed=False, periodic=False)
 
 
-def with_old_igraph():
+def shortest_path_with_old_igraph():
     for u, v in pairs:
         old_g.get_shortest_paths(u, v)
 
 
-def with_new_igraph():
+def shortest_path_with_new_igraph():
     for u, v in pairs:
         get_shortest_path(new_g, u, v)
 
 
 __benchmarks__ = [
-    (with_old_igraph, with_new_igraph, "Finding shortest path in grid graph")
+    (
+        shortest_path_with_old_igraph,
+        shortest_path_with_new_igraph,
+        "Finding shortest path in grid graph",
+    )
 ]
