@@ -1,11 +1,23 @@
+import sys
+
 from dataclasses import dataclass
+from pycapi import PyErr_CheckSignals
+from typing import Optional
 
 from .functions import igraph_strerror
-from .lib import igraph_set_error_handler
+from .lib import (
+    igraph_set_error_handler,
+    igraph_set_fatal_handler,
+    igraph_set_interruption_handler,
+)
 from .rng import NumPyRNG
-from .types import igraph_error_t, igraph_error_handler_t
+from .types import (
+    igraph_error_handler_t,
+    igraph_fatal_handler_t,
+    igraph_interruption_handler_t,
+)
 
-__all__ = ("setup_igraph_library",)
+__all__ = ("setup_igraph_library", "_get_last_error_state")
 
 
 @dataclass
@@ -17,16 +29,19 @@ class IgraphErrorState:
     message: bytes = b""
     filename: bytes = b""
     line: int = 0
-    error: igraph_error_t = igraph_error_t(0)
+    error: int = 0
 
-    def _error_handler(
-        self, message: bytes, filename: bytes, line: int, error: igraph_error_t
-    ):
+    def _error_handler(self, message: bytes, filename: bytes, line: int, error: int):
         self.message = message
         self.filename = filename
         self.line = line
         self.error = error
-        print(repr(self))
+
+    def _reset(self):
+        self.message = b""
+        self.filename = b""
+        self.line = 0
+        self.error = 0
 
     @property
     def has_error(self) -> bool:
@@ -37,7 +52,7 @@ class IgraphErrorState:
         """Raises an appropriate Python exception if there is an error stored
         in the state object. No-op otherwise.
         """
-        code = int(self.error)
+        code = self.error
 
         if code == 0:
             return
@@ -56,6 +71,8 @@ class IgraphErrorState:
         message_str = msg.decode("utf-8", errors="replace")
         error_code_str = igraph_strerror(self.error).decode("utf-8", errors="replace")
 
+        self._reset()
+
         raise exc(
             f"Error at {filename_str}:{self.line}: {message_str} -- {error_code_str}"
         )
@@ -65,21 +82,51 @@ _last_error = IgraphErrorState()
 
 
 @igraph_error_handler_t
-def _error_handler(message: bytes, filename: bytes, line: int, error: igraph_error_t):
+def _error_handler(message: bytes, filename: bytes, line: int, error: int):
     global _last_error
     _last_error._error_handler(message, filename, line, error)
 
 
-def _get_last_error_state() -> IgraphErrorState:
+@igraph_fatal_handler_t
+def _fatal_handler(message: bytes, filename: bytes, line: int):
+    filename_str = filename.decode("utf-8", "replace")
+    message_str = message.decode("utf-8", "replace")
+    print(
+        f"Fatal igraph error at {filename_str}:{line}: {message_str}", file=sys.stderr
+    )
+
+
+def _get_last_error_state() -> Optional[IgraphErrorState]:
     global _last_error
-    return _last_error
+    return _last_error if _last_error.has_error else None
 
 
-def _setup_error_handler() -> None:
-    """Sets up the error handler needed to integrate igraph's error handling
+def _setup_error_handlers() -> None:
+    """Sets up the error handlers needed to integrate igraph's error handling
     nicely with Python.
     """
     igraph_set_error_handler(_error_handler)
+    igraph_set_fatal_handler(_fatal_handler)
+
+
+@igraph_interruption_handler_t
+def _interruption_handler() -> bool:
+    try:
+        # If there is a pending Ctrl-C waiting to be handled, PyErr_CheckSignals
+        # will trigger a KeyboardInterrupt, which we catch and return True.
+        # Otherwise we return False as we don't want to interrupt igraph if
+        # PyErr_CheckSignals() returns True because of other signals (say,
+        # SIGALRM)
+        PyErr_CheckSignals()
+        return False
+    except KeyboardInterrupt:
+        # Calling PyErr_CheckSignals might trigger a KeyboardInterrupt on its
+        # own so we catch it here
+        return True
+
+
+def _setup_interruption_handler() -> None:
+    igraph_set_interruption_handler(_interruption_handler)
 
 
 def _setup_rng() -> None:
@@ -95,5 +142,6 @@ def setup_igraph_library() -> None:
     This function is called when the ``igraph_ctypes`` module is imported by the user.
     You should not need to call this function directly.
     """
-    _setup_error_handler()
-    _setup_rng()
+    _setup_error_handlers()
+    _setup_interruption_handler()
+    # _setup_rng()

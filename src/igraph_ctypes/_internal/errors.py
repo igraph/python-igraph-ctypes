@@ -11,5 +11,7 @@ def handle_igraph_error_t(code: igraph_error_t) -> None:
         error_state = _get_last_error_state()
         if error_state:
             error_state.raise_error()
+        elif code == 13:  # IGRAPH_INTERRUPTED; does not call error handler
+            raise KeyboardInterrupt
         else:
             raise RuntimeError(f"igraph returned error code {code}")
