@@ -144,4 +144,4 @@ def setup_igraph_library() -> None:
     """
     _setup_error_handlers()
     _setup_interruption_handler()
-    # _setup_rng()
+    _setup_rng()

@@ -354,7 +354,7 @@ class igraph_plfit_result_t(Structure):
     ]
 
 
-igraph_rng_state_t = py_object
+igraph_rng_state_t = c_void_p
 
 
 class igraph_rng_type_t(Structure):
