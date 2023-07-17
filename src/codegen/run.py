@@ -29,7 +29,7 @@ def longest_common_prefix_length(items: Sequence[str]) -> int:
     return best
 
 
-def generate_enums(template: Path, output: Path, headers: Iterable[Path]):
+def generate_enums(template: Path, output: Path, headers: Iterable[Path]):  # noqa: C901
     """Generates the contents of ``enums.py`` in the source tree by parsing
     the given include files from igraph's source tree.
 
@@ -37,14 +37,12 @@ def generate_enums(template: Path, output: Path, headers: Iterable[Path]):
     so the formatting of the input file matters.
     """
 
-    IGNORED_ENUMS = set(
-        (
-            "igraph_cached_property_t",
-            "igraph_attribute_type_t",
-            "igraph_attribute_elemtype_t",
-            "igraph_lapack_dsyev_which_t",
-        )
-    )
+    IGNORED_ENUMS = {
+        "igraph_cached_property_t",
+        "igraph_attribute_type_t",
+        "igraph_attribute_elemtype_t",
+        "igraph_lapack_dsyev_which_t",
+    }
     ENUM_NAME_REMAPPING = {
         "Adjacency": "AdjacencyMode",
         "BlissSh": "BLISSSplittingHeuristics",
@@ -70,7 +68,7 @@ def generate_enums(template: Path, output: Path, headers: Iterable[Path]):
         "Loops": [("IGNORE", 0)]
     }
 
-    def process_enum(fp: TextIO, spec) -> Optional[str]:
+    def process_enum(fp: TextIO, spec) -> Optional[str]:  # noqa: C901
         spec = re.sub(r"\s*/\*[^/]*\*/\s*", " ", spec)
         spec = spec.replace("IGRAPH_DEPRECATED_ENUMVAL", "")
         spec = re.sub(r"\s+", " ", spec)
