@@ -191,8 +191,9 @@ def main():
     code of the Python extension complete.
     """
     common_args = [
-        "~/dev/igraph/stimulus/.venv/bin/python",
-        "~/dev/igraph/stimulus/.venv/bin/stimulus",
+        sys.executable,
+        "-m",
+        "stimulus",
         "-f",
         str(IGRAPH_SOURCE_FOLDER / "interfaces" / "functions.yaml"),
         "-t",
