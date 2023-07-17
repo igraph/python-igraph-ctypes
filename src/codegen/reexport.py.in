@@ -1,0 +1,7 @@
+# fmt: off
+#
+# This module simply re-exports types from {module_name} that are meant to
+# be used by end users of the library.
+#
+# The rest of this file is generated
+

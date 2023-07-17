@@ -296,7 +296,7 @@ class SpinglassUpdateMode(IntEnum):
     CONFIG = 1
 
 
-class LazyAdlistSimplify(IntEnum):
+class LazyAdjacencyListSimplify(IntEnum):
     """Python counterpart of an ``igraph_lazy_adlist_simplify_t`` enum."""
 
     DONT_SIMPLIFY = 0
@@ -548,7 +548,7 @@ __all__ = (
     'LaplacianNormalization',
     'LaplacianSpectralEmbeddingType',
     'LayoutGrid',
-    'LazyAdlistSimplify',
+    'LazyAdjacencyListSimplify',
     'LeadingEigenvectorCommunityHistory',
     'Loops',
     'MatrixStorage',

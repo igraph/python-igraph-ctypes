@@ -21,7 +21,7 @@ stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.13.0" }
 
 [tool.ruff]
 ignore = ["F405"]
-line-length = 80
+line-length = 88
 select = ["B", "C", "E", "F", "W"]
 
 [tool.ruff.per-file-ignores]

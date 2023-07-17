@@ -1,16 +1,44 @@
+from fnmatch import fnmatch
 from os.path import expanduser
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, TextIO, Tuple
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    TextIO,
+    Tuple,
+    Union,
+)
 
+import ast
 import re
 import subprocess
 import sys
 
 
-IGRAPH_SOURCE_FOLDER = Path.home() / "dev" / "igraph" / "igraph"
+IGRAPH_C_CORE_SOURCE_FOLDER = Path.home() / "dev" / "igraph" / "igraph"
+SOURCE_FOLDER = Path(sys.modules[__name__].__file__ or "").parent.parent.absolute()
+
+
+def create_glob_matcher(globs: Union[str, Iterable[str]]) -> Callable[[str], bool]:
+    if isinstance(globs, str):
+        return create_glob_matcher((globs,))
+
+    glob_list = list(globs)
+
+    def result(value: str) -> bool:
+        return any(fnmatch(value, g) for g in glob_list)
+
+    return result
 
 
 def longest_common_prefix_length(items: Sequence[str]) -> int:
+    """Finds the length of the longest common prefix of the given list of
+    strings.
+    """
     if not items:
         return 0
 
@@ -29,7 +57,54 @@ def longest_common_prefix_length(items: Sequence[str]) -> int:
     return best
 
 
-def generate_enums(template: Path, output: Path, headers: Iterable[Path]):  # noqa: C901
+def reexport(
+    input: Path,
+    output: Path,
+    module_name: str,
+    match: Union[str, Sequence[str]] = "*",
+    *,
+    template: Path = SOURCE_FOLDER / "codegen" / "reexport.py.in",
+) -> None:
+    """Generates a Python module that re-exports all top-level functions and
+    classes matching the given glob or globs from another module.
+
+    Args:
+        input: the module whose content is to be re-exported
+        output: path to the source of the newly generated module
+        match: glob or globs that the re-exported function or class names
+            must match
+        template: name of the template file to use for the output
+    """
+    with input.open() as fp:
+        node = ast.parse(fp.read(), str(input))
+
+    matcher = create_glob_matcher(g for g in match if "*" in g or "?" in g)
+    matched_symbols = [
+        n.name
+        for n in node.body
+        if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and matcher(n.name)
+    ]
+    matched_symbols.extend(g for g in match if "*" not in g and "?" not in g)
+    matched_symbols.sort()
+
+    with output.open("w") as outfp:
+        with template.open("r") as infp:
+            outfp.write(infp.read().format(**locals()))
+
+        outfp.write(f"from {module_name} import (\n")
+        for symbol in matched_symbols:
+            outfp.write(f"    {symbol},\n")
+        outfp.write(")\n\n")
+
+        outfp.write("__all__ = (\n")
+        for symbol in matched_symbols:
+            outfp.write("    " + repr(symbol).replace("'", '"') + ",\n")
+        outfp.write(")\n")
+
+
+def generate_enums(  # noqa: C901
+    template: Path, output: Path, headers: Iterable[Path]
+) -> None:
     """Generates the contents of ``enums.py`` in the source tree by parsing
     the given include files from igraph's source tree.
 
@@ -53,6 +128,7 @@ def generate_enums(template: Path, output: Path, headers: Iterable[Path]):  # no
         "FasAlgorithm": "FeedbackArcSetAlgorithm",
         "FileformatType": "FileFormat",
         "LayoutDrlDefault": "DRLLayoutPreset",
+        "LazyAdlistSimplify": "LazyAdjacencyListSimplify",
         "Loops": None,
         "Neimode": "NeighborMode",
         "Optimal": "Optimality",
@@ -193,13 +269,13 @@ def main():
         "-m",
         "stimulus",
         "-f",
-        str(IGRAPH_SOURCE_FOLDER / "interfaces" / "functions.yaml"),
+        str(IGRAPH_C_CORE_SOURCE_FOLDER / "interfaces" / "functions.yaml"),
         "-t",
-        str(IGRAPH_SOURCE_FOLDER / "interfaces" / "types.yaml"),
+        str(IGRAPH_C_CORE_SOURCE_FOLDER / "interfaces" / "types.yaml"),
         "-f",
-        "src/codegen/functions.yaml",
+        str(SOURCE_FOLDER / "codegen" / "functions.yaml"),
         "-t",
-        "src/codegen/types.yaml",
+        str(SOURCE_FOLDER / "codegen" / "types.yaml"),
     ]
 
     args = [
@@ -209,9 +285,9 @@ def main():
             "-l",
             "python:ctypes",
             "-i",
-            "src/codegen/internal_lib.py.in",
+            str(SOURCE_FOLDER / "codegen" / "internal_lib.py.in"),
             "-o",
-            "src/igraph_ctypes/_internal/lib.py",
+            str(SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "lib.py"),
         ]
     ]
     subprocess.run(args, check=True)
@@ -223,17 +299,39 @@ def main():
             "-l",
             "python:ctypes-typed-wrapper",
             "-i",
-            "src/codegen/internal_functions.py.in",
+            str(SOURCE_FOLDER / "codegen" / "internal_functions.py.in"),
             "-o",
-            "src/igraph_ctypes/_internal/functions.py",
+            str(SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "functions.py"),
         ]
     ]
     subprocess.run(args, check=True)
 
     generate_enums(
-        Path("src/codegen/internal_enums.py.in"),
-        Path("src/igraph_ctypes/_internal/enums.py"),
-        (IGRAPH_SOURCE_FOLDER / "include").glob("*.h"),
+        SOURCE_FOLDER / "codegen" / "internal_enums.py.in",
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "enums.py",
+        (IGRAPH_C_CORE_SOURCE_FOLDER / "include").glob("*.h"),
+    )
+
+    reexport(
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "enums.py",
+        SOURCE_FOLDER / "igraph_ctypes" / "enums.py",
+        "._internal.enums",
+    )
+
+    reexport(
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "types.py",
+        SOURCE_FOLDER / "igraph_ctypes" / "types.py",
+        "._internal.types",
+        match=(
+            "BoolArray",
+            "EdgeLike",
+            "EdgeSelector",
+            "IntArray",
+            "RealArray",
+            "VertexLike",
+            "VertexPair",
+            "VertexSelector",
+        ),
     )
 
 
