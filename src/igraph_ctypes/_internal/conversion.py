@@ -89,6 +89,8 @@ __all__ = (
     "edge_capacities_to_igraph_vector_t_view",
     "edge_colors_to_igraph_vector_t",
     "edge_colors_to_igraph_vector_t_view",
+    "edge_lengths_to_igraph_vector_t",
+    "edge_lengths_to_igraph_vector_t_view",
     "edge_selector_to_igraph_es_t",
     "edge_weights_to_igraph_vector_t",
     "edge_weights_to_igraph_vector_t_view",
@@ -182,6 +184,12 @@ def edge_weights_to_igraph_vector_t_view(
     interpreted by the C core of igraph as all edges having equal weight.
     """
     return iterable_to_igraph_vector_t_view(weights) if weights is not None else None
+
+
+# Currently we handle lengths the same way as weights; this might change in
+# the future
+edge_lengths_to_igraph_vector_t = edge_weights_to_igraph_vector_t
+edge_lengths_to_igraph_vector_t_view = edge_weights_to_igraph_vector_t_view
 
 
 # Currently we handle capacities the same way as weights; this might change in

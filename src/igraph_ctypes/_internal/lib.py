@@ -596,6 +596,10 @@ igraph_connect_neighborhood = _lib.igraph_connect_neighborhood
 igraph_connect_neighborhood.restype = handle_igraph_error_t
 igraph_connect_neighborhood.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_neimode_t]
 
+igraph_graph_power = _lib.igraph_graph_power
+igraph_graph_power.restype = handle_igraph_error_t
+igraph_graph_power.argtypes = [POINTER(igraph_t), POINTER(igraph_t), igraph_integer_t, igraph_bool_t]
+
 igraph_linegraph = _lib.igraph_linegraph
 igraph_linegraph.restype = handle_igraph_error_t
 igraph_linegraph.argtypes = [POINTER(igraph_t), POINTER(igraph_t)]
@@ -1587,6 +1591,10 @@ igraph_split_join_distance.argtypes = [POINTER(igraph_vector_int_t), POINTER(igr
 igraph_community_infomap = _lib.igraph_community_infomap
 igraph_community_infomap.restype = handle_igraph_error_t
 igraph_community_infomap.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_integer_t, POINTER(igraph_vector_int_t), POINTER(igraph_real_t)]
+
+igraph_community_voronoi = _lib.igraph_community_voronoi
+igraph_community_voronoi.restype = handle_igraph_error_t
+igraph_community_voronoi.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_real_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_neimode_t, igraph_real_t]
 
 igraph_graphlets = _lib.igraph_graphlets
 igraph_graphlets.restype = handle_igraph_error_t

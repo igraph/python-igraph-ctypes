@@ -207,6 +207,15 @@ EDGE_WEIGHTS:
     OUT: "%C% = _Vector.create(0)"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
+EDGE_LENGTHS:
+  PY_TYPE: Iterable[float]
+  PY_RETURN_TYPE: RealArray
+  INCONV:
+    IN: "%C% = edge_lengths_to_igraph_vector_t_view(%I%, %I1%)"
+    INOUT: "%C% = edge_lengths_to_igraph_vector_t(%I%, %I1%)"
+    OUT: "%C% = _Vector.create(0)"
+  OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
+
 EDGE_CAPACITIES:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: RealArray
