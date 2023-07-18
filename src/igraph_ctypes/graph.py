@@ -41,36 +41,36 @@ class Graph:
 
         Creates an empty graph. All positional and keyword arguments are
         forwarded to `create_empty_graph()`, except `_wrap`, which may be used
-        to let the graph take an ownership of a low-level ctypes wrapper object
+        to let the graph take the ownership of a low-level ctypes wrapper object
         for an igraph graph. Typically you will not need to use `_wrap`.
         """
-        self._instance = _wrap or empty(*args, **kwds)
+        self._instance = _wrap or empty(*args, **kwds)._instance
 
     def add_edges(self: C, edges: Iterable[VertexPair]) -> C:
-        add_edges(self._instance, edges)
+        add_edges(self, edges)
         return self
 
     def add_vertices(self: C, n: int) -> C:
-        add_vertices(self._instance, n)
+        add_vertices(self, n)
         return self
 
     def delete_edges(self: C, edges: EdgeSelector) -> C:
-        delete_edges(self._instance, edges)
+        delete_edges(self, edges)
         return self
 
     def delete_vertices(self: C, vertices: VertexSelector) -> C:
-        delete_vertices(self._instance, vertices)
+        delete_vertices(self, vertices)
         return self
 
     def ecount(self) -> int:
         """Returns the number of edges in the graph."""
-        return ecount(self._instance)
+        return ecount(self)
 
     def edge(self, eid: int) -> VertexPair:
         """Returns the endpoints of the edge with the given index from the
         graph.
         """
-        return edge(self._instance, eid)
+        return edge(self, eid)
 
     def get_edge_id(
         self,
@@ -83,30 +83,30 @@ class Graph:
         """Returns the ID of an arbitrary edge between the given source and
         target vertices.
         """
-        return get_eid(self._instance, from_, to, directed, error)
+        return get_eid(self, from_, to, directed, error)
 
     def incident(
         self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
     ) -> NDArray[np_type_of_igraph_integer_t]:
-        return incident(self._instance, vid, mode)
+        return incident(self, vid, mode)
 
     def is_directed(self) -> bool:
         """Returns whether the graph is directed."""
-        return is_directed(self._instance)
+        return is_directed(self)
 
     def neighbors(
         self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
     ) -> NDArray[np_type_of_igraph_integer_t]:
         """Returns the list of neighbors of a vertex."""
-        return neighbors(self._instance, vid, mode)
+        return neighbors(self, vid, mode)
 
     def vcount(self) -> int:
         """Returns the number of vertices in the graph."""
-        return vcount(self._instance)
+        return vcount(self)
 
     @property
     def _as_parameter_(self) -> _Graph:
-        """ctypes hook function that extracts the low-level ctypes wrapper object
-        from the graph.
+        """ctypes hook function that extracts the low-level ctypes wrapper
+        object from the graph.
         """
         return self._instance

@@ -1,5 +1,16 @@
+from __future__ import annotations
+
 from ctypes import byref
-from typing import Any, Callable, Generic, NoReturn, Optional, Type, TypeVar
+from typing import (
+    Any,
+    Callable,
+    Generic,
+    NoReturn,
+    Optional,
+    Type,
+    TYPE_CHECKING,
+    TypeVar,
+)
 
 from .lib import (
     igraph_destroy,
@@ -36,6 +47,9 @@ from .types import (
     igraph_vs_t,
 )
 
+if TYPE_CHECKING:
+    from igraph_ctypes.graph import Graph
+
 __all__ = (
     "_EdgeSelector",
     "_Graph",
@@ -48,6 +62,7 @@ __all__ = (
     "_VectorIntList",
     "_VectorList",
     "_VertexSelector",
+    "_create_graph_from_boxed",
 )
 
 
@@ -251,3 +266,9 @@ class _RNG(
     )
 ):
     pass
+
+
+def _create_graph_from_boxed(graph: _Graph) -> Graph:
+    from igraph_ctypes.graph import Graph
+
+    return Graph(_wrap=graph.mark_initialized())

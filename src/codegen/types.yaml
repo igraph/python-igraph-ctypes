@@ -92,12 +92,12 @@ MATRIX_INT:
   OUTCONV: "%I% = igraph_matrix_int_t_to_numpy_array(%C%)"
 
 GRAPH:
-  PY_TYPE: _Graph
+  PY_TYPE: Graph
   INCONV:
     OUT: "%C% = _Graph()"
   OUTCONV:
     OUT: |-
-      %I% = %C%.mark_initialized()
+      %I% = _create_graph_from_boxed(%C%)
     INOUT: ~
 
 ATTRIBUTES:

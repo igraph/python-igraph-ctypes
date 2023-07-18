@@ -13,7 +13,7 @@ from ._internal.functions import (
     get_shortest_path_dijkstra,
 )
 
-__all__ = ("shortest_path",)
+__all__ = ("components", "shortest_path")
 
 
 def components(graph: Graph, mode: Connectedness = Connectedness.WEAK):

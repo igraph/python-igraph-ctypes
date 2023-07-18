@@ -1,6 +1,6 @@
-import numpy.typing as npt
+from __future__ import annotations
 
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
 
 from .conversion import *  # noqa
 from .enums import *  # noqa
@@ -16,9 +16,6 @@ from .types import (
     VertexLike,
     VertexPair,
     VertexSelector,
-    np_type_of_igraph_bool_t,
-    np_type_of_igraph_integer_t,
-    np_type_of_igraph_real_t,
 )
 from .wrappers import (
     _Graph,
@@ -28,7 +25,11 @@ from .wrappers import (
     _VectorBool,
     _VectorInt,
     _VectorIntList,
+    _create_graph_from_boxed,
 )
+
+if TYPE_CHECKING:
+    from igraph_ctypes.graph import Graph
 
 # fmt: off
 # flake8: noqa: E743

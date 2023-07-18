@@ -1,7 +1,7 @@
 from typing import Iterable, Union
 
 from .graph import Graph
-from ._internal.functions import create, famous, grg_game, square_lattice
+from ._internal.functions import create, empty, famous, grg_game, square_lattice
 
 __all__ = (
     "create_empty_graph",
@@ -19,7 +19,7 @@ def create_empty_graph(n: int, directed: bool = False) -> Graph:
         n: the number of vertices
         directed: whether the graph is directed
     """
-    return Graph(n, directed)
+    return empty(n, directed)
 
 
 def create_famous_graph(name: str) -> Graph:
@@ -31,7 +31,7 @@ def create_famous_graph(name: str) -> Graph:
     Parameters:
         name: the name of the graph to construct
     """
-    return Graph(_wrap=famous(name))
+    return famous(name)
 
 
 def create_graph_from_edge_list(
@@ -44,7 +44,7 @@ def create_graph_from_edge_list(
         n: the number of vertices in the graph if it cannot be inferred from
             the maximum edge ID in the edge list
     """
-    return Graph(_wrap=create(edges, n, directed))
+    return create(edges, n, directed)
 
 
 def create_square_lattice(
@@ -73,9 +73,7 @@ def create_square_lattice(
     else:
         periodic_per_dim = list(periodic)  # type: ignore
 
-    return Graph(
-        _wrap=square_lattice(dimvector, nei, directed, mutual, periodic_per_dim)
-    )
+    return square_lattice(dimvector, nei, directed, mutual, periodic_per_dim)
 
 
 def create_geometric_random_graph(n: int, radius: float, torus: bool = False):
@@ -86,4 +84,4 @@ def create_geometric_random_graph(n: int, radius: float, torus: bool = False):
         radius: connection distance; two vertices will be connected if they are
             closer to each other than this threshold
     """
-    return Graph(_wrap=grg_game(n, radius, torus)[0])
+    return grg_game(n, radius, torus)[0]
