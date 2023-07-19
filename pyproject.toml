@@ -16,8 +16,8 @@ pycapi = "^0.82.1"
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
 richbench = "^1.0.3"
-igraph = "^0.10.4"
-stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.13.0" }
+igraph = "^0.10.6"
+stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.14.0" }
 
 [tool.ruff]
 ignore = ["F405"]

@@ -37,7 +37,12 @@ if TYPE_CHECKING:
 
 
 def empty(n: int = 0, directed: bool = True) -> Graph:
-    """Type-annotated wrapper for ``igraph_empty``."""
+    """Creates an empty graph with the given number of vertices.
+
+    Parameters:
+        n: the number of vertices
+        directed: whether the graph is directed
+    """
     # Prepare input arguments
     c_graph = _Graph()
     c_n = n
@@ -687,7 +692,17 @@ def kautz(m: int, n: int) -> Graph:
 
 
 def famous(name: str) -> Graph:
-    """Type-annotated wrapper for ``igraph_famous``."""
+    """Creates one of the "famous" graphs embedded into igraph by name.
+
+    See the documentation of the ``igraph_famous()`` function in igraph's C core
+    for a list of names accepted by this function.
+
+    Parameters:
+        name: the name of the graph to construct
+
+    Returns:
+        the constructed graph
+    """
     # Prepare input arguments
     c_graph = _Graph()
     c_name = name.encode("utf-8")

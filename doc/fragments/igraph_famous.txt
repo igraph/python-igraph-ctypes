@@ -1,0 +1,10 @@
+Creates one of the "famous" graphs embedded into igraph by name.
+
+See the documentation of the ``igraph_famous()`` function in igraph's C core
+for a list of names accepted by this function.
+
+Parameters:
+    name: the name of the graph to construct
+
+Returns:
+    the constructed graph
