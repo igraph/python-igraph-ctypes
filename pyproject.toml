@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "igraph_ctypes"
-version = "0.1.0"
+version = "0.0.0.post58.dev0+4ca9643"
 description = ""
 authors = ["Tamas Nepusz <ntamas@gmail.com>"]
 packages = [
@@ -19,6 +19,12 @@ richbench = "^1.0.3"
 igraph = "^0.10.6"
 stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.14.0" }
 
+[tool.poetry-dynamic-versioning]
+enable = true
+
+[tool.poetry-dynamic-versioning.substitution]
+files = ["src/igraph_ctypes/_version.py"]
+
 [tool.ruff]
 ignore = ["F405"]
 line-length = 88
@@ -30,5 +36,5 @@ select = ["B", "C", "E", "F", "W"]
 "src/igraph_ctypes/_internal/lib.py" = ["E501"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
