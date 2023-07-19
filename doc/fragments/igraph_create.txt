@@ -1,0 +1,9 @@
+Creates a graph from the given edge list.
+
+Parameters:
+    edges: the list of edges in the graph
+    n: the number of vertices in the graph if it cannot be inferred from
+        the maximum edge ID in the edge list
+
+Returns:
+    the newly created graph
