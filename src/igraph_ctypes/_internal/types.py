@@ -13,13 +13,11 @@ from ctypes import (
     c_uint8,
     c_uint64,
     c_void_p,
-    py_object,
     POINTER,
     Structure,
     Union as CUnion,
 )
 from typing import Iterable, Literal, Sequence, Tuple, Union
-
 
 def vector_fields(base_type):
     """Function that receives a base type and returns the standard fields used
@@ -164,12 +162,6 @@ class igraph_inclist_t(Structure):
     """ctypes representation of ``igraph_adjlist_t``"""
 
     _fields_ = [("length", igraph_integer_t), ("incs", POINTER(igraph_vector_int_t))]
-
-
-class igraph_attribute_combination_t(Structure):
-    """ctypes representation of ``igraph_attribute_combination_t``"""
-
-    _fields_ = [("list", igraph_vector_ptr_t)]
 
 
 class igraph_t(Structure):

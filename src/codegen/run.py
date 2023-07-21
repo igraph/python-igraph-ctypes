@@ -114,12 +114,11 @@ def generate_enums(  # noqa: C901
 
     IGNORED_ENUMS = {
         "igraph_cached_property_t",
-        "igraph_attribute_type_t",
-        "igraph_attribute_elemtype_t",
         "igraph_lapack_dsyev_which_t",
     }
     ENUM_NAME_REMAPPING = {
         "Adjacency": "AdjacencyMode",
+        "AttributeElemtype": "AttributeElementType",
         "BlissSh": "BLISSSplittingHeuristics",
         "Degseq": "DegreeSequenceMode",
         "EdgeorderType": "EdgeOrder",

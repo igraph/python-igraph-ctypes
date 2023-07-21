@@ -9,10 +9,13 @@
 from ctypes import cdll, c_bool, c_char_p, c_double, c_int, c_void_p, POINTER
 from ctypes.util import find_library
 
+from .attributes import (
+    igraph_attribute_combination_t,
+    igraph_attribute_table_t,
+)
 from .errors import handle_igraph_error_t
 from .types import (
     FILE,
-    igraph_attribute_combination_t,
     igraph_bool_t,
     igraph_integer_t,
     igraph_real_t,
@@ -166,6 +169,16 @@ igraph_vector_bool_push_back.argtypes = [POINTER(igraph_vector_bool_t), igraph_b
 igraph_vector_bool_size = _lib.igraph_vector_bool_size
 igraph_vector_bool_size.restype = igraph_integer_t
 igraph_vector_bool_size.argtypes = [POINTER(igraph_vector_bool_t)]
+
+# Pointer vector type
+
+igraph_vector_ptr_init = _lib.igraph_vector_ptr_init
+igraph_vector_ptr_init.restype = handle_igraph_error_t
+igraph_vector_ptr_init.argtypes = [POINTER(igraph_vector_ptr_t), igraph_integer_t]
+
+igraph_vector_ptr_destroy = _lib.igraph_vector_ptr_destroy
+igraph_vector_ptr_destroy.restype = None
+igraph_vector_ptr_destroy.argtypes = [c_void_p]
 
 # Matrix type
 
@@ -383,6 +396,16 @@ igraph_rng_set_default.argtypes = [POINTER(igraph_rng_t)]
 igraph_destroy = _lib.igraph_destroy
 igraph_destroy.restype = None
 igraph_destroy.argtypes = [POINTER(igraph_t)]
+
+# Attributes
+
+igraph_has_attribute_table = _lib.igraph_has_attribute_table
+igraph_has_attribute_table.restype = igraph_bool_t
+igraph_has_attribute_table.argtypes = []
+
+igraph_set_attribute_table = _lib.igraph_set_attribute_table
+igraph_set_attribute_table.restype = POINTER(igraph_attribute_table_t)
+igraph_set_attribute_table.argtypes = [POINTER(igraph_attribute_table_t)]
 
 # Error handling and interruptions
 

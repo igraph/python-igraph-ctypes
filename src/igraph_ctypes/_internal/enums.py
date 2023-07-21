@@ -11,6 +11,24 @@ class Loops(IntEnum):
 
 # fmt: off
 # The rest of this file is generated
+class AttributeType(IntEnum):
+    """Python counterpart of an ``igraph_attribute_type_t`` enum."""
+
+    UNSPECIFIED = 0
+    NUMERIC = 1
+    BOOLEAN = 2
+    STRING = 3
+    OBJECT = 127
+
+
+class AttributeElementType(IntEnum):
+    """Python counterpart of an ``igraph_attribute_elemtype_t`` enum."""
+
+    GRAPH = 0
+    VERTEX = 1
+    EDGE = 2
+
+
 class AttributeCombinationType(IntEnum):
     """Python counterpart of an ``igraph_attribute_combination_type_t`` enum."""
 
@@ -527,6 +545,8 @@ __all__ = (
     'AddWeights',
     'AdjacencyMode',
     'AttributeCombinationType',
+    'AttributeElementType',
+    'AttributeType',
     'BLISSSplittingHeuristics',
     'BarabasiAlgorithm',
     'ColoringGreedy',

@@ -31,6 +31,8 @@ from .lib import (
     igraph_vector_int_list_init,
     igraph_vector_list_destroy,
     igraph_vector_list_init,
+    igraph_vector_ptr_destroy,
+    igraph_vector_ptr_init,
     igraph_vs_destroy,
 )
 from .types import (
@@ -44,6 +46,7 @@ from .types import (
     igraph_vector_int_t,
     igraph_vector_int_list_t,
     igraph_vector_list_t,
+    igraph_vector_ptr_t,
     igraph_vs_t,
 )
 
@@ -244,6 +247,12 @@ _VectorList = create_boxed(
     igraph_vector_list_t,
     constructor=igraph_vector_list_init,
     destructor=igraph_vector_list_destroy,
+)
+_VectorPtr = create_boxed(
+    "_VectorPtr",
+    igraph_vector_ptr_t,
+    constructor=igraph_vector_ptr_init,
+    destructor=igraph_vector_ptr_destroy,
 )
 _VertexSelector = create_boxed(
     "_VertexSelector",
