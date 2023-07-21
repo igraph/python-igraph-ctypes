@@ -29,6 +29,11 @@ igraph_get_shortest_path_astar:
   # igraph_astar_heuristic_func_t not handled yet
   IGNORE: PythonCTypes, PythonCTypesTypedWrapper
 
+igraph_empty:
+  # Changed the default value of 'directed' to false. Can be removed when
+  # the main igraph repo also changes the default
+  PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=False
+
 igraph_empty_attrs:
   # Not needed at all
   IGNORE: PythonCTypes, PythonCTypesTypedWrapper
