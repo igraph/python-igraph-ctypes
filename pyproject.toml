@@ -25,6 +25,9 @@ enable = true
 [tool.poetry-dynamic-versioning.substitution]
 files = ["src/igraph_ctypes/_version.py"]
 
+[tool.pytest.ini_options]
+addopts = "--cov-config=.coveragerc"
+
 [tool.ruff]
 ignore = ["F405"]
 line-length = 88
@@ -34,6 +37,24 @@ select = ["B", "C", "E", "F", "W"]
 "src/igraph_ctypes/_internal/enums.py" = ["E501"]
 "src/igraph_ctypes/_internal/functions.py" = ["E501"]
 "src/igraph_ctypes/_internal/lib.py" = ["E501"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+min_version = 4.0
+env_list = py311, py310
+
+[gh-actions]
+python =
+    3.10: py310
+    3.11: py311
+
+[testenv]
+deps =
+    pytest
+    pytest-cov
+commands = pytest tests
+"""
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]

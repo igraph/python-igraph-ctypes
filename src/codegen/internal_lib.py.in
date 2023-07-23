@@ -6,7 +6,7 @@
 
 # fmt: off
 
-from ctypes import cdll, c_bool, c_char_p, c_double, c_int, c_void_p, POINTER
+from ctypes import cdll, c_char_p, c_double, c_int, c_void_p, POINTER
 from ctypes.util import find_library
 
 from .attributes import (

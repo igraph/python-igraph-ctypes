@@ -201,11 +201,7 @@ def create_boxed(
     return BoxedClass
 
 
-# This trickery is needed to ensure that Pyright does to trip up on _Graph annotations
-class _Graph(create_boxed("_Graph", igraph_t, destructor=igraph_destroy)):
-    pass
-
-
+_Graph = create_boxed("_Graph", igraph_t, destructor=igraph_destroy)
 _Matrix = create_boxed(
     "_Matrix",
     igraph_matrix_t,
@@ -266,18 +262,15 @@ _EdgeSelector = create_boxed(
 )
 
 
-class _RNG(
-    create_boxed(
-        "_RNG",
-        igraph_rng_t,
-        constructor=igraph_rng_init,
-        destructor=igraph_rng_destroy,
-    )
-):
-    pass
+_RNG = create_boxed(
+    "_RNG",
+    igraph_rng_t,
+    constructor=igraph_rng_init,
+    destructor=igraph_rng_destroy,
+)
 
 
-def _create_graph_from_boxed(graph: _Graph) -> Graph:
+def _create_graph_from_boxed(graph: Boxed[igraph_t]) -> Graph:
     from igraph_ctypes.graph import Graph
 
     return Graph(_wrap=graph.mark_initialized())
