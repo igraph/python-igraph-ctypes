@@ -3604,7 +3604,7 @@ def bipartite_game_gnp(n1: int, n2: int, p: float, directed: bool = False, mode:
     return graph, types
 
 
-def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> Tuple[Graph, BoolArray]:
+def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> Tuple[Graph, BoolArray]:
     """Type-annotated wrapper for ``igraph_bipartite_game_gnm``."""
     # Prepare input arguments
     c_graph = _Graph()
@@ -3614,9 +3614,10 @@ def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: N
     c_m = m
     c_directed = any_to_igraph_bool_t(directed)
     c_mode = c_int(mode)
+    c_multiple = any_to_igraph_bool_t(multiple)
 
     # Call wrapped function
-    igraph_bipartite_game_gnm(c_graph, c_types, c_n1, c_n2, c_m, c_directed, c_mode)
+    igraph_bipartite_game_gnm(c_graph, c_types, c_n1, c_n2, c_m, c_directed, c_mode, c_multiple)
 
     # Prepare output arguments
     graph = _create_graph_from_boxed(c_graph)

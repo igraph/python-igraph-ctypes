@@ -13,11 +13,13 @@ from ctypes import (
     c_uint8,
     c_uint64,
     c_void_p,
+    py_object,
     POINTER,
     Structure,
     Union as CUnion,
 )
 from typing import Iterable, Literal, Sequence, Tuple, Union
+
 
 def vector_fields(base_type):
     """Function that receives a base type and returns the standard fields used
@@ -170,13 +172,13 @@ class igraph_t(Structure):
     _fields_ = [
         ("n", igraph_integer_t),
         ("directed", igraph_bool_t),
-        ("from_", igraph_vector_t),
-        ("to", igraph_vector_t),
-        ("oi", igraph_vector_t),
-        ("ii", igraph_vector_t),
-        ("os", igraph_vector_t),
-        ("is_", igraph_vector_t),
-        ("attr", c_void_p),
+        ("from_", igraph_vector_int_t),
+        ("to", igraph_vector_int_t),
+        ("oi", igraph_vector_int_t),
+        ("ii", igraph_vector_int_t),
+        ("os", igraph_vector_int_t),
+        ("is_", igraph_vector_int_t),
+        ("attr", py_object),
         ("cache", c_void_p),
     ]
 

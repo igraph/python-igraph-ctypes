@@ -123,6 +123,7 @@ def generate_enums(  # noqa: C901
         "Degseq": "DegreeSequenceMode",
         "EdgeorderType": "EdgeOrder",
         "EitType": "EdgeIteratorType",
+        "ErrorType": "ErrorCode",
         "EsType": "EdgeSequenceType",
         "FasAlgorithm": "FeedbackArcSetAlgorithm",
         "FileformatType": "FileFormat",

@@ -4,8 +4,11 @@ from dataclasses import dataclass
 from pycapi import PyErr_CheckSignals
 from typing import Optional
 
+from .attributes import DictAttributeHandler
+from .errors import igraph_error_t_to_python_exception_class
 from .functions import igraph_strerror
 from .lib import (
+    igraph_set_attribute_table,
     igraph_set_error_handler,
     igraph_set_fatal_handler,
     igraph_set_interruption_handler,
@@ -16,6 +19,7 @@ from .types import (
     igraph_fatal_handler_t,
     igraph_interruption_handler_t,
 )
+from .utils import get_raw_memory_view
 
 __all__ = ("setup_igraph_library", "_get_last_error_state")
 
@@ -53,15 +57,9 @@ class IgraphErrorState:
         in the state object. No-op otherwise.
         """
         code = self.error
-
-        if code == 0:
+        exc = igraph_error_t_to_python_exception_class(code)
+        if exc is None:
             return
-        elif code == 12:  # IGRAPH_UNIMPLEMENTED
-            exc = NotImplementedError
-        elif code == 2:  # IGRAPH_ENOMEM
-            exc = MemoryError
-        else:
-            exc = RuntimeError
 
         msg = self.message
         if msg and msg[-1] not in b".!?":
@@ -70,14 +68,18 @@ class IgraphErrorState:
         filename_str = self.filename.decode("utf-8", errors="replace")
         message_str = msg.decode("utf-8", errors="replace")
         error_code_str = igraph_strerror(self.error).decode("utf-8", errors="replace")
+        line = self.line
 
         self._reset()
 
         raise exc(
-            f"Error at {filename_str}:{self.line}: {message_str} -- {error_code_str}"
+            f"Error at {filename_str}:{line}: {message_str} -- {error_code_str}"
+            if message_str
+            else f"Error at {filename_str}:{line} -- {error_code_str}"
         )
 
 
+_attribute_handler = DictAttributeHandler()
 _last_error = IgraphErrorState()
 
 
@@ -136,6 +138,14 @@ def _setup_rng() -> None:
     NumPyRNG(default_rng()).attach()
 
 
+def _setup_attribute_table() -> None:
+    """Initializes the attribute handler table that is responsible for telling
+    the core C igraph library how to deal with attributes of graphs created
+    from Python.
+    """
+    igraph_set_attribute_table(_attribute_handler)
+
+
 def setup_igraph_library() -> None:
     """Integrates the facilities of the igraph library with Python.
 
@@ -145,3 +155,4 @@ def setup_igraph_library() -> None:
     _setup_error_handlers()
     _setup_interruption_handler()
     _setup_rng()
+    _setup_attribute_table()

@@ -1293,7 +1293,7 @@ igraph_bipartite_game_gnp.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_b
 
 igraph_bipartite_game_gnm = _lib.igraph_bipartite_game_gnm
 igraph_bipartite_game_gnm.restype = handle_igraph_error_t
-igraph_bipartite_game_gnm.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_neimode_t]
+igraph_bipartite_game_gnm.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_neimode_t, igraph_bool_t]
 
 igraph_bipartite_game = _lib.igraph_bipartite_game
 igraph_bipartite_game.restype = handle_igraph_error_t

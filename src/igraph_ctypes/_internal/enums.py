@@ -414,7 +414,7 @@ class MatrixStorage(IntEnum):
     COLUMN_MAJOR = 1
 
 
-class ErrorType(IntEnum):
+class ErrorCode(IntEnum):
     """Python counterpart of an ``igraph_error_type_t`` enum."""
 
     SUCCESS = 0
@@ -559,7 +559,7 @@ __all__ = (
     'EdgeSequenceType',
     'EigenAlgorithm',
     'ErdosRenyi',
-    'ErrorType',
+    'ErrorCode',
     'FeedbackArcSetAlgorithm',
     'FileFormat',
     'FloydWarshallAlgorithm',
