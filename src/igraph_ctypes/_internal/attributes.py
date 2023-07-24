@@ -82,14 +82,14 @@ class AttributeStorage(ABC):
 
 
 @dataclass(frozen=True)
-class dictAttributeStorage(AttributeStorage):
+class DictAttributeStorage(AttributeStorage):
     """dictionary-based storage area for the graph, vertex and edge attributes
     of a graph.
     """
 
     graph_attributes: dict[str, Any] = field(default_factory=dict)
-    vertex_attributes: dict[str, list] = field(default_factory=dict)
-    edge_attributes: dict[str, Any] = field(default_factory=dict)
+    vertex_attributes: dict[str, list[Any]] = field(default_factory=dict)
+    edge_attributes: dict[str, list[Any]] = field(default_factory=dict)
 
     def add_vertices(self, graph, n: int) -> None:
         pass
@@ -148,12 +148,12 @@ def _detach_storage_from_graph(graph) -> None:
 
 
 class AttributeHandler(AttributeHandlerBase):
-    """Attribute handler implementation that uses a dictAttributeStorage_
+    """Attribute handler implementation that uses a DictAttributeStorage_
     as its storage backend.
     """
 
     def init(self, graph, attr):
-        _assign_storage_to_graph(graph, dictAttributeStorage())
+        _assign_storage_to_graph(graph, DictAttributeStorage())
 
     def destroy(self, graph) -> None:
         storage = _get_storage_from_graph(graph)
