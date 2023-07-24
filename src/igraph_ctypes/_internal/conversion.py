@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from ctypes import memmove, POINTER
+from ctypes import addressof, memmove, POINTER
 from typing import Any, Iterable, Optional, Sequence, TYPE_CHECKING
 
 from .enums import MatrixStorage
@@ -104,8 +104,11 @@ __all__ = (
     "igraph_vector_bool_t_to_list",
     "igraph_vector_int_t_to_list",
     "igraph_vector_t_to_numpy_array",
+    "igraph_vector_t_to_numpy_array_view",
     "igraph_vector_bool_t_to_numpy_array",
+    "igraph_vector_bool_t_to_numpy_array_view",
     "igraph_vector_int_t_to_numpy_array",
+    "igraph_vector_int_t_to_numpy_array_view",
     "igraph_vector_int_list_t_to_list_of_numpy_array",
     "igraph_vector_list_t_to_list_of_numpy_array",
     "iterable_edge_indices_to_igraph_vector_int_t",
@@ -700,6 +703,14 @@ def igraph_vector_t_to_numpy_array(vector: _Vector) -> RealArray:
     return result
 
 
+def igraph_vector_t_to_numpy_array_view(vector: _Vector) -> RealArray:
+    n = igraph_vector_size(vector)
+    addr = addressof(igraph_vector_e_ptr(vector, 0).contents)
+    buf_type = igraph_real_t * n
+    buf = buf_type.from_address(addr)
+    return np.frombuffer(buf, dtype=np_type_of_igraph_real_t)
+
+
 def igraph_vector_bool_t_to_numpy_array(vector: _VectorBool) -> BoolArray:
     n = igraph_vector_bool_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_bool_t)
@@ -708,12 +719,28 @@ def igraph_vector_bool_t_to_numpy_array(vector: _VectorBool) -> BoolArray:
     return result
 
 
+def igraph_vector_bool_t_to_numpy_array_view(vector: _VectorBool) -> BoolArray:
+    n = igraph_vector_bool_size(vector)
+    addr = addressof(igraph_vector_bool_e_ptr(vector, 0).contents)
+    buf_type = igraph_bool_t * n
+    buf = buf_type.from_address(addr)
+    return np.frombuffer(buf, dtype=np_type_of_igraph_bool_t)
+
+
 def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> IntArray:
     n = igraph_vector_int_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_integer_t)
     if n > 0:
         memmove(result.ctypes.data, igraph_vector_int_e_ptr(vector, 0), result.nbytes)
     return result
+
+
+def igraph_vector_int_t_to_numpy_array_view(vector: _VectorInt) -> IntArray:
+    n = igraph_vector_int_size(vector)
+    addr = addressof(igraph_vector_int_e_ptr(vector, 0).contents)
+    buf_type = igraph_integer_t * n
+    buf = buf_type.from_address(addr)
+    return np.frombuffer(buf, dtype=np_type_of_igraph_integer_t)
 
 
 def igraph_vector_list_t_to_list_of_numpy_array(

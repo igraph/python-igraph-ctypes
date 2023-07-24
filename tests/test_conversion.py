@@ -11,10 +11,13 @@ from igraph_ctypes._internal.conversion import (
     igraph_matrix_int_t_to_numpy_array,
     igraph_vector_t_to_list,
     igraph_vector_t_to_numpy_array,
+    igraph_vector_t_to_numpy_array_view,
     igraph_vector_bool_t_to_list,
     igraph_vector_bool_t_to_numpy_array,
+    igraph_vector_bool_t_to_numpy_array_view,
     igraph_vector_int_t_to_list,
     igraph_vector_int_t_to_numpy_array,
+    igraph_vector_int_t_to_numpy_array_view,
     igraph_vector_int_list_t_to_list_of_numpy_array,
     igraph_vector_list_t_to_list_of_numpy_array,
     iterable_of_iterable_to_igraph_vector_list_t,
@@ -94,6 +97,22 @@ def test_bool_vector_roundtrip():
     assert (restored_array == expected_array).all()
 
 
+def test_bool_vector_view_roundtrip():
+    input = [False, 0, True, False, "", "yes", True]
+    expected = [bool(x) for x in input]
+    expected_array = array(expected, dtype=bool)
+
+    converted = iterable_to_igraph_vector_bool_t(expected)
+    assert isinstance(converted, _VectorBool)
+
+    restored = igraph_vector_bool_t_to_numpy_array_view(converted)
+    assert (restored == expected_array).all()
+
+    another_restored = igraph_vector_bool_t_to_numpy_array_view(converted)
+    assert (another_restored == expected_array).all()
+    assert restored.data == another_restored.data
+
+
 def test_int_vector_roundtrip():
     input = [1, 4, 7, 11, 8, 3, 5, 6, 2, -6]
     expected = list(input)
@@ -115,6 +134,22 @@ def test_int_vector_roundtrip():
     assert (restored_array == expected_array).all()
 
 
+def test_int_vector_view_roundtrip():
+    input = [1, 4, 7, 11, 8, 3, 5, 6, 2, -6]
+    expected = list(input)
+    expected_array = array(expected)
+
+    converted = iterable_to_igraph_vector_int_t(expected)
+    assert isinstance(converted, _VectorInt)
+
+    restored = igraph_vector_int_t_to_numpy_array_view(converted)
+    assert (restored == expected_array).all()
+
+    another_restored = igraph_vector_int_t_to_numpy_array_view(converted)
+    assert (another_restored == expected_array).all()
+    assert restored.data == another_restored.data
+
+
 def test_real_vector_roundtrip():
     input = [1.23, 4.567, 8.91011, -12.3456]
     expected = list(input)
@@ -134,6 +169,22 @@ def test_real_vector_roundtrip():
 
     restored_array = igraph_vector_t_to_numpy_array(converted)
     assert (restored_array == expected_array).all()
+
+
+def test_real_vector_view_roundtrip():
+    input = [1.23, 4.567, 8.91011, -12.3456]
+    expected = list(input)
+    expected_array = array(expected)
+
+    converted = iterable_to_igraph_vector_t(expected)
+    assert isinstance(converted, _Vector)
+
+    restored = igraph_vector_t_to_numpy_array_view(converted)
+    assert (restored == expected_array).all()
+
+    another_restored = igraph_vector_t_to_numpy_array_view(converted)
+    assert (another_restored == expected_array).all()
+    assert restored.data == another_restored.data
 
 
 def test_int_matrix_roundtrip():
@@ -196,7 +247,7 @@ def test_int_vector_list_roundtrip():
     restored_items = igraph_vector_int_list_t_to_list_of_numpy_array(converted)
     assert len(restored_items) == len(input)
 
-    for original_item, restored_item in zip(input, restored_items):
+    for original_item, restored_item in zip(input, restored_items, strict=True):
         assert (array(original_item) == restored_item).all()
 
 
@@ -214,12 +265,12 @@ def test_vector_list_roundtrip():
     restored_items = igraph_vector_list_t_to_list_of_numpy_array(converted)
     assert len(restored_items) == len(input)
 
-    for original_item, restored_item in zip(input, restored_items):
+    for original_item, restored_item in zip(input, restored_items, strict=True):
         assert (array(original_item) == restored_item).all()
 
 
 def test_vertex_selector():
-    g = create_empty_graph(5)._instance
+    g = create_empty_graph(5)
 
     vs = vertex_selector_to_igraph_vs_t(None, g)
     assert vs.unwrap().type == VertexSequenceType.NONE
@@ -246,7 +297,6 @@ def test_vertex_selector():
 def test_edge_selector():
     g = create_empty_graph(5)
     g.add_edges([(0, 1), (1, 2), (2, 4), (4, 0)])
-    g = g._instance
 
     es = edge_selector_to_igraph_es_t(None, g)
     assert es.unwrap().type == EdgeSequenceType.NONE
