@@ -1,168 +1,31 @@
+from abc import ABC, abstractmethod
 from ctypes import (
-    c_char_p,
-    c_int,
-    c_void_p,
     pointer,
     py_object,
-    CFUNCTYPE,
-    POINTER,
-    Structure,
 )
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Optional
 
+from .lib import igraph_error, igraph_vector_ptr_size
 from .refcount import incref, decref
-from .types import (
-    igraph_bool_t,
-    igraph_error_t,
-    igraph_es_t,
-    igraph_integer_t,
-    igraph_strvector_t,
-    igraph_t,
-    igraph_vector_bool_t,
-    igraph_vector_int_t,
-    igraph_vector_int_list_t,
-    igraph_vector_ptr_t,
-    igraph_vector_t,
-    igraph_vs_t,
-)
-from .utils import nop, protect
+from .types import igraph_attribute_table_t
+from .utils import nop, protect_with
 
-__all__ = ("AttributeHandlerBase", "DictAttributeHandler")
-
-
-p_igraph_t = POINTER(igraph_t)
-p_strvector_t = POINTER(igraph_strvector_t)
-p_vector_t = POINTER(igraph_vector_t)
-p_vector_bool_t = POINTER(igraph_vector_bool_t)
-p_vector_int_t = POINTER(igraph_vector_int_t)
-p_vector_int_list_t = POINTER(igraph_vector_int_list_t)
-p_vector_ptr_t = POINTER(igraph_vector_ptr_t)
-
-
-class igraph_attribute_combination_t(Structure):
-    """ctypes representation of ``igraph_attribute_combination_t``"""
-
-    _fields_ = [("list", igraph_vector_ptr_t)]
-
-
-class igraph_attribute_combination_record_t(Structure):
-    """ctypes representation of ``igraph_attribute_combination_record_t``"""
-
-    _fields_ = [("name", c_char_p), ("type", c_int), ("func", CFUNCTYPE(c_void_p))]
-
-
-p_attribute_combination_t = POINTER(igraph_attribute_combination_t)
-
-
-class igraph_attribute_table_t(Structure):
-    """ctypes representation of ``igraph_attribute_table_t``"""
-
-    TYPES = {
-        "init": CFUNCTYPE(igraph_error_t, p_igraph_t, p_vector_ptr_t),
-        "destroy": CFUNCTYPE(None, p_igraph_t),
-        "copy": CFUNCTYPE(
-            igraph_error_t,
-            p_igraph_t,
-            p_igraph_t,
-            igraph_bool_t,
-            igraph_bool_t,
-            igraph_bool_t,
-        ),
-        "add_vertices": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, igraph_integer_t, p_vector_ptr_t
-        ),
-        "permute_vertices": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, p_igraph_t, p_vector_int_t
-        ),
-        "combine_vertices": CFUNCTYPE(
-            igraph_error_t,
-            p_igraph_t,
-            p_igraph_t,
-            p_vector_int_list_t,
-            p_attribute_combination_t,
-        ),
-        "add_edges": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, p_vector_int_t, p_vector_ptr_t
-        ),
-        "permute_edges": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, p_igraph_t, p_vector_int_t
-        ),
-        "combine_edges": CFUNCTYPE(
-            igraph_error_t,
-            p_igraph_t,
-            p_igraph_t,
-            p_vector_int_list_t,
-            p_attribute_combination_t,
-        ),
-        "get_info": CFUNCTYPE(
-            igraph_error_t,
-            p_igraph_t,
-            p_strvector_t,
-            p_vector_int_t,
-            p_strvector_t,
-            p_vector_int_t,
-            p_strvector_t,
-            p_vector_int_t,
-        ),
-        "has_attr": CFUNCTYPE(igraph_bool_t, p_igraph_t, c_int, c_char_p),
-        "get_type": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, POINTER(c_int), c_int, c_char_p
-        ),
-        "get_numeric_graph_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, p_vector_t
-        ),
-        "get_string_graph_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, p_strvector_t
-        ),
-        "get_bool_graph_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, p_vector_bool_t
-        ),
-        "get_numeric_vertex_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, igraph_vs_t, p_vector_t
-        ),
-        "get_string_vertex_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, igraph_vs_t, p_strvector_t
-        ),
-        "get_bool_vertex_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, igraph_vs_t, p_vector_bool_t
-        ),
-        "get_numeric_edge_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, igraph_es_t, p_vector_t
-        ),
-        "get_string_edge_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, igraph_es_t, p_strvector_t
-        ),
-        "get_bool_edge_attr": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, c_char_p, igraph_es_t, p_vector_bool_t
-        ),
-    }
-
-    _fields_ = [
-        ("init", TYPES["init"]),
-        ("destroy", TYPES["destroy"]),
-        ("copy", TYPES["copy"]),
-        ("add_vertices", TYPES["add_vertices"]),
-        ("permute_vertices", TYPES["permute_vertices"]),
-        ("combine_vertices", TYPES["combine_vertices"]),
-        ("add_edges", TYPES["add_edges"]),
-        ("permute_edges", TYPES["permute_edges"]),
-        ("combine_edges", TYPES["combine_edges"]),
-        ("get_info", TYPES["get_info"]),
-        ("has_attr", TYPES["has_attr"]),
-        ("get_numeric_graph_attr", TYPES["get_numeric_graph_attr"]),
-        ("get_string_graph_attr", TYPES["get_string_graph_attr"]),
-        ("get_bool_graph_attr", TYPES["get_bool_graph_attr"]),
-        ("get_numeric_vertex_attr", TYPES["get_numeric_vertex_attr"]),
-        ("get_string_vertex_attr", TYPES["get_string_vertex_attr"]),
-        ("get_bool_vertex_attr", TYPES["get_bool_vertex_attr"]),
-        ("get_numeric_edge_attr", TYPES["get_numeric_edge_attr"]),
-        ("get_string_edge_attr", TYPES["get_string_edge_attr"]),
-        ("get_bool_edge_attr", TYPES["get_bool_edge_attr"]),
-    ]
+__all__ = ("AttributeHandlerBase", "AttributeHandler", "AttributeStorage")
 
 
 ################################################################################
+
+
+def _trigger_error(error: int) -> int:
+    return int(
+        igraph_error(
+            b"Attribute handler triggered an error",
+            b"<py-attribute-handler>",
+            1,
+            int(error),
+        )
+    )
 
 
 class AttributeHandlerBase:
@@ -175,6 +38,7 @@ class AttributeHandlerBase:
         """Returns an ``igraph_attribute_table_t`` instance that can be used
         to register this attribute handler in the core igraph library.
         """
+        protect = protect_with(_trigger_error)
         return {
             key: igraph_attribute_table_t.TYPES[key](protect(getattr(self, key, nop)))
             for key in igraph_attribute_table_t.TYPES.keys()
@@ -190,8 +54,35 @@ class AttributeHandlerBase:
         return self._table_ptr
 
 
+class AttributeStorage(ABC):
+    """Interface specification for objects that store graph, vertex and edge
+    attributes.
+    """
+
+    @abstractmethod
+    def add_vertices(self, n: int) -> None:
+        """Notifies the attribute storage object that the given number of
+        new vertices were added to the graph.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def clear(self):
+        """Clears the storage area, removing all attributes."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def copy(
+        self,
+        copy_graph_attributes: bool = True,
+        copy_vertex_attributes: bool = True,
+        copy_edge_attributes: bool = True,
+    ):
+        raise NotImplementedError
+
+
 @dataclass(frozen=True)
-class _DictAttributeStorage:
+class DictAttributeStorage(AttributeStorage):
     """Dictionary-based storage area for the graph, vertex and edge attributes
     of a graph.
     """
@@ -199,6 +90,9 @@ class _DictAttributeStorage:
     graph_attributes: Dict[str, Any] = field(default_factory=dict)
     vertex_attributes: Dict[str, Any] = field(default_factory=dict)
     edge_attributes: Dict[str, Any] = field(default_factory=dict)
+
+    def add_vertices(self, graph, n: int) -> None:
+        print("Added", n, "vertices")
 
     def clear(self) -> None:
         """Clears the storage area, removing all attributes from the
@@ -222,10 +116,7 @@ class _DictAttributeStorage:
         )
 
 
-_MISSING = object()
-
-
-def _assign_storage_to_graph(graph, storage: Any = _MISSING):
+def _assign_storage_to_graph(graph, storage: Optional[AttributeStorage] = None) -> None:
     """Assigns an attribute storage object to a graph, taking care of
     increasing or decreasing the reference count of the storage object if needed.
     """
@@ -233,36 +124,42 @@ def _assign_storage_to_graph(graph, storage: Any = _MISSING):
         old_storage = graph.contents.attr
     except ValueError:
         # No storage yet, this is OK
-        old_storage = _MISSING
+        old_storage = None
 
     if old_storage is storage:
         # Nothing to do
         return
 
-    if old_storage is not _MISSING:
+    if old_storage is not None:
         decref(old_storage)
 
-    if storage is not _MISSING:
+    if storage is not None:
         graph.contents.attr = py_object(incref(storage))
     else:
         graph.contents.attr = py_object()
 
 
-def _detach_storage_from_graph(graph):
-    return _assign_storage_to_graph(graph, _MISSING)
+def _get_storage_from_graph(graph) -> AttributeStorage:
+    return graph.contents.attr
 
 
-class DictAttributeHandler(AttributeHandlerBase):
-    """Attribute handler implementation that stores graph, vertex and edge
-    attributes in dictionaries.
+def _detach_storage_from_graph(graph) -> None:
+    return _assign_storage_to_graph(graph, None)
+
+
+class AttributeHandler(AttributeHandlerBase):
+    """Attribute handler implementation that uses a DictAttributeStorage_
+    as its storage backend.
     """
 
     def init(self, graph, attr):
-        _assign_storage_to_graph(graph, _DictAttributeStorage())
+        _assign_storage_to_graph(graph, DictAttributeStorage())
 
     def destroy(self, graph) -> None:
-        storage: _DictAttributeStorage = graph.contents.attr
-        storage.clear()
+        storage = _get_storage_from_graph(graph)
+        if storage:
+            storage.clear()
+
         _detach_storage_from_graph(graph)
 
     def copy(
@@ -273,19 +170,22 @@ class DictAttributeHandler(AttributeHandlerBase):
         copy_vertex_attributes: bool,
         copy_edge_attributes: bool,
     ):
-        try:
-            storage = incref(
-                graph.contents.attr.copy(
-                    copy_graph_attributes, copy_vertex_attributes, copy_edge_attributes
-                )
-            )
-            to.contents.attr = py_object(storage)
-        except Exception as ex:
-            print(repr(ex))
-            raise
+        storage = _get_storage_from_graph(graph)
+        new_storage = storage.copy(
+            copy_graph_attributes, copy_vertex_attributes, copy_edge_attributes
+        )
+        _assign_storage_to_graph(to, new_storage)
 
     def add_vertices(self, graph, n: int, attr) -> None:
-        pass
+        # attr will only ever be NULL here so raise an error if it is not
+        if attr:
+            raise RuntimeError(
+                "add_vertices() attribute handler called with non-null attr; "
+                "this is most likely a bug"
+            )
+
+        # Extend the existing attribute containers
+        _get_storage_from_graph(graph).add_vertices(graph, n)
 
     def permute_vertices(self, graph, to, mapping):
         pass

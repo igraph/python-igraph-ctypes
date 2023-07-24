@@ -12,8 +12,11 @@ from typing import (
     TypedDict,
     TypeVar,
     Type,
+    Union,
     cast,
 )
+
+from .types import igraph_integer_t
 
 
 C = TypeVar("C", bound="Boxed")
@@ -28,6 +31,8 @@ class BoxedConfig(TypedDict):
     ctype: Type
     constructor: Optional[Callable[..., None]]
     destructor: Optional[Callable[..., None]]
+    getitem: Optional[Callable]
+    len: Optional[Callable[..., Union[int, igraph_integer_t]]]
 
 
 def _fake_constructor(*args, **kwds) -> NoReturn:
@@ -45,6 +50,7 @@ class BoxedMeta(Generic[T], type):
         config = cls._get_boxed_config(classdict)
         if config:
             cls._add_constructors(name, bases, classdict, config)
+            cls._add_sequence_impl(classdict, config)
 
         return type.__new__(cls, name, bases, classdict)
 
@@ -106,6 +112,29 @@ class BoxedMeta(Generic[T], type):
         classdict["create"] = classmethod(create)
         classdict["create_with"] = classmethod(create_with)
         classdict["__init__"] = __init__
+
+    @classmethod
+    def _add_sequence_impl(
+        cls,
+        classdict: Dict[str, Any],
+        config: BoxedConfig,
+    ):
+        item_getter = classdict.get("getitem")
+        length_getter = classdict.get("len")
+
+        if length_getter:
+
+            def __len__(self) -> int:
+                return int(length_getter(byref(self.unwrap())))
+
+            classdict["__len__"] = __len__
+
+        if item_getter:
+
+            def __getitem__(self, index: int):
+                return item_getter(byref(self.unwrap()), index)
+
+            classdict["__getitem__"] = __getitem__
 
 
 class Boxed(Generic[T], metaclass=BoxedMeta):

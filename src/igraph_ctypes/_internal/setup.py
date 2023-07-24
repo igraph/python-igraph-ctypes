@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pycapi import PyErr_CheckSignals  # type: ignore
 from typing import Optional
 
-from .attributes import DictAttributeHandler
+from .attributes import AttributeHandler
 from .errors import igraph_error_t_to_python_exception_class
 from .functions import strerror
 from .lib import (
@@ -78,7 +78,7 @@ class IgraphErrorState:
         )
 
 
-_attribute_handler = DictAttributeHandler()
+_attribute_handler = AttributeHandler()
 _last_error = IgraphErrorState()
 
 

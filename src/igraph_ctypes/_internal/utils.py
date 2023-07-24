@@ -4,7 +4,7 @@ from typing import Callable, Union
 
 from .errors import python_exception_to_igraph_error_t
 
-__all__ = ("bytes_to_str",)
+__all__ = ("bytes_to_str", "get_raw_memory_view", "nop", "protect", "protect_with")
 
 
 def bytes_to_str(
@@ -47,3 +47,34 @@ def protect(func: Callable[..., None]) -> Callable[..., int]:
             return 0
 
     return wrapped
+
+
+def protect_with(
+    handler: Callable[[int], int]
+) -> Callable[[Callable[..., None]], Callable[..., int]]:
+    """Decorator factory that creates a decorator that takes a function that
+    can potentially throw a Python exception, and turns it into another function
+    that returns an igraph-compatible `igraph_error_t` error code instead,
+    piping it through the given handler function.
+    """
+
+    def decorator(func: Callable[..., None]) -> Callable[..., int]:
+        @wraps(func)
+        def wrapped(*args, **kwds) -> int:
+            try:
+                func(*args, **kwds)
+                return 0
+            except Exception as ex:
+                print(repr(ex))
+                code = python_exception_to_igraph_error_t(ex)
+
+            try:
+                return handler(code)
+            except Exception as ex:
+                # TODO(ntamas): warn here!
+                print(repr(ex))
+                return code
+
+        return wrapped
+
+    return decorator

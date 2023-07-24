@@ -23,6 +23,8 @@ from .lib import (
     igraph_vector_list_init,
     igraph_vector_ptr_destroy,
     igraph_vector_ptr_init,
+    igraph_vector_ptr_get,
+    igraph_vector_ptr_size,
     igraph_vs_destroy,
 )
 from .metamagic import Boxed
@@ -129,6 +131,8 @@ class _VectorPtr(Boxed[igraph_vector_ptr_t]):
         "ctype": igraph_vector_ptr_t,
         "constructor": igraph_vector_ptr_init,
         "destructor": igraph_vector_ptr_destroy,
+        "getitem": igraph_vector_ptr_get,
+        "len": igraph_vector_ptr_size,
     }
 
 

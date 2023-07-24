@@ -9,7 +9,10 @@ __all__ = ("handle_igraph_error_t",)
 def handle_igraph_error_t(code: igraph_error_t) -> None:
     """Handles the given igraph error code, raising exceptions appropriately."""
     if code:
+        from .lib import IGRAPH_FINALLY_FREE
         from .setup import _get_last_error_state
+
+        IGRAPH_FINALLY_FREE()
 
         error_state = _get_last_error_state()
         if error_state:

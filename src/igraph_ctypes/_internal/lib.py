@@ -4,13 +4,11 @@ from ctypes import cdll, c_char_p, c_double, c_int, c_void_p, POINTER
 from ctypes.util import find_library
 from typing import Any
 
-from .attributes import (
-    igraph_attribute_combination_t,
-    igraph_attribute_table_t,
-)
 from .errors import handle_igraph_error_t
 from .types import (
     FILE,
+    igraph_attribute_combination_t,
+    igraph_attribute_table_t,
     igraph_bool_t,
     igraph_integer_t,
     igraph_real_t,
@@ -174,6 +172,14 @@ igraph_vector_ptr_init.argtypes = [POINTER(igraph_vector_ptr_t), igraph_integer_
 igraph_vector_ptr_destroy = _lib.igraph_vector_ptr_destroy
 igraph_vector_ptr_destroy.restype = None
 igraph_vector_ptr_destroy.argtypes = [c_void_p]
+
+igraph_vector_ptr_get = _lib.igraph_vector_ptr_get
+igraph_vector_ptr_get.restype = c_void_p
+igraph_vector_ptr_get.argtypes = [POINTER(igraph_vector_ptr_t), igraph_integer_t]
+
+igraph_vector_ptr_size = _lib.igraph_vector_ptr_size
+igraph_vector_ptr_size.restype = igraph_integer_t
+igraph_vector_ptr_size.argtypes = [POINTER(igraph_vector_ptr_t)]
 
 # Matrix type
 
@@ -403,6 +409,14 @@ igraph_set_attribute_table.restype = POINTER(igraph_attribute_table_t)
 igraph_set_attribute_table.argtypes = [POINTER(igraph_attribute_table_t)]
 
 # Error handling and interruptions
+
+igraph_error = _lib.igraph_error
+igraph_error.restype = igraph_error_t   # this is OK; it will be called from attribute handlers in Python
+igraph_error.argtypes = [c_char_p, c_char_p, c_int, igraph_error_t]
+
+IGRAPH_FINALLY_FREE = _lib.IGRAPH_FINALLY_FREE
+IGRAPH_FINALLY_FREE.restype = None
+IGRAPH_FINALLY_FREE.argtypes = []
 
 igraph_set_error_handler = _lib.igraph_set_error_handler
 igraph_set_error_handler.restype = igraph_error_handler_t
