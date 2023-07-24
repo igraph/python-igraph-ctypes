@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ctypes import c_char_p, c_int
 from typing import Any, Iterable, List, Optional, Tuple, TYPE_CHECKING
 
 from .conversion import *  # noqa

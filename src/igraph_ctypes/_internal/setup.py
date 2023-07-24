@@ -1,12 +1,12 @@
 import sys
 
 from dataclasses import dataclass
-from pycapi import PyErr_CheckSignals
+from pycapi import PyErr_CheckSignals  # type: ignore
 from typing import Optional
 
 from .attributes import DictAttributeHandler
 from .errors import igraph_error_t_to_python_exception_class
-from .functions import igraph_strerror
+from .functions import strerror
 from .lib import (
     igraph_set_attribute_table,
     igraph_set_error_handler,
@@ -19,7 +19,6 @@ from .types import (
     igraph_fatal_handler_t,
     igraph_interruption_handler_t,
 )
-from .utils import get_raw_memory_view
 
 __all__ = ("setup_igraph_library", "_get_last_error_state")
 
@@ -67,7 +66,7 @@ class IgraphErrorState:
 
         filename_str = self.filename.decode("utf-8", errors="replace")
         message_str = msg.decode("utf-8", errors="replace")
-        error_code_str = igraph_strerror(self.error).decode("utf-8", errors="replace")
+        error_code_str = strerror(self.error)
         line = self.line
 
         self._reset()

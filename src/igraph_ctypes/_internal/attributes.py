@@ -8,10 +8,10 @@ from ctypes import (
     POINTER,
     Structure,
 )
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Optional
 
-from .refcount import incref, decref, refcount
+from .refcount import incref, decref
 from .types import (
     igraph_bool_t,
     igraph_error_t,
@@ -26,7 +26,7 @@ from .types import (
     igraph_vector_t,
     igraph_vs_t,
 )
-from .utils import protect
+from .utils import nop, protect
 
 __all__ = ("AttributeHandlerBase", "DictAttributeHandler")
 
@@ -176,9 +176,7 @@ class AttributeHandlerBase:
         to register this attribute handler in the core igraph library.
         """
         return {
-            key: igraph_attribute_table_t.TYPES[key](
-                protect(getattr(self, key, self._nop))
-            )
+            key: igraph_attribute_table_t.TYPES[key](protect(getattr(self, key, nop)))
             for key in igraph_attribute_table_t.TYPES.keys()
         }
 
@@ -190,10 +188,6 @@ class AttributeHandlerBase:
             )
             self._table_ptr = pointer(self._table)
         return self._table_ptr
-
-    @staticmethod
-    def _nop():
-        pass
 
 
 @dataclass(frozen=True)

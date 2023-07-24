@@ -3,14 +3,12 @@ name = "igraph_ctypes"
 version = "0.0.0.post58.dev0+4ca9643"
 description = ""
 authors = ["Tamas Nepusz <ntamas@gmail.com>"]
-packages = [
-    { include = "igraph_ctypes", from = "src" }
-]
+packages = [{ include = "igraph_ctypes", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 numpy = "^1.23.3"
-pycapi = "^0.82.1"
+pycapi = ">=0.82.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.1"
@@ -24,6 +22,10 @@ enable = true
 
 [tool.poetry-dynamic-versioning.substitution]
 files = ["src/igraph_ctypes/_version.py"]
+
+[[tool.mypy.overrides]]
+module = "igraph_ctypes._internal.wrappers"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "--cov-config=.coveragerc"
@@ -42,18 +44,22 @@ select = ["B", "C", "E", "F", "W"]
 legacy_tox_ini = """
 [tox]
 min_version = 4.0
-env_list = py311, py310
+env_list = py311, py310, type
 
 [gh-actions]
 python =
     3.10: py310
-    3.11: py311
+    3.11: py311, type
 
 [testenv]
 deps =
     pytest
     pytest-cov
 commands = pytest tests
+
+[testenv:type]
+deps = mypy
+commands = mypy src
 """
 
 [build-system]

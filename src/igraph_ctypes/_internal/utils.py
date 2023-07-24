@@ -3,7 +3,6 @@ from functools import wraps
 from typing import Callable, Union
 
 from .errors import python_exception_to_igraph_error_t
-from .types import igraph_error_t
 
 __all__ = ("bytes_to_str",)
 
@@ -25,6 +24,11 @@ def bytes_to_str(
 def get_raw_memory_view(obj):
     """Returns a view into the raw bytes of a ctypes object."""
     return cast(byref(obj), POINTER(c_ubyte * sizeof(obj))).contents
+
+
+def nop(*args, **kwds) -> None:
+    """Function placeholder that does nothing."""
+    pass
 
 
 def protect(func: Callable[..., None]) -> Callable[..., int]:

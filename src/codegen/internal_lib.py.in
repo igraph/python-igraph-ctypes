@@ -1,13 +1,8 @@
-# type: ignore
-#
-# Type annotations are ignored in this file because pylance is not smart enough
-# to figure out that `restypes` and `argtypes` are valid for a function imported
-# from a library
-
 # fmt: off
 
 from ctypes import cdll, c_char_p, c_double, c_int, c_void_p, POINTER
 from ctypes.util import find_library
+from typing import Any
 
 from .attributes import (
     igraph_attribute_combination_t,
@@ -66,7 +61,7 @@ def _load_igraph_c_library():
     return lib
 
 
-_lib = _load_igraph_c_library()
+_lib: Any = _load_igraph_c_library()
 
 # Vector type
 
