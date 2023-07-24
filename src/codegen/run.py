@@ -3,13 +3,10 @@ from os.path import expanduser
 from pathlib import Path
 from typing import (
     Callable,
-    Dict,
     Iterable,
-    List,
     Optional,
     Sequence,
     TextIO,
-    Tuple,
     Union,
 )
 
@@ -140,7 +137,7 @@ def generate_enums(  # noqa: C901
         "VitType": "VertexIteratorType",
         "VsType": "VertexSequenceType",
     }
-    EXTRA_ENUM_MEMBERS: Dict[str, Sequence[Tuple[str, int]]] = {
+    EXTRA_ENUM_MEMBERS: dict[str, Sequence[tuple[str, int]]] = {
         "Loops": [("IGNORE", 0)]
     }
 
@@ -219,7 +216,7 @@ def generate_enums(  # noqa: C901
         fp.write("\n\n")
         return name
 
-    def process_file(outfp: TextIO, infp: TextIO) -> List[str]:
+    def process_file(outfp: TextIO, infp: TextIO) -> list[str]:
         all_names = []
 
         current_enum, in_enum = [], False

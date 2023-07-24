@@ -4,7 +4,7 @@ from ctypes import (
     py_object,
 )
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 from .lib import igraph_error, igraph_vector_ptr_size
 from .refcount import incref, decref
@@ -34,7 +34,7 @@ class AttributeHandlerBase:
     _table: Optional[igraph_attribute_table_t] = None
     _table_ptr = None
 
-    def _get_attribute_handler_functions(self) -> Dict[str, Callable]:
+    def _get_attribute_handler_functions(self) -> dict[str, Callable]:
         """Returns an ``igraph_attribute_table_t`` instance that can be used
         to register this attribute handler in the core igraph library.
         """
@@ -60,7 +60,7 @@ class AttributeStorage(ABC):
     """
 
     @abstractmethod
-    def add_vertices(self, n: int) -> None:
+    def add_vertices(self, graph, n: int) -> None:
         """Notifies the attribute storage object that the given number of
         new vertices were added to the graph.
         """
@@ -82,17 +82,17 @@ class AttributeStorage(ABC):
 
 
 @dataclass(frozen=True)
-class DictAttributeStorage(AttributeStorage):
-    """Dictionary-based storage area for the graph, vertex and edge attributes
+class dictAttributeStorage(AttributeStorage):
+    """dictionary-based storage area for the graph, vertex and edge attributes
     of a graph.
     """
 
-    graph_attributes: Dict[str, Any] = field(default_factory=dict)
-    vertex_attributes: Dict[str, Any] = field(default_factory=dict)
-    edge_attributes: Dict[str, Any] = field(default_factory=dict)
+    graph_attributes: dict[str, Any] = field(default_factory=dict)
+    vertex_attributes: dict[str, list] = field(default_factory=dict)
+    edge_attributes: dict[str, Any] = field(default_factory=dict)
 
     def add_vertices(self, graph, n: int) -> None:
-        print("Added", n, "vertices")
+        pass
 
     def clear(self) -> None:
         """Clears the storage area, removing all attributes from the
@@ -148,12 +148,12 @@ def _detach_storage_from_graph(graph) -> None:
 
 
 class AttributeHandler(AttributeHandlerBase):
-    """Attribute handler implementation that uses a DictAttributeStorage_
+    """Attribute handler implementation that uses a dictAttributeStorage_
     as its storage backend.
     """
 
     def init(self, graph, attr):
-        _assign_storage_to_graph(graph, DictAttributeStorage())
+        _assign_storage_to_graph(graph, dictAttributeStorage())
 
     def destroy(self, graph) -> None:
         storage = _get_storage_from_graph(graph)

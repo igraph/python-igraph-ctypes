@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from ctypes import memmove, POINTER
-from typing import Any, Iterable, List, Optional, Sequence, TYPE_CHECKING
+from typing import Any, Iterable, Optional, Sequence, TYPE_CHECKING
 
 from .enums import MatrixStorage
 from .lib import (
@@ -659,17 +659,17 @@ def vertex_qtys_to_igraph_vector_t_view(
 ################################################################################
 
 
-def igraph_vector_t_to_list(vector: _Vector) -> List[float]:
+def igraph_vector_t_to_list(vector: _Vector) -> list[float]:
     n = igraph_vector_size(vector)
     return [float(igraph_vector_e(vector, i)) for i in range(n)]
 
 
-def igraph_vector_bool_t_to_list(vector: _VectorBool) -> List[bool]:
+def igraph_vector_bool_t_to_list(vector: _VectorBool) -> list[bool]:
     n = igraph_vector_bool_size(vector)
     return [bool(igraph_vector_bool_e(vector, i)) for i in range(n)]
 
 
-def igraph_vector_int_t_to_list(vector: _VectorInt) -> List[int]:
+def igraph_vector_int_t_to_list(vector: _VectorInt) -> list[int]:
     n = igraph_vector_int_size(vector)
     return [int(igraph_vector_int_e(vector, i)) for i in range(n)]
 
@@ -718,7 +718,7 @@ def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> IntArray:
 
 def igraph_vector_list_t_to_list_of_numpy_array(
     vector_list: _VectorList,
-) -> List[RealArray]:
+) -> list[RealArray]:
     n = igraph_vector_list_size(vector_list)
     vec = _Vector()
     result = []
@@ -736,7 +736,7 @@ def igraph_vector_list_t_to_list_of_numpy_array(
 
 def igraph_vector_int_list_t_to_list_of_numpy_array(
     vector_list: _VectorIntList,
-) -> List[IntArray]:
+) -> list[IntArray]:
     n = igraph_vector_int_list_size(vector_list)
     vec = _VectorInt()
     result = []

@@ -4,14 +4,11 @@ from ctypes import byref
 from typing import (
     Any,
     Callable,
-    Dict,
     Generic,
     NoReturn,
     Optional,
-    Tuple,
     TypedDict,
     TypeVar,
-    Type,
     Union,
     cast,
 )
@@ -28,7 +25,7 @@ class BoxedConfig(TypedDict):
     definition of a class that uses BoxedMeta as its metaclass.
     """
 
-    ctype: Type
+    ctype: type
     constructor: Optional[Callable[..., None]]
     destructor: Optional[Callable[..., None]]
     getitem: Optional[Callable]
@@ -46,7 +43,7 @@ class BoxedMeta(Generic[T], type):
     appropriate times.
     """
 
-    def __new__(cls, name: str, bases: Tuple[Type], classdict: Dict[str, Any]):
+    def __new__(cls, name: str, bases: tuple[type, ...], classdict: dict[str, Any]):
         config = cls._get_boxed_config(classdict)
         if config:
             cls._add_constructors(name, bases, classdict, config)
@@ -55,7 +52,7 @@ class BoxedMeta(Generic[T], type):
         return type.__new__(cls, name, bases, classdict)
 
     @classmethod
-    def _get_boxed_config(cls, classdict: Dict[str, Any]) -> Optional[BoxedConfig]:
+    def _get_boxed_config(cls, classdict: dict[str, Any]) -> Optional[BoxedConfig]:
         config = classdict.get("boxed_config")
         return cast(BoxedConfig, config) if isinstance(config, dict) else None
 
@@ -63,8 +60,8 @@ class BoxedMeta(Generic[T], type):
     def _add_constructors(
         cls,
         name: str,
-        bases: Tuple[Type],
-        classdict: Dict[str, Any],
+        bases: tuple[type, ...],
+        classdict: dict[str, Any],
         config: BoxedConfig,
     ):
         if "__init__" in classdict:
@@ -106,7 +103,7 @@ class BoxedMeta(Generic[T], type):
             else:
                 initialized = True
 
-            bases[0].__init__(self, instance, destructor, initialized)
+            bases[0].__init__(self, instance, destructor, initialized)  # type: ignore
 
         classdict["from_param"] = classmethod(from_param)
         classdict["create"] = classmethod(create)
@@ -116,7 +113,7 @@ class BoxedMeta(Generic[T], type):
     @classmethod
     def _add_sequence_impl(
         cls,
-        classdict: Dict[str, Any],
+        classdict: dict[str, Any],
         config: BoxedConfig,
     ):
         item_getter = classdict.get("getitem")

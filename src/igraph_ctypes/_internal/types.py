@@ -18,7 +18,7 @@ from ctypes import (
     Structure,
     Union as CUnion,
 )
-from typing import Iterable, Literal, Sequence, Tuple, Union
+from typing import Iterable, Literal, Sequence, Union
 
 
 def vector_fields(base_type):
@@ -574,7 +574,7 @@ MatrixIntLike = Union[Sequence[Sequence[int]], npt.NDArray]
 VertexLike = int
 """Type alias for Python types that can be converted to an igraph vertex ID"""
 
-VertexPair = Tuple[VertexLike, VertexLike]
+VertexPair = tuple[VertexLike, VertexLike]
 """A pair of objects that can both be converted into igraph vertex IDs"""
 
 VertexSelector = Iterable[VertexLike] | Literal["all"] | VertexLike | None

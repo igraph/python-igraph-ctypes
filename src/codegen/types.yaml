@@ -129,7 +129,7 @@ VERTEX_INDICES:
 
 VERTEX_INDICES_LIST:
   PY_TYPE: Iterable[Iterable[VertexLike]]
-  PY_RETURN_TYPE: List[IntArray]
+  PY_RETURN_TYPE: list[IntArray]
   INCONV:
     IN: "%C% = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(%I%)"
     OUT: "%C% = _VectorIntList.create(0)"
@@ -184,7 +184,7 @@ EDGE_INDICES:
 
 EDGE_INDICES_LIST:
   PY_TYPE: Iterable[Iterable[EdgeLike]]
-  PY_RETURN_TYPE: List[IntArray]
+  PY_RETURN_TYPE: list[IntArray]
   INCONV:
     IN: "%C% = iterable_of_edge_index_iterable_to_igraph_vector_int_list_t(%I%)"
     OUT: "%C% = _VectorIntList.create(0)"
