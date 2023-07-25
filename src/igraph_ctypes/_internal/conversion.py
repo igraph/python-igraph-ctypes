@@ -21,17 +21,17 @@ from .lib import (
     igraph_matrix_ncol,
     igraph_matrix_nrow,
     igraph_matrix_e_ptr,
-    igraph_vector_bool_e,
-    igraph_vector_bool_e_ptr,
+    igraph_vector_bool_get,
+    igraph_vector_bool_get_ptr,
     igraph_vector_bool_init_array,
     igraph_vector_bool_push_back,
     igraph_vector_bool_size,
     igraph_vector_bool_view,
-    igraph_vector_e,
-    igraph_vector_e_ptr,
+    igraph_vector_get,
+    igraph_vector_get_ptr,
     igraph_vector_init_array,
-    igraph_vector_int_e,
-    igraph_vector_int_e_ptr,
+    igraph_vector_int_get,
+    igraph_vector_int_get_ptr,
     igraph_vector_int_init_array,
     igraph_vector_int_list_get_ptr,
     igraph_vector_int_list_push_back,
@@ -664,17 +664,17 @@ def vertex_qtys_to_igraph_vector_t_view(
 
 def igraph_vector_t_to_list(vector: _Vector) -> list[float]:
     n = igraph_vector_size(vector)
-    return [float(igraph_vector_e(vector, i)) for i in range(n)]
+    return [float(igraph_vector_get(vector, i)) for i in range(n)]
 
 
 def igraph_vector_bool_t_to_list(vector: _VectorBool) -> list[bool]:
     n = igraph_vector_bool_size(vector)
-    return [bool(igraph_vector_bool_e(vector, i)) for i in range(n)]
+    return [bool(igraph_vector_bool_get(vector, i)) for i in range(n)]
 
 
 def igraph_vector_int_t_to_list(vector: _VectorInt) -> list[int]:
     n = igraph_vector_int_size(vector)
-    return [int(igraph_vector_int_e(vector, i)) for i in range(n)]
+    return [int(igraph_vector_int_get(vector, i)) for i in range(n)]
 
 
 def igraph_matrix_t_to_numpy_array(matrix: _Matrix) -> RealArray:
@@ -699,13 +699,13 @@ def igraph_vector_t_to_numpy_array(vector: _Vector) -> RealArray:
     n = igraph_vector_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_real_t)
     if n > 0:
-        memmove(result.ctypes.data, igraph_vector_e_ptr(vector, 0), result.nbytes)
+        memmove(result.ctypes.data, igraph_vector_get_ptr(vector, 0), result.nbytes)
     return result
 
 
 def igraph_vector_t_to_numpy_array_view(vector: _Vector) -> RealArray:
     n = igraph_vector_size(vector)
-    addr = addressof(igraph_vector_e_ptr(vector, 0).contents)
+    addr = addressof(igraph_vector_get_ptr(vector, 0).contents)
     buf_type = igraph_real_t * n
     buf = buf_type.from_address(addr)
     return np.frombuffer(buf, dtype=np_type_of_igraph_real_t)
@@ -715,13 +715,15 @@ def igraph_vector_bool_t_to_numpy_array(vector: _VectorBool) -> BoolArray:
     n = igraph_vector_bool_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_bool_t)
     if n > 0:
-        memmove(result.ctypes.data, igraph_vector_bool_e_ptr(vector, 0), result.nbytes)
+        memmove(
+            result.ctypes.data, igraph_vector_bool_get_ptr(vector, 0), result.nbytes
+        )
     return result
 
 
 def igraph_vector_bool_t_to_numpy_array_view(vector: _VectorBool) -> BoolArray:
     n = igraph_vector_bool_size(vector)
-    addr = addressof(igraph_vector_bool_e_ptr(vector, 0).contents)
+    addr = addressof(igraph_vector_bool_get_ptr(vector, 0).contents)
     buf_type = igraph_bool_t * n
     buf = buf_type.from_address(addr)
     return np.frombuffer(buf, dtype=np_type_of_igraph_bool_t)
@@ -731,13 +733,13 @@ def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> IntArray:
     n = igraph_vector_int_size(vector)
     result = np.zeros(n, dtype=np_type_of_igraph_integer_t)
     if n > 0:
-        memmove(result.ctypes.data, igraph_vector_int_e_ptr(vector, 0), result.nbytes)
+        memmove(result.ctypes.data, igraph_vector_int_get_ptr(vector, 0), result.nbytes)
     return result
 
 
 def igraph_vector_int_t_to_numpy_array_view(vector: _VectorInt) -> IntArray:
     n = igraph_vector_int_size(vector)
-    addr = addressof(igraph_vector_int_e_ptr(vector, 0).contents)
+    addr = addressof(igraph_vector_int_get_ptr(vector, 0).contents)
     buf_type = igraph_integer_t * n
     buf = buf_type.from_address(addr)
     return np.frombuffer(buf, dtype=np_type_of_igraph_integer_t)

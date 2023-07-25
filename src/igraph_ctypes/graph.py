@@ -1,4 +1,7 @@
-from typing import Iterable, Optional, TypeVar
+from __future__ import annotations
+
+from collections.abc import MutableMapping
+from typing import Any, Iterable, Optional, TypeVar
 
 from .enums import NeighborMode
 from .types import (
@@ -9,9 +12,11 @@ from .types import (
     VertexSelector,
 )
 
+from ._internal.attributes import AttributeStorage
 from ._internal.functions import (
     add_edges,
     add_vertices,
+    copy,
     delete_edges,
     delete_vertices,
     ecount,
@@ -53,6 +58,16 @@ class Graph:
         add_vertices(self, n)
         return self
 
+    def copy(self) -> Graph:
+        """Creates a copy of the graph.
+
+        The copy will have a vertex and an edge set that is independent from the
+        original graph. Graph, vertex and edge attributes are copied in a
+        shallow manner, i.e. the attribute mapping itself is copied but the
+        values will point to the same objects.
+        """
+        return copy(self)
+
     def delete_edges(self: C, edges: EdgeSelector) -> C:
         delete_edges(self, edges)
         return self
@@ -77,7 +92,7 @@ class Graph:
         to: VertexLike,
         *,
         directed: bool = True,
-        error: bool = True
+        error: bool = True,
     ) -> int:
         """Returns the ID of an arbitrary edge between the given source and
         target vertices.
@@ -104,8 +119,19 @@ class Graph:
         return vcount(self)
 
     @property
+    def attrs(self) -> MutableMapping[str, Any]:
+        """Provides access to the user-defined attributes of the graph."""
+        return self._get_attribute_storage().get_graph_attribute_map()
+
+    @property
     def _as_parameter_(self) -> _Graph:
         """ctypes hook function that extracts the low-level ctypes wrapper
         object from the graph.
         """
         return self._instance
+
+    def _get_attribute_storage(self) -> AttributeStorage:
+        """Returns a reference to the object responsible for storing the
+        attributes of the graph, its vertices and edges.
+        """
+        return self._instance.unwrap().attr

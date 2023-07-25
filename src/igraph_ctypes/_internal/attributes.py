@@ -4,10 +4,21 @@ from ctypes import (
     py_object,
 )
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from math import nan
+from typing import Any, Callable, MutableMapping, Optional
 
 from .conversion import igraph_vector_int_t_to_numpy_array_view
-from .lib import igraph_error
+from .lib import (
+    igraph_error,
+    igraph_vector_resize,
+    igraph_vector_set,
+    igraph_vector_bool_resize,
+    igraph_vector_bool_set,
+    igraph_vector_int_clear,
+    igraph_strvector_clear,
+    igraph_strvector_resize,
+    igraph_strvector_set,
+)
 from .refcount import incref, decref
 from .types import igraph_attribute_table_t, IntArray
 from .utils import nop, protect_with
@@ -86,6 +97,14 @@ class AttributeStorage(ABC):
         copy_vertex_attributes: bool = True,
         copy_edge_attributes: bool = True,
     ):
+        """Creates a shallow copy of the storage area."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_graph_attribute_map(self) -> MutableMapping[str, Any]:
+        """Returns a mutable mapping into the storage area that stores the graph
+        attributes.
+        """
         raise NotImplementedError
 
 
@@ -106,9 +125,6 @@ class DictAttributeStorage(AttributeStorage):
         pass
 
     def clear(self) -> None:
-        """Clears the storage area, removing all attributes from the
-        attribute dictionaries.
-        """
         self.graph_attributes.clear()
         self.vertex_attributes.clear()
         self.edge_attributes.clear()
@@ -119,12 +135,14 @@ class DictAttributeStorage(AttributeStorage):
         copy_vertex_attributes: bool = True,
         copy_edge_attributes: bool = True,
     ):
-        """Creates a shallow copy of the storage area."""
         return self.__class__(
             self.graph_attributes.copy() if copy_graph_attributes else {},
             self.vertex_attributes.copy() if copy_vertex_attributes else {},
             self.edge_attributes.copy() if copy_edge_attributes else {},
         )
+
+    def get_graph_attribute_map(self) -> MutableMapping[str, Any]:
+        return self.graph_attributes
 
 
 def _assign_storage_to_graph(graph, storage: Optional[AttributeStorage] = None) -> None:
@@ -223,7 +241,15 @@ class AttributeHandler(AttributeHandlerBase):
         pass
 
     def get_info(self, graph, gnames, gtypes, vnames, vtypes, enames, etypes):
-        pass
+        # TODO(ntamas): fill the names and the types
+        igraph_strvector_clear(gnames)
+        igraph_vector_int_clear(gtypes)
+
+        igraph_strvector_clear(vnames)
+        igraph_vector_int_clear(vtypes)
+
+        igraph_strvector_clear(enames)
+        igraph_vector_int_clear(etypes)
 
     def has_attr(self, graph, type, name) -> bool:
         return False
@@ -232,13 +258,35 @@ class AttributeHandler(AttributeHandlerBase):
         pass
 
     def get_numeric_graph_attr(self, graph, name, value):
-        pass
+        vec = value.contents
+        igraph_vector_resize(vec, 1)
+        igraph_vector_set(
+            vec,
+            0,
+            self._to_numeric(
+                _get_storage_from_graph(graph).get_graph_attribute_map()[name]
+            ),
+        )
 
     def get_string_graph_attr(self, graph, name, value):
-        pass
+        vec = value.contents
+        igraph_strvector_resize(vec, 1)
+        igraph_strvector_set(
+            vec,
+            0,
+            self._to_bytes(
+                _get_storage_from_graph(graph).get_graph_attribute_map()[name]
+            ),
+        )
 
-    def get_boolean_graph_attr(self, graph, name, value):
-        pass
+    def get_bool_graph_attr(self, graph, name, value):
+        vec = value.contents
+        igraph_vector_bool_resize(vec, 1)
+        igraph_vector_bool_set(
+            vec,
+            0,
+            bool(_get_storage_from_graph(graph).get_graph_attribute_map()[name]),
+        )
 
     def get_numeric_vertex_attr(self, graph, name, vs, value):
         pass
@@ -246,7 +294,7 @@ class AttributeHandler(AttributeHandlerBase):
     def get_string_vertex_attr(self, graph, name, vs, value):
         pass
 
-    def get_boolean_vertex_attr(self, graph, name, vs, value):
+    def get_bool_vertex_attr(self, graph, name, vs, value):
         pass
 
     def get_numeric_edge_attr(self, graph, name, es, value):
@@ -255,5 +303,27 @@ class AttributeHandler(AttributeHandlerBase):
     def get_string_edge_attr(self, graph, name, es, value):
         pass
 
-    def get_boolean_edge_attr(self, graph, name, es, value):
+    def get_bool_edge_attr(self, graph, name, es, value):
         pass
+
+    @staticmethod
+    def _to_bytes(value: Any) -> bytes:
+        """Converts an arbitrary Python object into a byte-level representation,
+        assuming UTF-8 encoding for strings. Returns an empty byte string if the
+        conversion fails.
+        """
+        try:
+            value_str = str(value)
+            return value_str.encode("utf-8", errors="replace")
+        except Exception:
+            return b""
+
+    @staticmethod
+    def _to_numeric(value: Any) -> float:
+        """Converts an arbitrary Python object into a floating-point value,
+        returning NaN if the conversion fails.
+        """
+        try:
+            return float(value)  # type: ignore
+        except Exception:
+            return nan
