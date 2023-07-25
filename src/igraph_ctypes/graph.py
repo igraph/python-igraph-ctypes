@@ -1,9 +1,9 @@
-from numpy.typing import NDArray
 from typing import Iterable, Optional, TypeVar
 
 from .enums import NeighborMode
 from .types import (
     EdgeSelector,
+    IntArray,
     VertexLike,
     VertexPair,
     VertexSelector,
@@ -23,7 +23,6 @@ from ._internal.functions import (
     neighbors,
     vcount,
 )
-from ._internal.types import np_type_of_igraph_integer_t
 from ._internal.wrappers import _Graph
 
 
@@ -87,7 +86,7 @@ class Graph:
 
     def incident(
         self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
-    ) -> NDArray[np_type_of_igraph_integer_t]:
+    ) -> IntArray:
         return incident(self, vid, mode)
 
     def is_directed(self) -> bool:
@@ -96,7 +95,7 @@ class Graph:
 
     def neighbors(
         self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
-    ) -> NDArray[np_type_of_igraph_integer_t]:
+    ) -> IntArray:
         """Returns the list of neighbors of a vertex."""
         return neighbors(self, vid, mode)
 

@@ -6,9 +6,10 @@ from ctypes import (
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
-from .lib import igraph_error, igraph_vector_ptr_size
+from .conversion import igraph_vector_int_t_to_numpy_array_view
+from .lib import igraph_error
 from .refcount import incref, decref
-from .types import igraph_attribute_table_t
+from .types import igraph_attribute_table_t, IntArray
 from .utils import nop, protect_with
 
 __all__ = ("AttributeHandlerBase", "AttributeHandler", "AttributeStorage")
@@ -67,6 +68,13 @@ class AttributeStorage(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def add_edges(self, graph, edges) -> None:
+        """Notifies the attribute storage object that the given edges were
+        added to the graph.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def clear(self):
         """Clears the storage area, removing all attributes."""
         raise NotImplementedError
@@ -92,6 +100,9 @@ class DictAttributeStorage(AttributeStorage):
     edge_attributes: dict[str, list[Any]] = field(default_factory=dict)
 
     def add_vertices(self, graph, n: int) -> None:
+        pass
+
+    def add_edges(self, graph, edges: IntArray) -> None:
         pass
 
     def clear(self) -> None:
@@ -194,7 +205,16 @@ class AttributeHandler(AttributeHandlerBase):
         pass
 
     def add_edges(self, graph, edges, attr) -> None:
-        pass
+        # attr will only ever be NULL here so raise an error if it is not
+        if attr:
+            raise RuntimeError(
+                "add_edges() attribute handler called with non-null attr; "
+                "this is most likely a bug"
+            )
+
+        # Extend the existing attribute containers
+        edge_array = igraph_vector_int_t_to_numpy_array_view(edges).reshape((-1, 2))
+        _get_storage_from_graph(graph).add_edges(graph, edge_array)
 
     def permute_edges(self, graph, to, mapping):
         pass
