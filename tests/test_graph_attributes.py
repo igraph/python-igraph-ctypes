@@ -34,4 +34,6 @@ def test_copying_graph_copies_attributes():
     assert g2.attrs["age"] == 42
     assert g2.attrs["name"] == "Zachary karate club graph"
 
-    g2.attrs
+    del g2.attrs["age"]
+    assert "age" not in g2.attrs
+    assert g.attrs["age"] == 42
