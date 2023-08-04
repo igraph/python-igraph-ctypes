@@ -307,6 +307,14 @@ class AttributeValueList(Sequence[T]):
         else:
             self._raise_invalid_index_error()
 
+    def _extend_length(self, n: int) -> None:
+        """Extends the list with a given number of new items at the end, even
+        if the list is marked as fixed-length.
+
+        Do not use this method unless you know what you are doing.
+        """
+        self._items.extend([None] * n)  # type: ignore
+
     def _raise_invalid_index_error(self) -> NoReturn:
         # Wording of error message similar to NumPy
         raise IndexError(

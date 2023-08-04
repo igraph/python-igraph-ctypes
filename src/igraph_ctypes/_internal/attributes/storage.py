@@ -30,7 +30,7 @@ class AttributeStorage(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_edges(self, graph, edges) -> None:
+    def add_edges(self, graph, edges: IntArray) -> None:
         """Notifies the attribute storage object that the given edges were
         added to the graph.
         """
@@ -84,10 +84,13 @@ class DictAttributeStorage(AttributeStorage):
     edge_attributes: dict[str, AttributeValueList[Any]] = field(default_factory=dict)
 
     def add_vertices(self, graph, n: int) -> None:
-        pass
+        for value_list in self.vertex_attributes.values():
+            value_list._extend_length(n)
 
     def add_edges(self, graph, edges: IntArray) -> None:
-        pass
+        n = edges.shape[0]
+        for value_list in self.edge_attributes.values():
+            value_list._extend_length(n)
 
     def clear(self) -> None:
         self.graph_attributes.clear()
