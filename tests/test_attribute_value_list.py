@@ -355,4 +355,4 @@ def test_delitem(items: AVL, to_delete, expected: list[int]):
 
 def test_delitem_invalid_index(items: AVL):
     with raises(IndexError, match="valid indices"):
-        del items[RuntimeError]
+        del items[RuntimeError]  # type: ignore
