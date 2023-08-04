@@ -1,14 +1,9 @@
-from abc import ABC, abstractmethod
-from ctypes import (
-    pointer,
-    py_object,
-)
-from dataclasses import dataclass, field
+from ctypes import pointer
 from math import nan
-from typing import Any, Callable, MutableMapping, Optional
+from typing import Any, Callable, Optional
 
-from .conversion import igraph_vector_int_t_to_numpy_array_view
-from .lib import (
+from igraph_ctypes._internal.conversion import igraph_vector_int_t_to_numpy_array_view
+from igraph_ctypes._internal.lib import (
     igraph_error,
     igraph_vector_resize,
     igraph_vector_set,
@@ -19,14 +14,20 @@ from .lib import (
     igraph_strvector_resize,
     igraph_strvector_set,
 )
-from .refcount import incref, decref
-from .types import igraph_attribute_table_t, IntArray
-from .utils import nop, protect_with
+from igraph_ctypes._internal.types import igraph_attribute_table_t
+from igraph_ctypes._internal.utils import nop, protect_with
 
-__all__ = ("AttributeHandlerBase", "AttributeHandler", "AttributeStorage")
+from .storage import (
+    DictAttributeStorage,
+    assign_storage_to_graph,
+    detach_storage_from_graph,
+    get_storage_from_graph,
+)
 
-
-################################################################################
+__all__ = (
+    "AttributeHandlerBase",
+    "AttributeHandler",
+)
 
 
 def _trigger_error(error: int) -> int:
@@ -66,130 +67,20 @@ class AttributeHandlerBase:
         return self._table_ptr
 
 
-class AttributeStorage(ABC):
-    """Interface specification for objects that store graph, vertex and edge
-    attributes.
-    """
-
-    @abstractmethod
-    def add_vertices(self, graph, n: int) -> None:
-        """Notifies the attribute storage object that the given number of
-        new vertices were added to the graph.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def add_edges(self, graph, edges) -> None:
-        """Notifies the attribute storage object that the given edges were
-        added to the graph.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def clear(self):
-        """Clears the storage area, removing all attributes."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def copy(
-        self,
-        copy_graph_attributes: bool = True,
-        copy_vertex_attributes: bool = True,
-        copy_edge_attributes: bool = True,
-    ):
-        """Creates a shallow copy of the storage area."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_graph_attribute_map(self) -> MutableMapping[str, Any]:
-        """Returns a mutable mapping into the storage area that stores the graph
-        attributes.
-        """
-        raise NotImplementedError
-
-
-@dataclass(frozen=True)
-class DictAttributeStorage(AttributeStorage):
-    """dictionary-based storage area for the graph, vertex and edge attributes
-    of a graph.
-    """
-
-    graph_attributes: dict[str, Any] = field(default_factory=dict)
-    vertex_attributes: dict[str, list[Any]] = field(default_factory=dict)
-    edge_attributes: dict[str, list[Any]] = field(default_factory=dict)
-
-    def add_vertices(self, graph, n: int) -> None:
-        pass
-
-    def add_edges(self, graph, edges: IntArray) -> None:
-        pass
-
-    def clear(self) -> None:
-        self.graph_attributes.clear()
-        self.vertex_attributes.clear()
-        self.edge_attributes.clear()
-
-    def copy(
-        self,
-        copy_graph_attributes: bool = True,
-        copy_vertex_attributes: bool = True,
-        copy_edge_attributes: bool = True,
-    ):
-        return self.__class__(
-            self.graph_attributes.copy() if copy_graph_attributes else {},
-            self.vertex_attributes.copy() if copy_vertex_attributes else {},
-            self.edge_attributes.copy() if copy_edge_attributes else {},
-        )
-
-    def get_graph_attribute_map(self) -> MutableMapping[str, Any]:
-        return self.graph_attributes
-
-
-def _assign_storage_to_graph(graph, storage: Optional[AttributeStorage] = None) -> None:
-    """Assigns an attribute storage object to a graph, taking care of
-    increasing or decreasing the reference count of the storage object if needed.
-    """
-    try:
-        old_storage = graph.contents.attr
-    except ValueError:
-        # No storage yet, this is OK
-        old_storage = None
-
-    if old_storage is storage:
-        # Nothing to do
-        return
-
-    if old_storage is not None:
-        decref(old_storage)
-
-    if storage is not None:
-        graph.contents.attr = py_object(incref(storage))
-    else:
-        graph.contents.attr = py_object()
-
-
-def _get_storage_from_graph(graph) -> AttributeStorage:
-    return graph.contents.attr
-
-
-def _detach_storage_from_graph(graph) -> None:
-    return _assign_storage_to_graph(graph, None)
-
-
 class AttributeHandler(AttributeHandlerBase):
     """Attribute handler implementation that uses a DictAttributeStorage_
     as its storage backend.
     """
 
     def init(self, graph, attr):
-        _assign_storage_to_graph(graph, DictAttributeStorage())
+        assign_storage_to_graph(graph, DictAttributeStorage())
 
     def destroy(self, graph) -> None:
-        storage = _get_storage_from_graph(graph)
+        storage = get_storage_from_graph(graph)
         if storage:
             storage.clear()
 
-        _detach_storage_from_graph(graph)
+        detach_storage_from_graph(graph)
 
     def copy(
         self,
@@ -199,11 +90,11 @@ class AttributeHandler(AttributeHandlerBase):
         copy_vertex_attributes: bool,
         copy_edge_attributes: bool,
     ):
-        storage = _get_storage_from_graph(graph)
+        storage = get_storage_from_graph(graph)
         new_storage = storage.copy(
             copy_graph_attributes, copy_vertex_attributes, copy_edge_attributes
         )
-        _assign_storage_to_graph(to, new_storage)
+        assign_storage_to_graph(to, new_storage)
 
     def add_vertices(self, graph, n: int, attr) -> None:
         # attr will only ever be NULL here so raise an error if it is not
@@ -214,7 +105,7 @@ class AttributeHandler(AttributeHandlerBase):
             )
 
         # Extend the existing attribute containers
-        _get_storage_from_graph(graph).add_vertices(graph, n)
+        get_storage_from_graph(graph).add_vertices(graph, n)
 
     def permute_vertices(self, graph, to, mapping):
         pass
@@ -232,7 +123,7 @@ class AttributeHandler(AttributeHandlerBase):
 
         # Extend the existing attribute containers
         edge_array = igraph_vector_int_t_to_numpy_array_view(edges).reshape((-1, 2))
-        _get_storage_from_graph(graph).add_edges(graph, edge_array)
+        get_storage_from_graph(graph).add_edges(graph, edge_array)
 
     def permute_edges(self, graph, to, mapping):
         pass
@@ -264,7 +155,7 @@ class AttributeHandler(AttributeHandlerBase):
             vec,
             0,
             self._to_numeric(
-                _get_storage_from_graph(graph).get_graph_attribute_map()[name]
+                get_storage_from_graph(graph).get_graph_attribute_map()[name]
             ),
         )
 
@@ -275,7 +166,7 @@ class AttributeHandler(AttributeHandlerBase):
             vec,
             0,
             self._to_bytes(
-                _get_storage_from_graph(graph).get_graph_attribute_map()[name]
+                get_storage_from_graph(graph).get_graph_attribute_map()[name]
             ),
         )
 
@@ -285,7 +176,7 @@ class AttributeHandler(AttributeHandlerBase):
         igraph_vector_bool_set(
             vec,
             0,
-            bool(_get_storage_from_graph(graph).get_graph_attribute_map()[name]),
+            bool(get_storage_from_graph(graph).get_graph_attribute_map()[name]),
         )
 
     def get_numeric_vertex_attr(self, graph, name, vs, value):

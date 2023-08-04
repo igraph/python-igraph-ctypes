@@ -5,3 +5,4 @@ omit = src/codegen/*
 exclude_lines =
     pragma: no cover
     if TYPE_CHECKING:
+    ^\s*\.\.\.$
