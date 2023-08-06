@@ -19,6 +19,7 @@ stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.14.1" }
 
 [tool.poetry.group.doc.dependencies]
 mkdocs-material = "^9.1.21"
+mkdocstrings = { version = "^0.22.0", extras = ["python"] }
 
 [tool.poetry-dynamic-versioning]
 enable = true

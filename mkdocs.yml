@@ -2,6 +2,11 @@ site_name: igraph ctypes interface for Python
 repo_url: https://github.com/igraph/python-igraph-ctypes
 # repo_name: igraph/python-igraph-ctypes
 
+nav:
+  - Home: index.md
+  - Notes: notes.md
+  - API reference: reference.md
+
 theme:
   name: material
 
@@ -46,3 +51,8 @@ extra:
 copyright: >
   Copyright &copy; 2003 - 2023 The igraph core team –
   <a href="#__consent">Change cookie settings</a>
+
+plugins:
+  - search
+  - mkdocstrings
+
