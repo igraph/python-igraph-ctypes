@@ -102,7 +102,7 @@ class AttributeHandler(AttributeHandlerBase):
             raise RuntimeError(
                 "add_vertices() attribute handler called with non-null attr; "
                 "this is most likely a bug"
-            )
+            )  # pragma: no cover
 
         # Extend the existing attribute containers
         get_storage_from_graph(graph).add_vertices(graph, n)
@@ -119,7 +119,7 @@ class AttributeHandler(AttributeHandlerBase):
             raise RuntimeError(
                 "add_edges() attribute handler called with non-null attr; "
                 "this is most likely a bug"
-            )
+            )  # pragma: no cover
 
         # Extend the existing attribute containers
         edge_array = igraph_vector_int_t_to_numpy_array_view(edges).reshape((-1, 2))

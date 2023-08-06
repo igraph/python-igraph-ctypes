@@ -356,3 +356,11 @@ def test_delitem(items: AVL, to_delete, expected: list[int]):
 def test_delitem_invalid_index(items: AVL):
     with raises(IndexError, match="valid indices"):
         del items[RuntimeError]  # type: ignore
+
+
+def test__extend_length(items: AVL):
+    assert len(items) == 5 and items.fixed_length
+    items._extend_length(3)
+    assert len(items) == 8 and items.fixed_length
+    items._extend_length(0)
+    assert len(items) == 8 and items.fixed_length

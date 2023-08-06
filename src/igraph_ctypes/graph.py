@@ -12,7 +12,7 @@ from .types import (
     VertexSelector,
 )
 
-from ._internal.attributes import AttributeStorage, AttributeValueList
+from ._internal.attributes import AttributeMap, AttributeStorage
 from ._internal.functions import (
     add_edges,
     add_vertices,
@@ -124,7 +124,7 @@ class Graph:
         return self._get_attribute_storage().get_graph_attribute_map()
 
     @property
-    def vattrs(self) -> MutableMapping[str, AttributeValueList]:
+    def vattrs(self) -> AttributeMap[Any]:
         """Provides access to the user-defined attributes of the vertices of the
         graph.
 
@@ -133,7 +133,7 @@ class Graph:
         return self._get_attribute_storage().get_vertex_attribute_map()
 
     @property
-    def eattrs(self) -> MutableMapping[str, AttributeValueList]:
+    def eattrs(self) -> AttributeMap[Any]:
         """Provides access to the user-defined attributes of the edges of the
         graph.
 

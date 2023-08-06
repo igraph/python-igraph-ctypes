@@ -1,15 +1,24 @@
 import numpy as np
 
 from itertools import repeat
-from math import ceil, floor
+from math import ceil
 from numpy.typing import NDArray
 from types import EllipsisType
-from typing import Any, cast, Iterable, NoReturn, Sequence, Sized, TypeVar, overload
+from typing import (
+    Any,
+    cast,
+    Iterable,
+    NoReturn,
+    Sequence,
+    Sized,
+    TypeVar,
+    overload,
+)
 
 __all__ = ("AttributeValueList",)
 
 C = TypeVar("C", bound="AttributeValueList")
-T = TypeVar("T")
+T = TypeVar("T", covariant=True)
 
 
 BoolLike = bool | np.bool_
@@ -24,7 +33,7 @@ IndexLike = (
 )
 
 
-class AttributeValueList(Sequence[T]):
+class AttributeValueList(Sequence[T | None]):
     """List-like data structure that stores the values of a vertex or an edge
     attribute for every vertex and edge in the graph, while supporting
     NumPy-style fancy indexing operations.
@@ -60,7 +69,7 @@ class AttributeValueList(Sequence[T]):
     the graph.
     """
 
-    _items: list[T]
+    _items: list[T | None]
     """The items in the list."""
 
     _fixed_length: bool
@@ -130,7 +139,7 @@ class AttributeValueList(Sequence[T]):
         raise RuntimeError("cannot delete items from a fixed-length list")
 
     @overload
-    def __getitem__(self, index: IntLike) -> T:
+    def __getitem__(self, index: IntLike) -> T | None:
         ...
 
     @overload

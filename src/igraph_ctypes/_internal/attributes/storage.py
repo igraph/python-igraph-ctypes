@@ -6,7 +6,7 @@ from typing import Any, MutableMapping, Optional
 from igraph_ctypes._internal.refcount import incref, decref
 from igraph_ctypes._internal.types import IntArray
 
-from .value_list import AttributeValueList
+from .map import AttributeMap
 
 __all__ = (
     "AttributeStorage",
@@ -59,16 +59,16 @@ class AttributeStorage(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_vertex_attribute_map(self) -> MutableMapping[str, AttributeValueList[Any]]:
-        """Returns a mutable mapping into the storage area that stores the
-        vertex attributes.
+    def get_vertex_attribute_map(self) -> AttributeMap:
+        """Returns an attribute map corresponding to the storage area that
+        stores the vertex attributes.
         """
         raise NotImplementedError
 
     @abstractmethod
-    def get_edge_attribute_map(self) -> MutableMapping[str, AttributeValueList[Any]]:
-        """Returns a mutable mapping into the storage area that stores the
-        edge attributes.
+    def get_edge_attribute_map(self) -> AttributeMap:
+        """Returns an attribute map corresponding to the storage area that
+        stores the edge attributes.
         """
         raise NotImplementedError
 
@@ -80,17 +80,18 @@ class DictAttributeStorage(AttributeStorage):
     """
 
     graph_attributes: dict[str, Any] = field(default_factory=dict)
-    vertex_attributes: dict[str, AttributeValueList[Any]] = field(default_factory=dict)
-    edge_attributes: dict[str, AttributeValueList[Any]] = field(default_factory=dict)
+    vertex_attributes: AttributeMap[Any] = field(
+        default_factory=AttributeMap.wrap_empty_dict
+    )
+    edge_attributes: AttributeMap[Any] = field(
+        default_factory=AttributeMap.wrap_empty_dict
+    )
 
     def add_vertices(self, graph, n: int) -> None:
-        for value_list in self.vertex_attributes.values():
-            value_list._extend_length(n)
+        self.vertex_attributes._extend_common_length(n)
 
     def add_edges(self, graph, edges: IntArray) -> None:
-        n = edges.shape[0]
-        for value_list in self.edge_attributes.values():
-            value_list._extend_length(n)
+        self.edge_attributes._extend_common_length(edges.shape[0])
 
     def clear(self) -> None:
         self.graph_attributes.clear()
@@ -105,21 +106,21 @@ class DictAttributeStorage(AttributeStorage):
     ):
         return self.__class__(
             self.graph_attributes.copy() if copy_graph_attributes else {},
-            {k: v.copy() for k, v in self.vertex_attributes.items()}
+            self.vertex_attributes.copy()
             if copy_vertex_attributes
-            else {},
-            {k: v.copy() for k, v in self.edge_attributes.items()}
+            else self.vertex_attributes.copy_empty(),
+            self.edge_attributes.copy()
             if copy_edge_attributes
-            else {},
+            else self.edge_attributes.copy_empty(),
         )
 
     def get_graph_attribute_map(self) -> MutableMapping[str, Any]:
         return self.graph_attributes
 
-    def get_vertex_attribute_map(self) -> MutableMapping[str, AttributeValueList[Any]]:
+    def get_vertex_attribute_map(self) -> AttributeMap:
         return self.vertex_attributes
 
-    def get_edge_attribute_map(self) -> MutableMapping[str, AttributeValueList[Any]]:
+    def get_edge_attribute_map(self) -> AttributeMap:
         return self.edge_attributes
 
 
