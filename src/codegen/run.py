@@ -274,7 +274,7 @@ def main():
         "-t",
         str(SOURCE_FOLDER / "codegen" / "types.yaml"),
         "-D",
-        str(SOURCE_FOLDER.parent / "doc" / "fragments"),
+        str(SOURCE_FOLDER.parent / "docs" / "fragments"),
     ]
 
     args = [

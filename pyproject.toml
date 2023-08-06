@@ -17,6 +17,9 @@ richbench = "^1.0.3"
 igraph = "^0.10.6"
 stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.14.1" }
 
+[tool.poetry.group.doc.dependencies]
+mkdocs-material = "^9.1.21"
+
 [tool.poetry-dynamic-versioning]
 enable = true
 

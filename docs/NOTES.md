@@ -1,5 +1,8 @@
 # Open questions
 
+Open questions to be discussed regarding the design of the new igraph
+Python interface:
+
 - Shall we allow string representations of enums to be resolved to their
   corresponding enum values? This would make it possible to write something
   like `"directed"` instead of `Adjacency.DIRECTED`.
