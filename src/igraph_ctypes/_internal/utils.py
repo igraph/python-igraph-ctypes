@@ -5,6 +5,7 @@ from functools import wraps
 from numpy.typing import DTypeLike
 from typing import Any, Callable, Iterable, Union
 
+from .enums import AttributeType
 from .errors import python_exception_to_igraph_error_t
 from .types import (
     np_type_of_igraph_bool_t,
@@ -29,19 +30,11 @@ def bytes_to_str(
         return value.decode(encoding, errors)
 
 
-def get_numpy_attribute_type_from_iterable(  # noqa: C901
+def get_igraph_attribute_type_from_iterable(  # noqa: C901
     it: Iterable[Any],
-) -> DTypeLike:
-    """Determines the appropriate NumPy datatype to store all the items found in
-    the given iterable as an attribute.
-
-    This means that this function basically classifies the iterable into one of
-    the following data types:
-
-    - np_type_of_igraph_bool_t for Boolean attributes
-    - np_type_of_igraph_real_t for numeric attributes
-    - np_type_of_igraph_string for string attributes
-    - np.object_ for any other (mixed) attribute type
+) -> AttributeType:
+    """Determines the appropriate igraph attribute type to store all the items
+    found in the given iterable as an attribute.
 
     When the iterable is empty, a numeric attribute will be assumed.
     """
@@ -50,39 +43,58 @@ def get_numpy_attribute_type_from_iterable(  # noqa: C901
         item = next(it)
     except StopIteration:
         # Iterable empty
-        return np_type_of_igraph_real_t
+        return AttributeType.NUMERIC
 
-    best_fit: DTypeLike
+    best_fit: AttributeType
     if isinstance(item, bool):
-        best_fit = np_type_of_igraph_bool_t
+        best_fit = AttributeType.BOOLEAN
     elif isinstance(item, (int, float, np.number)):
-        best_fit = np_type_of_igraph_real_t
+        best_fit = AttributeType.NUMERIC
     elif isinstance(item, str):
-        best_fit = np_type_of_igraph_string
+        best_fit = AttributeType.STRING
     else:
-        return np.object_
+        return AttributeType.OBJECT
 
     for item in it:
         if isinstance(item, bool):
-            if best_fit == np_type_of_igraph_string:
-                return np.object_
+            if best_fit == AttributeType.STRING:
+                return AttributeType.OBJECT
         elif isinstance(item, (int, float, np.number)):
-            if best_fit == np_type_of_igraph_string:
-                return np.object_
+            if best_fit == AttributeType.STRING:
+                return AttributeType.OBJECT
             else:
-                best_fit = np_type_of_igraph_real_t
+                best_fit = AttributeType.NUMERIC
         elif isinstance(item, str):
-            if best_fit != np_type_of_igraph_string:
-                return np.object_
+            if best_fit != AttributeType.STRING:
+                return AttributeType.OBJECT
         else:
-            return np.object_
+            return AttributeType.OBJECT
 
     return best_fit
+
+
+def get_numpy_attribute_type_from_iterable(  # noqa: C901
+    it: Iterable[Any],
+) -> DTypeLike:
+    attr_type = get_igraph_attribute_type_from_iterable(it)
+    return igraph_to_numpy_attribute_type(attr_type)
 
 
 def get_raw_memory_view(obj):
     """Returns a view into the raw bytes of a ctypes object."""
     return cast(byref(obj), POINTER(c_ubyte * sizeof(obj))).contents
+
+
+def igraph_to_numpy_attribute_type(type: AttributeType) -> DTypeLike:
+    """Converts an igraph attribute type to an equivalent NumPy data type."""
+    if type is AttributeType.BOOLEAN:
+        return np_type_of_igraph_bool_t
+    elif type is AttributeType.NUMERIC:
+        return np_type_of_igraph_real_t
+    elif type is AttributeType.STRING:
+        return np_type_of_igraph_string
+    else:
+        return np.object_
 
 
 def nop(*args, **kwds) -> None:
