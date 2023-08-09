@@ -1,8 +1,16 @@
+import numpy as np
+
 from ctypes import byref, cast, c_char_p, c_ubyte, POINTER, sizeof
 from functools import wraps
-from typing import Callable, Union
+from numpy.typing import DTypeLike
+from typing import Any, Callable, Iterable, Union
 
 from .errors import python_exception_to_igraph_error_t
+from .types import (
+    np_type_of_igraph_bool_t,
+    np_type_of_igraph_real_t,
+    np_type_of_igraph_string,
+)
 
 __all__ = ("bytes_to_str", "get_raw_memory_view", "nop", "protect", "protect_with")
 
@@ -19,6 +27,57 @@ def bytes_to_str(
         return wrapped.decode(encoding, errors) if wrapped is not None else ""
     else:
         return value.decode(encoding, errors)
+
+
+def get_numpy_attribute_type_from_iterable(  # noqa: C901
+    it: Iterable[Any],
+) -> DTypeLike:
+    """Determines the appropriate NumPy datatype to store all the items found in
+    the given iterable as an attribute.
+
+    This means that this function basically classifies the iterable into one of
+    the following data types:
+
+    - np_type_of_igraph_bool_t for Boolean attributes
+    - np_type_of_igraph_real_t for numeric attributes
+    - np_type_of_igraph_string for string attributes
+    - np.object_ for any other (mixed) attribute type
+
+    When the iterable is empty, a numeric attribute will be assumed.
+    """
+    it = iter(it)
+    try:
+        item = next(it)
+    except StopIteration:
+        # Iterable empty
+        return np_type_of_igraph_real_t
+
+    best_fit: DTypeLike
+    if isinstance(item, bool):
+        best_fit = np_type_of_igraph_bool_t
+    elif isinstance(item, (int, float, np.number)):
+        best_fit = np_type_of_igraph_real_t
+    elif isinstance(item, str):
+        best_fit = np_type_of_igraph_string
+    else:
+        return np.object_
+
+    for item in it:
+        if isinstance(item, bool):
+            if best_fit == np_type_of_igraph_string:
+                return np.object_
+        elif isinstance(item, (int, float, np.number)):
+            if best_fit == np_type_of_igraph_string:
+                return np.object_
+            else:
+                best_fit = np_type_of_igraph_real_t
+        elif isinstance(item, str):
+            if best_fit != np_type_of_igraph_string:
+                return np.object_
+        else:
+            return np.object_
+
+    return best_fit
 
 
 def get_raw_memory_view(obj):
