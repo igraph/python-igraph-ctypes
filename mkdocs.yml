@@ -1,17 +1,23 @@
 site_name: igraph ctypes interface for Python
 repo_url: https://github.com/igraph/python-igraph-ctypes
-# repo_name: igraph/python-igraph-ctypes
 
 nav:
   - Home: index.md
   - Notes: notes.md
-  - API reference: reference.md
+  - API reference:
+      - api/graph.md
+      - api/constructors.md
+      - api/paths.md
+
+exclude_docs: |
+  fragments/
 
 theme:
   name: material
 
   features:
     - content.action.edit
+    - content.code.copy
     - navigation.instant
     - navigation.tracking
     - navigation.footer
@@ -63,4 +69,3 @@ plugins:
             - src
           options:
             show_source: false
-

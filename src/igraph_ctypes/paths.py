@@ -16,7 +16,14 @@ from ._internal.functions import (
 __all__ = ("components", "shortest_path")
 
 
-def components(graph: Graph, mode: Connectedness = Connectedness.WEAK):
+def components(graph: Graph, mode: Connectedness = Connectedness.WEAK) -> IntArray:
+    """Finds the weakly or strongly connected components of a graph.
+
+    Args:
+        graph: the graph
+        mode: whether the function should return weakly or strongly connected
+            components
+    """
     membership, _, _ = connected_components(graph, mode)
     return membership
 
@@ -29,6 +36,22 @@ def shortest_path(
     weights: Optional[Iterable[float]] = None,
     method: str = "dijkstra",
 ) -> IntArray:
+    """Finds a single shortest path between two vertices in a graph.
+
+    Args:
+        graph: the graph
+        source: the source vertex
+        target: the target vertex
+        mode: TODO
+        weights: list of weights for each edge in the graph, or ``None`` to treat
+            the edges as unweighted
+        method: the method to use for finding shortest paths when the graph is
+            weighted. May be one of `"dijkstra"` (Dijkstra's algorithm) or
+            `"bellman-ford"` (Bellman-Ford algorithm).
+
+    Returns:
+        the IDs of the vertices along the shortest path
+    """
     # TODO(ntamas): handle epath?
     if weights is None:
         vpath, _ = get_shortest_path(graph, source, target, mode)
