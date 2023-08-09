@@ -1,6 +1,6 @@
 import numpy as np
 
-from itertools import repeat
+from itertools import islice
 from math import ceil
 from numpy.typing import NDArray
 from types import EllipsisType
@@ -8,11 +8,18 @@ from typing import (
     Any,
     cast,
     Iterable,
+    Iterator,
     NoReturn,
     Sequence,
     Sized,
     TypeVar,
     overload,
+)
+
+from .enums import AttributeType
+from .utils import (
+    get_igraph_attribute_type_from_iterable,
+    igraph_to_numpy_attribute_type,
 )
 
 __all__ = ("AttributeValueList",)
@@ -67,27 +74,87 @@ class AttributeValueList(Sequence[T | None]):
     retrieving the vertex or edge attributes of a graph because in this case
     the length of the list is dictated by the number of vertices or edges in
     the graph.
+
+    Internally, this class uses a NumPy typed array with an appropriate type.
+    The type of the array is decided at construction time if a type is provided;
+    otherwise the class will attempt to determine the most appropriate type
+    based on the initial items. If there are no items, a numeric list will be
+    created.
     """
 
-    _items: list[T | None]
-    """The items in the list."""
+    _items: NDArray
+    """Internal storage area for the items in the list."""
+
+    _num_items: int
+    """The number of items actually used in the backing storage (which may
+    be larger to prevent reallocations when extending).
+    """
+
+    _type: AttributeType
+    """The types of the attributes that can be stored in this list."""
 
     _fixed_length: bool
     """Whether the length of the list is fixed."""
 
-    def __init__(self, items: Iterable[T] | None = None, *, fixed_length: bool = False):
+    def __init__(
+        self,
+        items: Iterable[T] | None = None,
+        *,
+        type: AttributeType | None = None,
+        fixed_length: bool = False,
+        _wrap: bool = False,
+    ):
         """Constructor."""
-        self._items = list(items) if items is not None else []
-        self._fixed_length = bool(fixed_length)
+        if _wrap:
+            # Special case, not for public use. items is a NumPy array and
+            # we can wrap it as is. Must be called only when no one else has
+            # a reference to this array.
+            if type is None:
+                raise RuntimeError("no type specified")
+            if not isinstance(items, np.ndarray):
+                raise RuntimeError("input is not a NumPy array")
+
+            self._items = items  # type: ignore
+            self._type = type
+            self._fixed_length = bool(fixed_length)
+        else:
+            # Normal, public constructor path
+            if type is None:
+                type = (
+                    AttributeType.NUMERIC
+                    if items is None
+                    else get_igraph_attribute_type_from_iterable(items)
+                )
+
+            dtype = igraph_to_numpy_attribute_type(type)
+            self._items = np.fromiter(items if items is not None else (), dtype=dtype)
+            self._type = type
+            self._fixed_length = bool(fixed_length)
+
+        self._num_items = len(self._items)
+
+    def compact(self) -> None:
+        """Compacts the list in-place, reclaiming any memory that was used
+        earlier for storage when the list was longer.
+        """
+        if len(self._items > self._num_items):
+            self._items = self._items[: self._num_items]
 
     def copy(self: C) -> C:
         """Returns a shallow copy of the list."""
-        return self.__class__(self._items, fixed_length=self._fixed_length)
+        return self.__class__(
+            self._items, type=self._type, fixed_length=self._fixed_length
+        )
 
     @property
     def fixed_length(self) -> bool:
         """Returns whether the list is fixed-length."""
         return self._fixed_length
+
+    @property
+    def type(self) -> AttributeType:
+        """Returns the igraph attribute type of this list."""
+        return self._type
 
     def __eq__(self, other: Any) -> bool:
         """Returns whether the list is equal to some other sequence of items.
@@ -101,37 +168,56 @@ class AttributeValueList(Sequence[T | None]):
         if other is self:
             return True
         if isinstance(other, AttributeValueList):
-            return self._items == other._items
+            return np.array_equal(self._items, other._items)
         return False
 
-    def __delitem__(self, index: IntLike) -> None:  # noqa: C901
+    def __delitem__(self, index: IndexLike) -> None:  # noqa: C901
         if index is ...:
             if not self.fixed_length:
-                self._items.clear()
+                self._num_items = 0
                 return
 
-        elif isinstance(index, (int, np.integer, slice)):
+        elif isinstance(index, (int, np.integer)):
             if not self.fixed_length:
-                del self._items[index]
+                self._num_items -= 1
+                self._items[index:-1] = self._items[(index + 1) :]
+                return
+
+        elif isinstance(index, slice):
+            slice_len = _slice_length(index, self._num_items)
+            if slice_len <= 0:
+                # Nothing to delete, this is allowed
+                return
+
+            if not self.fixed_length:
+                # There are probably quite a few more special cases that we could
+                # treat here more efficiently
+                if (
+                    index.start is None
+                    and index.stop is None
+                    and index.step in (None, 1, -1)
+                ):
+                    del self[...]
+                else:
+                    self._items = np.delete(self._items, index)
+                    self._num_items = len(self._items)
                 return
 
         elif hasattr(index, "__getitem__"):
-            if isinstance(index, np.ndarray):
-                if len(index) > 0 and isinstance(index[0], (np.bool_, bool)):
-                    to_delete = sorted(np.flatnonzero(index))  # type: ignore
-                else:
-                    to_delete = sorted(index.flat)  # type: ignore
-            else:
-                if len(index) > 0 and isinstance(index[0], (np.bool_, bool)):
-                    to_delete = [i for i, j in enumerate(index) if j]
-                else:
-                    to_delete = sorted(set(index))  # type: ignore
-
-            if not self.fixed_length or not to_delete:
-                to_delete.reverse()
-                for i in to_delete:
-                    del self._items[i]  # type: ignore
+            if isinstance(index, Sized) and len(index) == 0:
+                # Nothing to delete, this is allowed
                 return
+
+            tmp = np.delete(self._items, index)  # type: ignore
+            if not self.fixed_length:
+                self._items = tmp
+                self._num_items = len(self._items)
+                return
+            else:
+                # Try to delete anyway, check if the length remains the same
+                if len(tmp) == len(self._items):
+                    # This is okay
+                    return
 
         else:
             self._raise_invalid_index_error()
@@ -156,33 +242,46 @@ class AttributeValueList(Sequence[T | None]):
         items = self._items
 
         if isinstance(index, (int, np.integer)):
-            return items[index]
+            if index < 0:
+                new_index = index + self._num_items
+                if new_index < 0 or new_index >= self._num_items:
+                    raise IndexError("list index out of range")
+                return items[new_index]
+            else:
+                return items[index]
 
         elif isinstance(index, slice):
-            return self.__class__(items[index])
+            return self.__class__(items[index].copy(), type=self._type, _wrap=True)
 
         elif index is ...:
             return self.copy()
 
         elif isinstance(index, Sequence):
-            if self._check_boolean_mask(index):
-                return self.__class__(
-                    item for item, mask in zip(items, index, strict=True) if mask
-                )
-            else:
-                return self.__class__(items[i] for i in cast(Sequence[IntLike], index))
+            return self.__class__(
+                self._items[index,], type=self._type, _wrap=True  # type: ignore
+            )
 
         elif isinstance(index, np.ndarray):
-            return np.asarray(self._items)[index]
+            return self._items[index]
 
         self._raise_invalid_index_error()
 
+    def __iter__(self) -> Iterable[T]:
+        return (
+            islice(self._items, self._num_items)
+            if self._num_items < len(self._items)
+            else iter(self._items)
+        )
+
     def __len__(self) -> int:
-        return len(self._items)
+        return self._num_items
 
     def __repr__(self) -> str:
         fl = ", fixed_length=True" if self._fixed_length else ""
-        return f"{self.__class__.__name__}({self._items!r}{fl})"
+        return (
+            f"{self.__class__.__name__}({self._items.tolist()!r}, "
+            f"type={int(self._type)}{fl})"
+        )
 
     def __setitem__(  # noqa: C901
         self, index: IndexLike, value: T | Sequence[T] | NDArray
@@ -209,24 +308,10 @@ class AttributeValueList(Sequence[T | None]):
         if not is_iterable:
             # Atomic value
             value = cast(T, value)
-
             if isinstance(index, slice):
-                num_indices = _slice_length(index, len(self))
-                self._items[index] = repeat(value, num_indices)  # type: ignore
-
-            elif isinstance(index, Sequence):
-                if self._check_boolean_mask(index):
-                    gen = (i for i, item in enumerate(index) if item)
-                else:
-                    gen = index
-                for i in gen:
-                    self._items[i] = value  # type: ignore
-
-            elif isinstance(index, np.ndarray):
-                if index.dtype in (bool, np.bool_):
-                    index = np.flatnonzero(index)
-                for i in index.flat:
-                    self._items[i] = value  # type: ignore
+                self._items[index] = value  # type: ignore
+            elif isinstance(index, (slice, Sequence, np.ndarray)):
+                self._items[index,] = value  # type: ignore
             else:
                 self._raise_invalid_index_error()
 
@@ -242,77 +327,15 @@ class AttributeValueList(Sequence[T | None]):
                     )
             self._items[index] = value  # type: ignore
 
-        elif isinstance(index, Sequence):
+        elif isinstance(index, (Sequence, np.ndarray)):
+            if isinstance(index, np.ndarray):
+                index = index.ravel()
             if isinstance(value, np.ndarray):
                 value = value.ravel()
-            else:
-                if not isinstance(value, Sequence):
-                    value = list(value)  # type: ignore
+            if isinstance(value, Iterator):
+                value = list(value)
+            self._items[index,] = value
 
-            assert isinstance(value, Sized)
-            num_values = len(value)
-
-            if self._check_boolean_mask(index):
-                mask_size = index.count(True)  # also works for np.bool_
-                if not is_seq:
-                    value = list(value)  # type: ignore
-
-                if num_values != mask_size:
-                    raise ValueError(
-                        # similar to NumPy
-                        f"indexing assignment cannot assign {num_values} input "
-                        f"value(s) to the {mask_size} output value(s) where the "
-                        f"mask is true"
-                    )
-
-                gen = (i for i, item in enumerate(index) if item)
-            else:
-                gen = index
-
-            for i, v in zip(gen, value, strict=True):  # type: ignore
-                self._items[i] = v  # type: ignore
-
-        elif isinstance(index, np.ndarray):
-            if isinstance(value, np.ndarray):
-                value = value.ravel()
-            else:
-                if not isinstance(value, Sequence):
-                    value = list(value)  # type: ignore
-
-            assert isinstance(value, Sized)
-            num_values = len(value)
-
-            if index.dtype in (bool, np.bool_):
-                # Boolean mask
-                index = np.flatnonzero(index)
-
-            if num_values != index.size:
-                raise ValueError(
-                    # similar to NumPy
-                    f"indexing assignment cannot assign {num_values} input "
-                    f"value(s) to {index.size} slot(s)"
-                )
-
-            for i, j in enumerate(index.flat):
-                self._items[j] = value[i]  # type: ignore
-
-        else:
-            self._raise_invalid_index_error()
-
-    def _check_boolean_mask(self, index: Sequence[Any]) -> bool:
-        """Checks whether the given sequence is a Boolean mask by evaluating
-        its first item and assuming that all the items are of the same type.
-        """
-        if len(index) == 0:
-            return False
-
-        first = index[0]
-        if isinstance(first, (bool, np.bool_)):
-            if len(index) != len(self):
-                self._raise_mask_mismatch_error(index)
-            return True
-        elif isinstance(first, (int, np.integer)):
-            return False
         else:
             self._raise_invalid_index_error()
 
@@ -322,21 +345,34 @@ class AttributeValueList(Sequence[T | None]):
 
         Do not use this method unless you know what you are doing.
         """
-        self._items.extend([None] * n)  # type: ignore
+        target_length = self._num_items + n
+        if len(self._items) < target_length:
+            # We do not have enough space pre-allocated
+            new_length = self._num_items
+            while new_length < target_length:
+                new_length <<= 1
+
+            if self._type is AttributeType.BOOLEAN:
+                default_value = False
+            elif self._type is AttributeType.NUMERIC:
+                default_value = 0.0
+            elif self._type is AttributeType.STRING:
+                default_value = ""
+            else:
+                default_value = None
+
+            self._items = np.pad(
+                self._items,
+                ((0, new_length - len(self._items)),),
+                constant_values=(default_value,),  # type: ignore
+            )
+        self._num_items = target_length
 
     def _raise_invalid_index_error(self) -> NoReturn:
         # Wording of error message similar to NumPy
         raise IndexError(
             "only integers, slices (`:`), ellipsis (`...`) and integer or "
             "boolean arrays are valid indices"
-        )
-
-    def _raise_mask_mismatch_error(self, index: Sized) -> NoReturn:
-        # Wording of error message similar to NumPy
-        raise IndexError(
-            f"boolean index did not match indexed list; list "
-            f"length is {len(self)} but boolean index length "
-            f"is {len(index)}"
         )
 
 

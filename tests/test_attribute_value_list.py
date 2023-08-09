@@ -4,6 +4,7 @@ from igraph_ctypes._internal.attributes.value_list import (
 )
 
 from numpy import array, ndarray, bool_
+from numpy.testing import assert_array_equal
 from pytest import fixture, mark, raises
 
 
@@ -69,8 +70,11 @@ def test_copy(items: AVL):
 
 
 def test_repr(items: AVL):
-    assert repr(items) == "AttributeValueList([1, 2, 3, 4, 5], fixed_length=True)"
-    assert repr(items[:]) == "AttributeValueList([1, 2, 3, 4, 5])"
+    assert (
+        repr(items)
+        == "AttributeValueList([1.0, 2.0, 3.0, 4.0, 5.0], type=1, fixed_length=True)"
+    )
+    assert repr(items[:]) == "AttributeValueList([1.0, 2.0, 3.0, 4.0, 5.0], type=1)"
 
 
 def test_getitem_single_index(items: AVL):
@@ -84,7 +88,7 @@ def test_getitem_slice(items: AVL):
     sliced = items[2:4]
     assert isinstance(sliced, AVL)
     assert not sliced.fixed_length
-    assert sliced._items == [3, 4]
+    assert_array_equal(sliced._items, [3, 4])
     assert sliced._items is not items._items
 
 
@@ -103,14 +107,14 @@ def test_getitem_index_sequence(items: AVL):
     sublist = items[0, 2, 4]
     assert isinstance(sublist, AVL)
     assert not sublist.fixed_length
-    assert sublist._items == [1, 3, 5]
+    assert_array_equal(sublist._items, [1, 3, 5])
     assert sublist._items is not items._items
 
     indices = [0, 1, 3]
     sublist = items[indices]
     assert isinstance(sublist, AVL)
     assert not sublist.fixed_length
-    assert sublist._items == [1, 2, 4]
+    assert_array_equal(sublist._items, [1, 2, 4])
     assert sublist._items is not items._items
 
 
@@ -128,7 +132,7 @@ def test_getitem_boolean_mask(items: AVL):
     assert list(sublist) == [1, 2, 4]
     assert sublist._items is not items._items
 
-    with raises(IndexError, match="list length"):
+    with raises(IndexError, match="boolean index did not match indexed array"):
         mask.pop()
         sublist[mask]
 
@@ -168,6 +172,20 @@ def test_getitem_numpy_boolean_mask(items: AVL):
 def test_getitem_invalid_index(items: AVL):
     with raises(IndexError, match="valid indices"):
         items[RuntimeError]  # type: ignore
+
+
+@mark.skip("not implemented yet")
+def test_getitem_negative_indexing(items: AVL):
+    items = items[:]
+    items._extend_length(1)
+
+    # Now the backing storage has 10 items, but the list has only 6 active items.
+    # Indexing with negative indices should not allow us to get into the
+    # inactive part
+    assert len(items) == 6
+    assert len(items._items) >= 6
+    assert items[-1] == 0
+    assert items[-2] == 5
 
 
 def test_setitem_single_index(items: AVL):
@@ -215,10 +233,10 @@ def test_setitem_index_sequence(items: AVL):
     assert items.fixed_length
 
     with raises(ValueError):
-        items[()] = [1]
+        items[()] = [1, 2]
 
     with raises(ValueError):
-        items[1, 2] = [1]
+        items[1, 2, 3] = [1, 2]
 
     with raises(ValueError):
         items[(1,)] = []
@@ -227,7 +245,7 @@ def test_setitem_index_sequence(items: AVL):
         items[(1.0,)] = [1]  # type: ignore
 
     with raises(ValueError):
-        items[1, 2] = array([1])
+        items[1, 2] = array([1, 2, 3])
 
 
 def test_setitem_boolean_mask(items: AVL):
@@ -248,7 +266,7 @@ def test_setitem_boolean_mask(items: AVL):
     assert list(items) == [44, 11, 3, 22, 5]
 
     with raises(ValueError):
-        items[mask] = (44,)
+        items[mask] = (44, 1)
 
 
 def test_setitem_numpy_array(items: AVL):
@@ -279,7 +297,7 @@ def test_setitem_numpy_array(items: AVL):
     assert list(items) == [42, 23, 43, 33, 22]
     assert items.fixed_length
 
-    with raises(ValueError, match="cannot assign"):
+    with raises(ValueError, match="could not be broadcast"):
         items[array([(1, 2)], dtype=int)] = [22, 33, 44]
 
 
@@ -338,18 +356,18 @@ def test_setitem_invalid_index(items: AVL):
     ),
 )
 def test_delitem(items: AVL, to_delete, expected: list[int]):
-    if expected != [1, 2, 3, 4, 5]:
+    if expected != [1.0, 2.0, 3.0, 4.0, 5.0]:
         # List will change so we cannot delete from a fixed-length list
         with raises(RuntimeError, match="fixed-length"):
             del items[to_delete]  # type: ignore
     else:
         # List stays the same so we can delete
         del items[to_delete]  # type: ignore
-        assert list(items) == expected
+        assert list(items) == [float(x) for x in expected]
 
     items = items[:]
     del items[to_delete]  # type: ignore
-    assert list(items) == expected
+    assert list(items) == [float(x) for x in expected]
     assert not items.fixed_length
 
 

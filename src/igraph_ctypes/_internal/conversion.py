@@ -68,7 +68,7 @@ from .types import (
     VertexPair,
     VertexSelector,
 )
-from .utils import bytes_to_str, igraph_to_numpy_attribute_type
+from .utils import bytes_to_str
 from .wrappers import (
     _EdgeSelector,
     _Matrix,
@@ -100,7 +100,6 @@ __all__ = (
     "edge_weights_to_igraph_vector_t_view",
     "igraph_matrix_t_to_numpy_array",
     "igraph_matrix_int_t_to_numpy_array",
-    "igraph_to_numpy_attribute_type",
     "igraph_vector_t_to_list",
     "igraph_vector_bool_t_to_list",
     "igraph_vector_int_t_to_list",

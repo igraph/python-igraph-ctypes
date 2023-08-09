@@ -51,8 +51,8 @@ def test_adding_vertices_extends_vertex_attribute_vectors():
     g.vattrs.set("age", (5, 10, 15, 20, 25))
 
     g.add_vertices(3)
-    assert list(g.vattrs["name"]) == ["test"] * 5 + [None] * 3
-    assert list(g.vattrs["age"]) == [5, 10, 15, 20, 25] + [None] * 3
+    assert list(g.vattrs["name"]) == ["test"] * 5 + [""] * 3
+    assert list(g.vattrs["age"]) == [5, 10, 15, 20, 25] + [0] * 3
 
 
 def test_assigning_vertex_attributes_between_graphs():

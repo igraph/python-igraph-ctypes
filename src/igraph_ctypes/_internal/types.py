@@ -49,7 +49,6 @@ igraph_uint_t = (
 np_type_of_igraph_bool_t = np.bool_
 np_type_of_igraph_integer_t = np.int64
 np_type_of_igraph_real_t = np.float64
-np_type_of_igraph_string = np.string_
 np_type_of_igraph_uint_t = np.uint64
 
 
