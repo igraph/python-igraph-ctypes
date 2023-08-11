@@ -1,0 +1,14 @@
+Writes the graph in plain edge list format to an output stream.
+
+THe plain edge list format records the structure of the graph _only_ and the
+vertices of the graph will be referred to as numeric vertex IDs instead of
+vertex names.
+
+See `write_graph_ncol()` if you have vertex names and you want to use them
+in the output file instead of IDs.
+
+Parameters:
+    graph: the graph to write
+    outstream: the output file or stream to write the graph to. May be a
+        filename, a path-like object or a file-like object if it is backed
+        by a low-level file handle

@@ -5083,7 +5083,21 @@ def read_graph_dl(instream: FileLike, directed: bool = True) -> Graph:
 
 
 def write_graph_edgelist(graph: Graph, outstream: FileLike) -> None:
-    """Type-annotated wrapper for ``igraph_write_graph_edgelist``."""
+    """Writes the graph in plain edge list format to an output stream.
+
+    THe plain edge list format records the structure of the graph _only_ and the
+    vertices of the graph will be referred to as numeric vertex IDs instead of
+    vertex names.
+
+    See `write_graph_ncol()` if you have vertex names and you want to use them
+    in the output file instead of IDs.
+
+    Parameters:
+        graph: the graph to write
+        outstream: the output file or stream to write the graph to. May be a
+            filename, a path-like object or a file-like object if it is backed
+            by a low-level file handle
+    """
     # Create exit stack for graceful cleanup
     with ExitStack() as py__stack:
 
@@ -5142,7 +5156,19 @@ def write_graph_leda(graph: Graph, outstream: FileLike, names: str = "name", wei
 
 
 def write_graph_graphml(graph: Graph, outstream: FileLike, prefixattr: bool = True) -> None:
-    """Type-annotated wrapper for ``igraph_write_graph_graphml``."""
+    """Writes the graph in GraphML format to an output stream.
+
+    The GraphML format preserves numeric, string and boolean attributes.
+
+    Parameters:
+        graph: the graph to write
+        outstream: the output file or stream to write the graph to. May be a
+            filename, a path-like object or a file-like object if it is backed
+            by a low-level file handle
+        prefixattr: whether to put a prefix in front of the attribute names to
+            ensure uniqueness if the graph has vertex and edge (or graph)
+            attributes with the same name
+    """
     # Create exit stack for graceful cleanup
     with ExitStack() as py__stack:
 

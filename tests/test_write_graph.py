@@ -2,7 +2,7 @@ from pathlib import Path
 from pytest import fixture, raises
 
 from igraph_ctypes.constructors import create_graph_from_edge_list
-from igraph_ctypes.io import write_graph_edgelist
+from igraph_ctypes.io import write_graph_edgelist, write_graph_graphml
 
 
 @fixture
@@ -11,9 +11,9 @@ def simple_graph():
     return g
 
 
-def test_write_graph_edgelist(simple_graph, tmp_path):
+def test_write_graph_edgelist(simple_graph, tmp_path, datadir):
     path: Path = tmp_path / "edges.txt"
-    expected = "0 1\n1 2\n1 3\n2 3\n"
+    expected = (datadir / "simple_graph.txt").read_text()
     path_str = str(path)
 
     # Write to a file specified by its filename
@@ -48,3 +48,14 @@ def test_write_graph_edgelist(simple_graph, tmp_path):
     with raises(OSError):
         with path.open("r") as fp:
             write_graph_edgelist(simple_graph, fp)
+
+
+def test_write_graph_graphml(simple_graph, tmp_path, datadir):
+    path: Path = tmp_path / "edges.graphml"
+    expected = (datadir / "simple_graph.graphml").read_text()
+    path_str = str(path)
+
+    # Write to a file specified by its filename
+    write_graph_graphml(simple_graph, path_str)
+    assert path.read_text() == expected
+    path.unlink()

@@ -870,6 +870,20 @@ pytest = ">=4.6"
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtualenv"]
 
 [[package]]
+name = "pytest-datadir"
+version = "1.4.1"
+description = "pytest plugin for test data directories and files"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pytest-datadir-1.4.1.tar.gz", hash = "sha256:9f7a3c4def6ac4cac3cc8181139ab53bd2667231052bd40cb07081748d4420f0"},
+    {file = "pytest_datadir-1.4.1-py3-none-any.whl", hash = "sha256:095f441782b1b907587eca7227fdbae94be43f1c96b4b2cbcc6801a4645be1af"},
+]
+
+[package.dependencies]
+pytest = ">=5.0"
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -1208,4 +1222,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "324a88b7bbee2920506cf1c77342329e0bcdfde4374d9d0ab87a73bfb3d12ed5"
+content-hash = "6664adb7755d728c70c06b2d9e8d81258de4cd7673438b681503fa130cad4fc1"

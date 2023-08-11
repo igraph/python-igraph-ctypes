@@ -16,6 +16,7 @@ pytest-cov = "^4.0.0"
 richbench = "^1.0.3"
 igraph = "^0.10.6"
 stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.15.0" }
+pytest-datadir = "^1.4.1"
 
 [tool.poetry.group.doc.dependencies]
 mkdocs-material = "^9.1.21"
@@ -59,6 +60,7 @@ python =
 deps =
     pytest
     pytest-cov
+    pytest-datadir
 commands = pytest tests
 
 [testenv:type]

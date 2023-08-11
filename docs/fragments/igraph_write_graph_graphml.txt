@@ -1,0 +1,12 @@
+Writes the graph in GraphML format to an output stream.
+
+The GraphML format preserves numeric, string and boolean attributes.
+
+Parameters:
+    graph: the graph to write
+    outstream: the output file or stream to write the graph to. May be a
+        filename, a path-like object or a file-like object if it is backed
+        by a low-level file handle
+    prefixattr: whether to put a prefix in front of the attribute names to
+        ensure uniqueness if the graph has vertex and edge (or graph)
+        attributes with the same name
