@@ -18,7 +18,9 @@ from ctypes import (
     Structure,
     Union as CUnion,
 )
-from typing import Iterable, Literal, Sequence, Union
+from io import IOBase
+from os import PathLike
+from typing import Iterable, Literal, Sequence
 
 
 def vector_fields(base_type):
@@ -56,6 +58,9 @@ class FILE(Structure):
     """ctypes representation of a ``FILE`` object"""
 
     pass
+
+
+FilePtr = c_void_p
 
 
 class igraph_complex_t(Structure):
@@ -551,11 +556,6 @@ class igraph_attribute_table_t(Structure):
 EdgeLike = int
 """Type alias for Python types that can be converted to an igraph edge ID"""
 
-EdgeSelector = Iterable[EdgeLike] | Literal["all"] | EdgeLike | None
-"""Type alias for Python types that can be converted to an igraph edge
-selector.
-"""
-
 BoolArray = npt.NDArray[np_type_of_igraph_bool_t]
 """Type alias for NumPy arrays containing igraph booleans"""
 
@@ -565,10 +565,10 @@ IntArray = npt.NDArray[np_type_of_igraph_integer_t]
 RealArray = npt.NDArray[np_type_of_igraph_real_t]
 """Type alias for NumPy arrays containing igraph reals"""
 
-MatrixLike = Union[Sequence[Sequence[float]], npt.NDArray]
+MatrixLike = Sequence[Sequence[float]] | npt.NDArray
 """Type alias for Python types that can be converted to an igraph matrix."""
 
-MatrixIntLike = Union[Sequence[Sequence[int]], npt.NDArray]
+MatrixIntLike = Sequence[Sequence[int]] | npt.NDArray
 """Type alias for Python types that can be converted to an igraph integer matrix."""
 
 VertexLike = int
@@ -580,4 +580,14 @@ VertexPair = tuple[VertexLike, VertexLike]
 VertexSelector = Iterable[VertexLike] | Literal["all"] | VertexLike | None
 """Type alias for Python types that can be converted to an igraph vertex
 selector.
+"""
+
+EdgeSelector = Iterable[EdgeLike] | Literal["all"] | EdgeLike | None
+"""Type alias for Python types that can be converted to an igraph edge
+selector.
+"""
+
+FileLike = int | bytes | str | PathLike[bytes] | PathLike[str] | IOBase
+"""Type alias for Python types that can be used in places where the C core
+expects a FILE* pointer.
 """

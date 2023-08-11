@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import ExitStack
 from ctypes import c_char_p, c_int
 from typing import Any, Iterable, Optional, TYPE_CHECKING
 
@@ -10,6 +11,7 @@ from .types import (
     BoolArray,
     EdgeLike,
     EdgeSelector,
+    FileLike,
     IntArray,
     MatrixLike,
     MatrixIntLike,
@@ -3801,7 +3803,30 @@ def maximal_cliques(graph: Graph, min_size: int = 0, max_size: int = 0) -> list[
     # Construct return value
     return res
 
-# igraph_maximal_cliques_subset: no Python type known for type: OUTFILE
+
+def maximal_cliques_subset(graph: Graph, subset: Iterable[VertexLike], outfile: Optional[FileLike] = None, min_size: int = 0, max_size: int = 0) -> tuple[list[IntArray], int]:
+    """Type-annotated wrapper for ``igraph_maximal_cliques_subset``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_subset = iterable_vertex_indices_to_igraph_vector_int_t(subset)
+        c_res = _VectorIntList.create(0)
+        c_no = igraph_integer_t()
+        c_outfile = py__stack.enter_context(any_to_file_ptr(outfile, "w"))
+        c_min_size = min_size
+        c_max_size = max_size
+
+        # Call wrapped function
+        igraph_maximal_cliques_subset(c_graph, c_subset, c_res, c_no, c_outfile, c_min_size, c_max_size)
+
+        # Prepare output arguments
+        res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+        no = c_no.value
+
+        # Construct return value
+        return res, no
 
 # igraph_maximal_cliques_callback: no Python type known for type: CLIQUE_FUNC
 
@@ -3823,7 +3848,20 @@ def maximal_cliques_count(graph: Graph, min_size: int = 0, max_size: int = 0) ->
     # Construct return value
     return no
 
-# igraph_maximal_cliques_file: no Python type known for type: OUTFILE
+
+def maximal_cliques_file(graph: Graph, res: FileLike, min_size: int = 0, max_size: int = 0) -> None:
+    """Type-annotated wrapper for ``igraph_maximal_cliques_file``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_res = py__stack.enter_context(any_to_file_ptr(res, "w"))
+        c_min_size = min_size
+        c_max_size = max_size
+
+        # Call wrapped function
+        igraph_maximal_cliques_file(c_graph, c_res, c_min_size, c_max_size)
 
 
 def maximal_cliques_hist(graph: Graph, min_size: int = 0, max_size: int = 0) -> RealArray:
@@ -4918,41 +4956,247 @@ def get_stochastic(graph: Graph, column_wise: bool = False, weights: Optional[It
 
 # igraph_to_undirected: no Python type known for type: TOUNDIRECTED
 
-# igraph_read_graph_edgelist: no Python type known for type: INFILE
 
-# igraph_read_graph_ncol: no Python type known for type: INFILE
+def read_graph_edgelist(instream: FileLike, n: int = 0, directed: bool = True) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_edgelist``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
 
-# igraph_read_graph_lgl: no Python type known for type: INFILE
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+        c_n = n
+        c_directed = any_to_igraph_bool_t(directed)
 
-# igraph_read_graph_pajek: no Python type known for type: INFILE
+        # Call wrapped function
+        igraph_read_graph_edgelist(c_graph, c_instream, c_n, c_directed)
 
-# igraph_read_graph_graphml: no Python type known for type: INFILE
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
 
-# igraph_read_graph_dimacs_flow: no Python type known for type: INFILE
+        # Construct return value
+        return graph
 
-# igraph_read_graph_graphdb: no Python type known for type: INFILE
+# igraph_read_graph_ncol: no Python type known for type: VECTOR_STR
 
-# igraph_read_graph_gml: no Python type known for type: INFILE
+# igraph_read_graph_lgl: no Python type known for type: ADD_WEIGHTS
 
-# igraph_read_graph_dl: no Python type known for type: INFILE
 
-# igraph_write_graph_edgelist: no Python type known for type: OUTFILE
+def read_graph_pajek(instream: FileLike) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_pajek``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
 
-# igraph_write_graph_ncol: no Python type known for type: OUTFILE
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
 
-# igraph_write_graph_lgl: no Python type known for type: OUTFILE
+        # Call wrapped function
+        igraph_read_graph_pajek(c_graph, c_instream)
 
-# igraph_write_graph_leda: no Python type known for type: OUTFILE
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
 
-# igraph_write_graph_graphml: no Python type known for type: OUTFILE
+        # Construct return value
+        return graph
 
-# igraph_write_graph_pajek: no Python type known for type: OUTFILE
 
-# igraph_write_graph_dimacs_flow: no Python type known for type: OUTFILE
+def read_graph_graphml(instream: FileLike, index: int = 0) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_graphml``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
 
-# igraph_write_graph_gml: no Python type known for type: OUTFILE
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+        c_index = index
 
-# igraph_write_graph_dot: no Python type known for type: OUTFILE
+        # Call wrapped function
+        igraph_read_graph_graphml(c_graph, c_instream, c_index)
+
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
+
+        # Construct return value
+        return graph
+
+# igraph_read_graph_dimacs_flow: no Python type known for type: VECTOR_STR
+
+
+def read_graph_graphdb(instream: FileLike, directed: bool = False) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_graphdb``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+        c_directed = any_to_igraph_bool_t(directed)
+
+        # Call wrapped function
+        igraph_read_graph_graphdb(c_graph, c_instream, c_directed)
+
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
+
+        # Construct return value
+        return graph
+
+
+def read_graph_gml(instream: FileLike) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_gml``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+
+        # Call wrapped function
+        igraph_read_graph_gml(c_graph, c_instream)
+
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
+
+        # Construct return value
+        return graph
+
+
+def read_graph_dl(instream: FileLike, directed: bool = True) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_dl``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+        c_directed = any_to_igraph_bool_t(directed)
+
+        # Call wrapped function
+        igraph_read_graph_dl(c_graph, c_instream, c_directed)
+
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
+
+        # Construct return value
+        return graph
+
+
+def write_graph_edgelist(graph: Graph, outstream: FileLike) -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_edgelist``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+
+        # Call wrapped function
+        igraph_write_graph_edgelist(c_graph, c_outstream)
+
+
+def write_graph_ncol(graph: Graph, outstream: FileLike, names: str = "name", weights: str = "weight") -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_ncol``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+        c_names = names.encode("utf-8")
+        c_weights = weights.encode("utf-8")
+
+        # Call wrapped function
+        igraph_write_graph_ncol(c_graph, c_outstream, c_names, c_weights)
+
+
+def write_graph_lgl(graph: Graph, outstream: FileLike, names: str = "name", weights: str = "weight", isolates: bool = True) -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_lgl``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+        c_names = names.encode("utf-8")
+        c_weights = weights.encode("utf-8")
+        c_isolates = any_to_igraph_bool_t(isolates)
+
+        # Call wrapped function
+        igraph_write_graph_lgl(c_graph, c_outstream, c_names, c_weights, c_isolates)
+
+
+def write_graph_leda(graph: Graph, outstream: FileLike, names: str = "name", weights: str = "weight") -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_leda``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+        c_names = names.encode("utf-8")
+        c_weights = weights.encode("utf-8")
+
+        # Call wrapped function
+        igraph_write_graph_leda(c_graph, c_outstream, c_names, c_weights)
+
+
+def write_graph_graphml(graph: Graph, outstream: FileLike, prefixattr: bool = True) -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_graphml``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+        c_prefixattr = any_to_igraph_bool_t(prefixattr)
+
+        # Call wrapped function
+        igraph_write_graph_graphml(c_graph, c_outstream, c_prefixattr)
+
+
+def write_graph_pajek(graph: Graph, outstream: FileLike) -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_pajek``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+
+        # Call wrapped function
+        igraph_write_graph_pajek(c_graph, c_outstream)
+
+
+def write_graph_dimacs_flow(graph: Graph, outstream: FileLike, capacity: Iterable[float], source: VertexLike = 0, target: VertexLike = 0) -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_dimacs_flow``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+        c_source = vertexlike_to_igraph_integer_t(source)
+        c_target = vertexlike_to_igraph_integer_t(target)
+        c_capacity = iterable_to_igraph_vector_t_view(capacity)
+
+        # Call wrapped function
+        igraph_write_graph_dimacs_flow(c_graph, c_outstream, c_source, c_target, c_capacity)
+
+# igraph_write_graph_gml: no Python type known for type: WRITE_GML_SW
+
+
+def write_graph_dot(graph: Graph, outstream: FileLike) -> None:
+    """Type-annotated wrapper for ``igraph_write_graph_dot``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = graph
+        c_outstream = py__stack.enter_context(any_to_file_ptr(outstream, "w"))
+
+        # Call wrapped function
+        igraph_write_graph_dot(c_graph, c_outstream)
 
 
 def motifs_randesu(graph: Graph, cut_prob: Iterable[float], size: int = 3) -> RealArray:

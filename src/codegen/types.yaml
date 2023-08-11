@@ -233,6 +233,20 @@ BIPARTITE_TYPES:
     INOUT: "%C% = iterable_to_igraph_vector_bool_t(%I%) if %I% is not None else None"
     OUT: "%C% = _VectorBool.create(0)"
 
+INFILE:
+  PY_TYPE: FileLike
+  PY_RETURN_TYPE: c_int
+  INCONV:
+    IN: '%C% = %S%.enter_context(any_to_file_ptr(%I%, "r"))'
+  FLAGS: stack
+
+OUTFILE:
+  PY_TYPE: FileLike
+  PY_RETURN_TYPE: c_int
+  INCONV:
+    IN: '%C% = %S%.enter_context(any_to_file_ptr(%I%, "w"))'
+  FLAGS: stack
+
 ADJACENCY_MODE:
   PY_TYPE: AdjacencyMode
   INCONV:

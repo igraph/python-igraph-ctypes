@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import numpy as np
 
-from ctypes import addressof, memmove, POINTER
-from typing import Any, Iterable, Optional, Sequence, TYPE_CHECKING
+from contextlib import contextmanager
+from ctypes import addressof, get_errno, memmove, POINTER
+from os import strerror
+from typing import Any, IO, Iterable, Iterator, Optional, Sequence, TYPE_CHECKING
 
 from .enums import MatrixStorage
 from .lib import (
+    fdopen,
+    fflush,
     igraph_es_all,
     igraph_es_none,
     igraph_es_vector_copy,
@@ -60,6 +64,7 @@ from .types import (
     BoolArray,
     EdgeLike,
     EdgeSelector,
+    FilePtr,
     IntArray,
     MatrixLike,
     MatrixIntLike,
@@ -86,6 +91,7 @@ if TYPE_CHECKING:
 
 
 __all__ = (
+    "any_to_file_ptr",
     "any_to_igraph_bool_t",
     "bytes_to_str",
     "edgelike_to_igraph_integer_t",
@@ -135,6 +141,67 @@ __all__ = (
     "vertex_qtys_to_igraph_vector_t",
     "vertex_qtys_to_igraph_vector_t_view",
 )
+
+
+@contextmanager
+def any_to_file_ptr(obj: Any, mode: str) -> Iterator[Optional[FilePtr]]:
+    """Converts an arbitrary Python object to an open file pointer in the C
+    layer, using the following rules:
+
+    - ``None`` is returned as is.
+
+    - Integers are treated as file handles and a low-level ``fdopen()`` call
+      from the C standard library will be used to convert them into a ``FILE*``
+      pointer.
+
+    - File-like objects with a ``fileno()`` method will be converted into a
+      file handle and then they will be treated the same way as integers above.
+
+    - Anything else is forwarded to ``open()`` to convert them into a file-like
+      object. They will then be treated as any other file-like object. The
+      created object will be _closed_ automatically when the context manager
+      exits.
+    """
+    if obj is None:
+        yield None
+        return
+
+    handle: int
+    fp: IO[Any] | None = None
+    file_ptr: Optional[FilePtr] = None
+
+    if isinstance(obj, int):
+        handle = obj
+    elif hasattr(obj, "fileno") and callable(obj.fileno):
+        # Flush pending writes first to ensure that they do not get mixed up
+        # with the ones performed by igraph's C core
+        if hasattr(obj, "flush") and callable(obj.flush):
+            obj.flush()
+        handle = obj.fileno()
+    else:
+        fp = open(obj, mode)
+        try:
+            if hasattr(fp, "fileno") and callable(fp.fileno):
+                handle = fp.fileno()
+            else:
+                raise TypeError("open() returned an object without a file handle")
+        except Exception:
+            fp.close()
+            fp = None
+            raise
+
+    try:
+        file_ptr = fdopen(
+            handle, mode.encode("ascii") if isinstance(mode, str) else mode
+        )
+        if not file_ptr:
+            errno = get_errno()
+            raise OSError(errno, strerror(errno))
+        yield file_ptr
+        fflush(file_ptr)
+    finally:
+        if fp is not None:
+            fp.close()  # takes care of fclose() on file_ptr
 
 
 def any_to_igraph_bool_t(obj: Any) -> igraph_bool_t:

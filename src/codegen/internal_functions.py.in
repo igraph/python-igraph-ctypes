@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import ExitStack
 from ctypes import c_char_p, c_int
 from typing import Any, Iterable, Optional, TYPE_CHECKING
 
@@ -10,6 +11,7 @@ from .types import (
     BoolArray,
     EdgeLike,
     EdgeSelector,
+    FileLike,
     IntArray,
     MatrixLike,
     MatrixIntLike,

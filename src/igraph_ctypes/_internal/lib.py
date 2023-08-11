@@ -1,12 +1,14 @@
 # fmt: off
 
-from ctypes import cdll, c_char_p, c_double, c_int, c_size_t, c_void_p, POINTER
+from ctypes import cdll, c_char_p, c_double, c_int, c_size_t, c_void_p, CDLL, POINTER
 from ctypes.util import find_library
+from platform import system
 from typing import Any
 
 from .errors import handle_igraph_error_t
 from .types import (
     FILE,
+    FilePtr,
     igraph_attribute_combination_t,
     igraph_attribute_table_t,
     igraph_bool_t,
@@ -59,7 +61,34 @@ def _load_igraph_c_library():
     return lib
 
 
+def _load_libc():
+    """Imports the C standard library using `ctypes`."""
+    if system() == "Windows":
+        return CDLL("msvcrt.dll", use_errno=True)
+    elif system() == "Darwin":
+        return CDLL("libc.dylib", use_errno=True)
+    elif system() == "Linux":
+        return CDLL("libc.so.6", use_errno=True)
+    else:
+        raise RuntimeError("Cannot import C standard library on this platform")
+
+
+_libc: Any = _load_libc()
 _lib: Any = _load_igraph_c_library()
+
+# Standard libc functions
+
+fclose = _libc.fclose
+fclose.restype = int
+fclose.argtypes = [POINTER(FILE)]
+
+fflush = _libc.fflush
+fflush.restype = int
+fflush.argtypes = [POINTER(FILE)]
+
+fdopen = _libc.fdopen
+fdopen.restype = POINTER(FILE)
+fdopen.argtypes = [c_int, c_char_p]
 
 # Vector type
 
