@@ -177,7 +177,7 @@ def test_getitem_invalid_index(items: AVL):
 @mark.skip("not implemented yet")
 def test_getitem_negative_indexing(items: AVL):
     items = items[:]
-    items._extend_length(1)
+    items._extend_length_by(1)
 
     # Now the backing storage has 10 items, but the list has only 6 active items.
     # Indexing with negative indices should not allow us to get into the
@@ -376,9 +376,9 @@ def test_delitem_invalid_index(items: AVL):
         del items[RuntimeError]  # type: ignore
 
 
-def test__extend_length(items: AVL):
+def test__extend_length_with(items: AVL):
     assert len(items) == 5 and items.fixed_length
-    items._extend_length(3)
+    items._extend_length_by(3)
     assert len(items) == 8 and items.fixed_length
-    items._extend_length(0)
+    items._extend_length_by(0)
     assert len(items) == 8 and items.fixed_length

@@ -1,6 +1,5 @@
 import numpy as np
 
-from itertools import islice
 from math import ceil
 from numpy.typing import NDArray
 from types import EllipsisType
@@ -82,12 +81,18 @@ class AttributeValueList(Sequence[T | None]):
     created.
     """
 
-    _items: NDArray
-    """Internal storage area for the items in the list."""
+    _buffer: NDArray
+    """NumPy array acting as a backing store for the ``_items`` array. The size
+    of the ``_buffer`` doubles every time we need more space to store the items.
+    This allows us to have better performance when appending items to the
+    ``_items`` array because most of the time we can just change ``_items`` to
+    be a view into a longer part of the ``_buffer`` without having to
+    re-allocate the buffer.
+    """
 
-    _num_items: int
-    """The number of items actually used in the backing storage (which may
-    be larger to prevent reallocations when extending).
+    _items: NDArray
+    """NumPy array view of the internal storage area of the items in the list.
+    This array is a view into ``_buffer``.
     """
 
     _type: AttributeType
@@ -114,9 +119,7 @@ class AttributeValueList(Sequence[T | None]):
             if not isinstance(items, np.ndarray):
                 raise RuntimeError("input is not a NumPy array")
 
-            self._items = items  # type: ignore
-            self._type = type
-            self._fixed_length = bool(fixed_length)
+            array = items
         else:
             # Normal, public constructor path
             if type is None:
@@ -127,18 +130,24 @@ class AttributeValueList(Sequence[T | None]):
                 )
 
             dtype = igraph_to_numpy_attribute_type(type)
-            self._items = np.fromiter(items if items is not None else (), dtype=dtype)
-            self._type = type
-            self._fixed_length = bool(fixed_length)
+            array = np.fromiter(items if items is not None else (), dtype=dtype)
 
-        self._num_items = len(self._items)
+        # Now we have a NumPy array, but what we actually want is a chunk of
+        # memory that we manage ourselves, and a NumPy view on top of it
+        self._buffer = array
+        self._items = self._buffer[:]
+        self._type = type
+        self._fixed_length = bool(fixed_length)
 
     def compact(self) -> None:
         """Compacts the list in-place, reclaiming any memory that was used
         earlier for storage when the list was longer.
         """
-        if len(self._items > self._num_items):
-            self._items = self._items[: self._num_items]
+        num_items = len(self._items)
+        if len(self._buffer) > num_items:
+            # refcheck=False is potentially dangerous but I think we are okay
+            # with it here
+            self._buffer.resize((num_items,), refcheck=False)
 
     def copy(self: C) -> C:
         """Returns a shallow copy of the list."""
@@ -174,17 +183,17 @@ class AttributeValueList(Sequence[T | None]):
     def __delitem__(self, index: IndexLike) -> None:  # noqa: C901
         if index is ...:
             if not self.fixed_length:
-                self._num_items = 0
+                self._items = self._buffer[:0]
                 return
 
         elif isinstance(index, (int, np.integer)):
             if not self.fixed_length:
-                self._num_items -= 1
                 self._items[index:-1] = self._items[(index + 1) :]
+                self._items = self._buffer[: len(self._items) - 1]
                 return
 
         elif isinstance(index, slice):
-            slice_len = _slice_length(index, self._num_items)
+            slice_len = _slice_length(index, len(self))
             if slice_len <= 0:
                 # Nothing to delete, this is allowed
                 return
@@ -199,8 +208,9 @@ class AttributeValueList(Sequence[T | None]):
                 ):
                     del self[...]
                 else:
-                    self._items = np.delete(self._items, index)
-                    self._num_items = len(self._items)
+                    tmp = np.delete(self._items, index)
+                    self._buffer = tmp
+                    self._items = self._buffer[:]
                 return
 
         elif hasattr(index, "__getitem__"):
@@ -210,8 +220,8 @@ class AttributeValueList(Sequence[T | None]):
 
             tmp = np.delete(self._items, index)  # type: ignore
             if not self.fixed_length:
-                self._items = tmp
-                self._num_items = len(self._items)
+                self._buffer = tmp
+                self._items = self._buffer[:]
                 return
             else:
                 # Try to delete anyway, check if the length remains the same
@@ -242,13 +252,7 @@ class AttributeValueList(Sequence[T | None]):
         items = self._items
 
         if isinstance(index, (int, np.integer)):
-            if index < 0:
-                new_index = index + self._num_items
-                if new_index < 0 or new_index >= self._num_items:
-                    raise IndexError("list index out of range")
-                return items[new_index]
-            else:
-                return items[index]
+            return items[index]
 
         elif isinstance(index, slice):
             return self.__class__(items[index].copy(), type=self._type, _wrap=True)
@@ -267,14 +271,10 @@ class AttributeValueList(Sequence[T | None]):
         self._raise_invalid_index_error()
 
     def __iter__(self) -> Iterable[T]:
-        return (
-            islice(self._items, self._num_items)
-            if self._num_items < len(self._items)
-            else iter(self._items)
-        )
+        return iter(self._items)
 
     def __len__(self) -> int:
-        return self._num_items
+        return len(self._items)
 
     def __repr__(self) -> str:
         fl = ", fixed_length=True" if self._fixed_length else ""
@@ -339,19 +339,18 @@ class AttributeValueList(Sequence[T | None]):
         else:
             self._raise_invalid_index_error()
 
-    def _extend_length(self, n: int) -> None:
+    def _extend_length_by(self, n: int) -> None:
         """Extends the list with a given number of new items at the end, even
         if the list is marked as fixed-length.
 
         Do not use this method unless you know what you are doing.
         """
-        target_length = self._num_items + n
-        if len(self._items) < target_length:
-            # We do not have enough space pre-allocated
-            new_length = self._num_items
-            while new_length < target_length:
-                new_length <<= 1
-
+        current_length = len(self)
+        target_length = current_length + n
+        if len(self._buffer) < target_length:
+            # We do not have enough space pre-allocated, find the nearest
+            # power of two that will suffice
+            new_length = 2 ** int(np.ceil(np.log2(target_length)))
             if self._type is AttributeType.BOOLEAN:
                 default_value = False
             elif self._type is AttributeType.NUMERIC:
@@ -361,12 +360,10 @@ class AttributeValueList(Sequence[T | None]):
             else:
                 default_value = None
 
-            self._items = np.pad(
-                self._items,
-                ((0, new_length - len(self._items)),),
-                constant_values=(default_value,),  # type: ignore
-            )
-        self._num_items = target_length
+            self._buffer.resize((new_length,), refcheck=False)
+            self._buffer[current_length:new_length] = default_value
+
+        self._items = self._buffer[:target_length]
 
     def _raise_invalid_index_error(self) -> NoReturn:
         # Wording of error message similar to NumPy

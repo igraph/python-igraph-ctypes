@@ -96,7 +96,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
     def _extend_common_length(self, n: int) -> None:
         self._common_length_of_values += n
         for value_list in self._items.values():
-            value_list._extend_length(n)
+            value_list._extend_length_by(n)
 
     def __getitem__(self, key: str) -> AttributeValueList[T]:
         return self._items[key]
