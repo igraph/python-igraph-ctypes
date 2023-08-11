@@ -8,7 +8,6 @@ from typing import Any
 from .errors import handle_igraph_error_t
 from .types import (
     FILE,
-    FilePtr,
     igraph_attribute_combination_t,
     igraph_attribute_table_t,
     igraph_bool_t,
