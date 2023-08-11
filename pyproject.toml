@@ -15,7 +15,7 @@ pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
 richbench = "^1.0.3"
 igraph = "^0.10.6"
-stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.15.0" }
+stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.16.0" }
 pytest-datadir = "^1.4.1"
 
 [tool.poetry.group.doc.dependencies]

@@ -1124,7 +1124,7 @@ files = [
 
 [[package]]
 name = "stimulus"
-version = "0.15.0"
+version = "0.16.0"
 description = "Experimental code generator for high-level interfaces of igraph"
 optional = false
 python-versions = "^3.7"
@@ -1133,13 +1133,14 @@ develop = false
 
 [package.dependencies]
 deepmerge = "^0.3.0"
+jinja2 = "^3.1.2"
 PyYAML = "^6.0"
 
 [package.source]
 type = "git"
 url = "https://github.com/igraph/stimulus.git"
-reference = "0.15.0"
-resolved_reference = "242137d444cb364c06bc422cc65c0077d5de6772"
+reference = "0.16.0"
+resolved_reference = "a9a55a6086ebfd1350d89ece8d31719837bce635"
 
 [[package]]
 name = "texttable"
@@ -1222,4 +1223,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "6664adb7755d728c70c06b2d9e8d81258de4cd7673438b681503fa130cad4fc1"
+content-hash = "b66a76c1c186fb0f32cd8ac386f0a88a0a544a68f465b8778513cc854f551221"

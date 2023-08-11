@@ -9,6 +9,4 @@ in the output file instead of IDs.
 
 Parameters:
     graph: the graph to write
-    outstream: the output file or stream to write the graph to. May be a
-        filename, a path-like object or a file-like object if it is backed
-        by a low-level file handle
+{% include '_include/write_graph_outstream.txt' %}
