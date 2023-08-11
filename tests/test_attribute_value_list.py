@@ -174,7 +174,6 @@ def test_getitem_invalid_index(items: AVL):
         items[RuntimeError]  # type: ignore
 
 
-@mark.skip("not implemented yet")
 def test_getitem_negative_indexing(items: AVL):
     items = items[:]
     items._extend_length_by(1)
