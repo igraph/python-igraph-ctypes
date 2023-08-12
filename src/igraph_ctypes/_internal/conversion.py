@@ -570,7 +570,7 @@ def numpy_array_to_igraph_vector_bool_t_view(
     into the appropriate layout and data type first and then a view will be
     provided into the copy.
     """
-    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_real_t, flatten=flatten)
+    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_bool_t, flatten=flatten)
 
     result = _VectorBool()
     igraph_vector_bool_view(

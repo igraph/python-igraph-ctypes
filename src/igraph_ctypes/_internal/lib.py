@@ -135,6 +135,10 @@ igraph_vector_size = _lib.igraph_vector_size
 igraph_vector_size.restype = igraph_integer_t
 igraph_vector_size.argtypes = [POINTER(igraph_vector_t)]
 
+igraph_vector_update = _lib.igraph_vector_update
+igraph_vector_update.restype = handle_igraph_error_t
+igraph_vector_update.argtypes = [POINTER(igraph_vector_t), POINTER(igraph_vector_t)]
+
 # Integer vector type
 
 igraph_vector_int_init = _lib.igraph_vector_int_init
@@ -181,6 +185,10 @@ igraph_vector_int_size = _lib.igraph_vector_int_size
 igraph_vector_int_size.restype = igraph_integer_t
 igraph_vector_int_size.argtypes = [POINTER(igraph_vector_int_t)]
 
+igraph_vector_int_update = _lib.igraph_vector_int_update
+igraph_vector_int_update.restype = handle_igraph_error_t
+igraph_vector_int_update.argtypes = [POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
+
 # Boolean vector type
 
 igraph_vector_bool_init = _lib.igraph_vector_bool_init
@@ -226,6 +234,10 @@ igraph_vector_bool_set.argtypes = [POINTER(igraph_vector_bool_t), igraph_integer
 igraph_vector_bool_size = _lib.igraph_vector_bool_size
 igraph_vector_bool_size.restype = igraph_integer_t
 igraph_vector_bool_size.argtypes = [POINTER(igraph_vector_bool_t)]
+
+igraph_vector_bool_update = _lib.igraph_vector_bool_update
+igraph_vector_bool_update.restype = handle_igraph_error_t
+igraph_vector_bool_update.argtypes = [POINTER(igraph_vector_bool_t), POINTER(igraph_vector_bool_t)]
 
 # Pointer vector type
 
