@@ -9,6 +9,7 @@ from ctypes import addressof, get_errno, memmove, POINTER
 from os import strerror
 from typing import Any, IO, Iterable, Iterator, Optional, Sequence, TYPE_CHECKING
 
+from .attributes.utils import python_type_to_igraph_attribute_type
 from .enums import MatrixStorage
 from .lib import (
     fdopen,
@@ -129,6 +130,7 @@ __all__ = (
     "iterable_to_igraph_vector_t",
     "iterable_to_igraph_vector_t_view",
     "iterable_vertex_indices_to_igraph_vector_int_t",
+    "python_type_to_igraph_attribute_type",
     "sequence_to_igraph_matrix_int_t",
     "sequence_to_igraph_matrix_int_t_view",
     "sequence_to_igraph_matrix_t",

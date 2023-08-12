@@ -11,6 +11,15 @@ def simple_graph():
     return g
 
 
+@fixture
+def graph_with_attributes():
+    g = create_graph_from_edge_list(
+        [0, 1, 0, 2, 2, 3, 3, 4, 4, 2, 2, 5, 5, 0, 6, 3, 5, 6], directed=False
+    )
+    g.attrs["date"] = "2009-01-10"
+    return g
+
+
 def test_write_graph_edgelist(simple_graph, tmp_path, datadir):
     path: Path = tmp_path / "edges.txt"
     expected = (datadir / "simple_graph.txt").read_text()

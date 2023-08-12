@@ -396,3 +396,21 @@ def test_type_getter():
 
     items = AVL(["foo", "bar", False, 42])
     assert items.type == AttributeType.OBJECT
+
+
+def test_casting():
+    items = AVL([0, 1, 2, 0, 4])
+    items.cast(bool)
+
+    assert items.type == AttributeType.BOOLEAN
+    assert list(items) == [False, True, True, False, True]
+
+    items.cast(str)
+
+    assert items.type == AttributeType.STRING
+    assert list(items) == ["False", "True", "True", "False", "True"]
+
+    items.cast(object)
+
+    assert items.type == AttributeType.OBJECT
+    assert list(items) == ["False", "True", "True", "False", "True"]

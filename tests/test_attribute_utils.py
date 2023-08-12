@@ -1,4 +1,4 @@
-from numpy import inf, nan, object_
+from numpy import inf, nan, bool_, int_, object_
 
 from igraph_ctypes._internal.enums import AttributeType
 from igraph_ctypes._internal.types import (
@@ -6,11 +6,47 @@ from igraph_ctypes._internal.types import (
     np_type_of_igraph_real_t,
 )
 from igraph_ctypes._internal.attributes.utils import (
-    get_igraph_attribute_type_from_iterable,
-    get_numpy_attribute_type_from_iterable,
+    iterable_to_igraph_attribute_type,
+    iterable_to_numpy_attribute_type,
+    python_object_to_igraph_attribute_type,
+    python_type_to_igraph_attribute_type,
 )
 
 from pytest import mark
+
+
+@mark.parametrize(
+    ("input", "expected"),
+    [
+        (42, AttributeType.NUMERIC),
+        (42.0, AttributeType.NUMERIC),
+        (True, AttributeType.BOOLEAN),
+        ("42", AttributeType.STRING),
+        ([42], AttributeType.OBJECT),
+        (int_(42), AttributeType.NUMERIC),
+        (bool_(True), AttributeType.BOOLEAN),
+        (None, AttributeType.OBJECT),
+    ],
+)
+def test_python_object_to_igraph_attribute_type(input, expected):
+    assert python_object_to_igraph_attribute_type(input) == expected
+
+
+@mark.parametrize(
+    ("input", "expected"),
+    [
+        (int, AttributeType.NUMERIC),
+        (float, AttributeType.NUMERIC),
+        (bool, AttributeType.BOOLEAN),
+        (str, AttributeType.STRING),
+        (object, AttributeType.OBJECT),
+        (int_, AttributeType.NUMERIC),
+        (bool_, AttributeType.BOOLEAN),
+        (object_, AttributeType.OBJECT),
+    ],
+)
+def test_python_type_to_igraph_attribute_type(input, expected):
+    assert python_type_to_igraph_attribute_type(input) == expected
 
 
 @mark.parametrize(
@@ -32,7 +68,7 @@ from pytest import mark
     ],
 )
 def test_conversion_from_python_to_numpy_array_type(input, expected):
-    assert get_numpy_attribute_type_from_iterable(input) == expected
+    assert iterable_to_numpy_attribute_type(input) == expected
 
 
 @mark.parametrize(
@@ -54,4 +90,4 @@ def test_conversion_from_python_to_numpy_array_type(input, expected):
     ],
 )
 def test_conversion_from_python_to_igraph_attribute_type(input, expected):
-    assert get_igraph_attribute_type_from_iterable(input) == expected
+    assert iterable_to_igraph_attribute_type(input) == expected

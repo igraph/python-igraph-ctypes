@@ -11,14 +11,17 @@ from typing import (
     NoReturn,
     Sequence,
     Sized,
+    Type,
     TypeVar,
+    Union,
     overload,
 )
 
 from .enums import AttributeType
 from .utils import (
-    get_igraph_attribute_type_from_iterable,
+    iterable_to_igraph_attribute_type,
     igraph_to_numpy_attribute_type,
+    python_type_to_igraph_attribute_type,
 )
 
 __all__ = ("AttributeValueList",)
@@ -126,18 +129,43 @@ class AttributeValueList(Sequence[T | None]):
                 type = (
                     AttributeType.NUMERIC
                     if items is None
-                    else get_igraph_attribute_type_from_iterable(items)
+                    else iterable_to_igraph_attribute_type(items)
                 )
 
             dtype = igraph_to_numpy_attribute_type(type)
             array = np.fromiter(items if items is not None else (), dtype=dtype)
 
+        self._fixed_length = bool(fixed_length)
+
         # Now we have a NumPy array, but what we actually want is a chunk of
         # memory that we manage ourselves, and a NumPy view on top of it
+        self._init_with_array(array, type)
+
+    def _init_with_array(self, array: NDArray, type: AttributeType):
         self._buffer = array
         self._items = self._buffer[:]
         self._type = type
-        self._fixed_length = bool(fixed_length)
+
+    def cast(self, new_type: Union[AttributeType, Type]) -> None:
+        """Converts the type of the attribute represented by this list to the
+        given type.
+
+        Args:
+            new_type: the new type of the attribute. May be an igraph
+                AttributeType_ or a Python type. Python types will be
+                converted to their equivalent igraph attribute types.
+        """
+        if not isinstance(new_type, AttributeType):
+            new_type = python_type_to_igraph_attribute_type(new_type)
+
+        numpy_type = igraph_to_numpy_attribute_type(new_type)
+        if new_type is AttributeType.STRING and self._type is not AttributeType.STRING:
+            # Requires special treatment because AttributeType.STRING is
+            # np.object_ so no conversion would happen by default
+            new_array = np.array([str(x) for x in self._items], dtype=numpy_type)
+        else:
+            new_array = self._items.astype(numpy_type)
+        self._init_with_array(new_array, new_type)
 
     def compact(self) -> None:
         """Compacts the list in-place, reclaiming any memory that was used
@@ -208,9 +236,7 @@ class AttributeValueList(Sequence[T | None]):
                 ):
                     del self[...]
                 else:
-                    tmp = np.delete(self._items, index)
-                    self._buffer = tmp
-                    self._items = self._buffer[:]
+                    self._init_with_array(np.delete(self._items, index), self._type)
                 return
 
         elif hasattr(index, "__getitem__"):
@@ -220,8 +246,7 @@ class AttributeValueList(Sequence[T | None]):
 
             tmp = np.delete(self._items, index)  # type: ignore
             if not self.fixed_length:
-                self._buffer = tmp
-                self._items = self._buffer[:]
+                self._init_with_array(tmp, self._type)
                 return
             else:
                 # Try to delete anyway, check if the length remains the same

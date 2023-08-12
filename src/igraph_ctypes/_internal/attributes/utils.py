@@ -1,7 +1,7 @@
 import numpy as np
 
 from numpy.typing import DTypeLike
-from typing import Any, Iterable
+from typing import Any, Iterable, Type
 
 from .enums import AttributeType
 from ..types import (
@@ -10,13 +10,24 @@ from ..types import (
 )
 
 __all__ = (
-    "get_igraph_attribute_type_from_iterable",
-    "get_numpy_attribute_type_from_iterable",
     "igraph_to_numpy_attribute_type",
+    "iterable_to_igraph_attribute_type",
+    "iterable_to_numpy_attribute_type",
+    "python_type_to_igraph_attribute_type",
 )
 
 
-def get_igraph_attribute_type_from_iterable(  # noqa: C901
+def igraph_to_numpy_attribute_type(type: AttributeType) -> DTypeLike:
+    """Converts an igraph attribute type to an equivalent NumPy data type."""
+    if type is AttributeType.BOOLEAN:
+        return np_type_of_igraph_bool_t
+    elif type is AttributeType.NUMERIC:
+        return np_type_of_igraph_real_t
+    else:
+        return np.object_
+
+
+def iterable_to_igraph_attribute_type(
     it: Iterable[Any],
 ) -> AttributeType:
     """Determines the appropriate igraph attribute type to store all the items
@@ -31,26 +42,18 @@ def get_igraph_attribute_type_from_iterable(  # noqa: C901
         # Iterable empty
         return AttributeType.UNSPECIFIED
 
-    best_fit: AttributeType
-    if isinstance(item, bool):
-        best_fit = AttributeType.BOOLEAN
-    elif isinstance(item, (int, float, np.number)):
-        best_fit = AttributeType.NUMERIC
-    elif isinstance(item, str):
-        best_fit = AttributeType.STRING
-    else:
-        return AttributeType.OBJECT
-
+    best_fit = python_type_to_igraph_attribute_type(type(item))
     for item in it:
-        if isinstance(item, bool):
+        next_type = python_type_to_igraph_attribute_type(type(item))
+        if next_type is AttributeType.BOOLEAN:
             if best_fit == AttributeType.STRING:
                 return AttributeType.OBJECT
-        elif isinstance(item, (int, float, np.number)):
+        elif next_type is AttributeType.NUMERIC:
             if best_fit == AttributeType.STRING:
                 return AttributeType.OBJECT
             else:
                 best_fit = AttributeType.NUMERIC
-        elif isinstance(item, str):
+        elif next_type is AttributeType.STRING:
             if best_fit != AttributeType.STRING:
                 return AttributeType.OBJECT
         else:
@@ -59,9 +62,7 @@ def get_igraph_attribute_type_from_iterable(  # noqa: C901
     return best_fit
 
 
-def get_numpy_attribute_type_from_iterable(
-    it: Iterable[Any],
-) -> DTypeLike:
+def iterable_to_numpy_attribute_type(it: Iterable[Any]) -> DTypeLike:
     """Determines the appropriate NumPy attribute type to store all the items
     found in the given iterable as an attribute.
 
@@ -70,17 +71,33 @@ def get_numpy_attribute_type_from_iterable(
 
     When the iterable is empty, a numeric attribute will be assumed.
     """
-    attr_type = get_igraph_attribute_type_from_iterable(it)
+    attr_type = iterable_to_igraph_attribute_type(it)
     if attr_type is AttributeType.UNSPECIFIED:
         attr_type = AttributeType.NUMERIC
     return igraph_to_numpy_attribute_type(attr_type)
 
 
-def igraph_to_numpy_attribute_type(type: AttributeType) -> DTypeLike:
-    """Converts an igraph attribute type to an equivalent NumPy data type."""
-    if type is AttributeType.BOOLEAN:
-        return np_type_of_igraph_bool_t
-    elif type is AttributeType.NUMERIC:
-        return np_type_of_igraph_real_t
-    else:
-        return np.object_
+def python_object_to_igraph_attribute_type(obj: Any) -> AttributeType:
+    """Converts the given Python object into the most fitting igraph attribute
+    type.
+    """
+    if isinstance(obj, (bool, np.bool_)):
+        return AttributeType.BOOLEAN
+    if isinstance(obj, (int, float, np.number)):
+        return AttributeType.NUMERIC
+    if isinstance(obj, str):
+        return AttributeType.STRING
+    return AttributeType.OBJECT
+
+
+def python_type_to_igraph_attribute_type(obj: Type[Any]) -> AttributeType:
+    """Converts the given Python type into the most fitting igraph attribute
+    type.
+    """
+    if issubclass(obj, (bool, np.bool_)):
+        return AttributeType.BOOLEAN
+    if issubclass(obj, (int, float, np.number)):
+        return AttributeType.NUMERIC
+    if issubclass(obj, str):
+        return AttributeType.STRING
+    return AttributeType.OBJECT
