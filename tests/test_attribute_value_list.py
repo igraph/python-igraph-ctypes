@@ -1,3 +1,4 @@
+from igraph_ctypes.enums import AttributeType
 from igraph_ctypes._internal.attributes.value_list import (
     AttributeValueList,
     _slice_length,
@@ -381,3 +382,17 @@ def test__extend_length_with(items: AVL):
     assert len(items) == 8 and items.fixed_length
     items._extend_length_by(0)
     assert len(items) == 8 and items.fixed_length
+
+
+def test_type_getter():
+    items = AVL([1, 2, 3, 4, 5])
+    assert items.type == AttributeType.NUMERIC
+
+    items = AVL([False, False, True])
+    assert items.type == AttributeType.BOOLEAN
+
+    items = AVL(["foo", "bar", "baz"])
+    assert items.type == AttributeType.STRING
+
+    items = AVL(["foo", "bar", False, 42])
+    assert items.type == AttributeType.OBJECT

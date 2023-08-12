@@ -78,3 +78,11 @@ def test_shallow_copy():
     map = g.vattrs.copy()
     assert map["name"] == g.vattrs["name"] and map["name"] is not g.vattrs["name"]
     assert map["age"] == g.vattrs["age"] and map["age"] is not g.vattrs["age"]
+
+
+def test_attempt_to_change_attribute_type():
+    g = create_empty_graph(5)
+    g.vattrs.set("age", (5, 10, 15, 20, 25))
+
+    with raises(ValueError, match="could not convert"):
+        g.vattrs["age"][2] = "test"
