@@ -16,7 +16,19 @@ def graph_with_attributes():
     g = create_graph_from_edge_list(
         [0, 1, 0, 2, 2, 3, 3, 4, 4, 2, 2, 5, 5, 0, 6, 3, 5, 6], directed=False
     )
+
     g.attrs["date"] = "2009-01-10"
+
+    g.vattrs.set(
+        "name", ["Alice", "Bob", "Claire", "Dennis", "Esther", "Frank", "George"]
+    )
+    g.vattrs.set("age", [25, 31, 18, 47, 22, 23, 50])
+    g.vattrs.set("gender", ["f", "m", "f", "m", "f", "m", "m"])
+
+    g.eattrs.set(
+        "is_formal", [False, False, True, True, True, False, True, False, False]
+    )
+
     return g
 
 
@@ -66,5 +78,17 @@ def test_write_graph_graphml(simple_graph, tmp_path, datadir):
 
     # Write to a file specified by its filename
     write_graph_graphml(simple_graph, path_str)
+    assert path.read_text() == expected
+    path.unlink()
+
+
+def test_write_graph_graphml_attributes(graph_with_attributes, tmp_path, datadir):
+    path: Path = tmp_path / "edges.graphml"
+    expected = (datadir / "graph_with_attributes.graphml").read_text()
+    path_str = str(path)
+
+    # Write to a file specified by its filename
+    write_graph_graphml(graph_with_attributes, path_str)
+    write_graph_graphml(graph_with_attributes, "/tmp/expected.graphml")
     assert path.read_text() == expected
     path.unlink()

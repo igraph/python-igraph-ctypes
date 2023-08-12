@@ -538,6 +538,7 @@ class igraph_attribute_table_t(Structure):
         ("combine_edges", TYPES["combine_edges"]),
         ("get_info", TYPES["get_info"]),
         ("has_attr", TYPES["has_attr"]),
+        ("get_type", TYPES["get_type"]),
         ("get_numeric_graph_attr", TYPES["get_numeric_graph_attr"]),
         ("get_string_graph_attr", TYPES["get_string_graph_attr"]),
         ("get_bool_graph_attr", TYPES["get_bool_graph_attr"]),

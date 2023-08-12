@@ -330,8 +330,10 @@ def test_setitem_invalid_index(items: AVL):
     ("to_delete", "expected"),
     [
         (2, [1, 2, 4, 5]),
-        (slice(2, 4), [1, 2, 5]),
         (..., []),
+        (slice(2, 0), [1, 2, 3, 4, 5]),
+        (slice(2, 4), [1, 2, 5]),
+        (slice(None), []),
         ((), [1, 2, 3, 4, 5]),
         ((0, 2, 4), [2, 4]),
         ((False, False, False, False, False), [1, 2, 3, 4, 5]),
@@ -343,8 +345,10 @@ def test_setitem_invalid_index(items: AVL):
     ],
     ids=(
         "single_index",
-        "slice",
         "ellipsis",
+        "empty_slice",
+        "slice",
+        "whole_slice",
         "empty_tuple",
         "tuple",
         "empty_bool_mask",

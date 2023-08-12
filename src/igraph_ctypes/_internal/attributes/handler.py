@@ -1,17 +1,25 @@
+from __future__ import annotations
+
 from ctypes import pointer
 from math import nan
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, TYPE_CHECKING
 
 from igraph_ctypes._internal.conversion import igraph_vector_int_t_to_numpy_array_view
+from igraph_ctypes._internal.enums import AttributeElementType, AttributeType
 from igraph_ctypes._internal.lib import (
     igraph_error,
+    igraph_es_as_vector,
     igraph_vector_resize,
     igraph_vector_set,
     igraph_vector_bool_resize,
     igraph_vector_bool_set,
     igraph_vector_int_clear,
+    igraph_vector_int_push_back,
+    igraph_vector_int_size,
+    igraph_vs_as_vector,
     igraph_strvector_clear,
     igraph_strvector_resize,
+    igraph_strvector_push_back,
     igraph_strvector_set,
 )
 from igraph_ctypes._internal.types import igraph_attribute_table_t
@@ -23,6 +31,11 @@ from .storage import (
     detach_storage_from_graph,
     get_storage_from_graph,
 )
+from .utils import python_object_to_igraph_attribute_type
+from .value_list import AttributeValueList
+
+if TYPE_CHECKING:
+    from igraph_ctypes._internal.wrappers import _VectorInt
 
 __all__ = (
     "AttributeHandlerBase",
@@ -72,8 +85,13 @@ class AttributeHandler(AttributeHandlerBase):
     as its storage backend.
     """
 
+    _indices: _VectorInt
+
     def init(self, graph, attr):
+        from igraph_ctypes._internal.wrappers import _VectorInt
+
         assign_storage_to_graph(graph, DictAttributeStorage())
+        self._indices = _VectorInt.create(0)
 
     def destroy(self, graph) -> None:
         storage = get_storage_from_graph(graph)
@@ -132,70 +150,141 @@ class AttributeHandler(AttributeHandlerBase):
         pass
 
     def get_info(self, graph, gnames, gtypes, vnames, vtypes, enames, etypes):
-        # TODO(ntamas): fill the names and the types
+        storage = get_storage_from_graph(graph)
+
         igraph_strvector_clear(gnames)
         igraph_vector_int_clear(gtypes)
+        for name, value in storage.get_graph_attribute_map().items():
+            igraph_strvector_push_back(gnames, name.encode("utf-8"))
+            igraph_vector_int_push_back(
+                gtypes, python_object_to_igraph_attribute_type(value)
+            )
 
         igraph_strvector_clear(vnames)
         igraph_vector_int_clear(vtypes)
+        for name, value in storage.get_vertex_attribute_map().items():
+            igraph_strvector_push_back(vnames, name.encode("utf-8"))
+            igraph_vector_int_push_back(vtypes, value.type)
 
         igraph_strvector_clear(enames)
         igraph_vector_int_clear(etypes)
+        for name, value in storage.get_edge_attribute_map().items():
+            igraph_strvector_push_back(enames, name.encode("utf-8"))
+            igraph_vector_int_push_back(etypes, value.type)
 
-    def has_attr(self, graph, type, name) -> bool:
-        return False
+    def has_attr(self, graph, type: int, name: bytes) -> bool:
+        storage = get_storage_from_graph(graph)
+        name_str = name.decode("utf-8")
+
+        if type == AttributeElementType.GRAPH:
+            map = storage.get_graph_attribute_map()
+        elif type == AttributeElementType.VERTEX:
+            map = storage.get_vertex_attribute_map()
+        elif type == AttributeElementType.EDGE:
+            map = storage.get_edge_attribute_map()
+        else:
+            return False
+
+        return name_str in map
 
     def get_type(self, graph, type, elemtype, name):
-        pass
+        storage = get_storage_from_graph(graph)
+        name_str = name.decode("utf-8")
 
-    def get_numeric_graph_attr(self, graph, name, value):
-        vec = value.contents
-        igraph_vector_resize(vec, 1)
-        igraph_vector_set(
-            vec,
-            0,
-            self._to_numeric(
-                get_storage_from_graph(graph).get_graph_attribute_map()[name]
-            ),
-        )
+        if type == AttributeElementType.GRAPH:
+            map = storage.get_graph_attribute_map()
+            if name_str in map:
+                return python_object_to_igraph_attribute_type(map[name_str])
+        elif type == AttributeElementType.VERTEX:
+            map = storage.get_vertex_attribute_map()
+            if name_str in map:
+                return map[name_str].type
+        elif type == AttributeElementType.EDGE:
+            map = storage.get_edge_attribute_map()
+        else:
+            return AttributeType.UNSPECIFIED
 
-    def get_string_graph_attr(self, graph, name, value):
-        vec = value.contents
-        igraph_strvector_resize(vec, 1)
-        igraph_strvector_set(
-            vec,
-            0,
-            self._to_bytes(
-                get_storage_from_graph(graph).get_graph_attribute_map()[name]
-            ),
-        )
+        return map[name_str].type if name_str in map else AttributeType.UNSPECIFIED
 
-    def get_bool_graph_attr(self, graph, name, value):
-        vec = value.contents
-        igraph_vector_bool_resize(vec, 1)
-        igraph_vector_bool_set(
-            vec,
-            0,
-            bool(get_storage_from_graph(graph).get_graph_attribute_map()[name]),
-        )
+    def get_numeric_graph_attr(self, graph, name: bytes, value):
+        map = get_storage_from_graph(graph).get_graph_attribute_map()
+        igraph_vector_resize(value, 1)
+        igraph_vector_set(value, 0, self._to_numeric(map[name.decode("utf-8")]))
 
-    def get_numeric_vertex_attr(self, graph, name, vs, value):
-        pass
+    def get_string_graph_attr(self, graph, name: bytes, value):
+        map = get_storage_from_graph(graph).get_graph_attribute_map()
+        igraph_strvector_resize(value, 1)
+        igraph_strvector_set(value, 0, self._to_bytes(map[name.decode("utf-8")]))
 
-    def get_string_vertex_attr(self, graph, name, vs, value):
-        pass
+    def get_bool_graph_attr(self, graph, name: bytes, value):
+        map = get_storage_from_graph(graph).get_graph_attribute_map()
+        igraph_vector_bool_resize(value, 1)
+        igraph_vector_bool_set(value, 0, bool(map[name.decode("utf-8")]))
 
-    def get_bool_vertex_attr(self, graph, name, vs, value):
-        pass
+    def get_numeric_vertex_attr(self, graph, name: bytes, vs, value):
+        map = get_storage_from_graph(graph).get_vertex_attribute_map()
 
-    def get_numeric_edge_attr(self, graph, name, es, value):
-        pass
+        igraph_vs_as_vector(graph, vs, self._indices)
+        values = self._get_values_by_index(map[name.decode("utf-8")], self._indices)
 
-    def get_string_edge_attr(self, graph, name, es, value):
-        pass
+        igraph_vector_resize(value, len(values))
+        for i, v in enumerate(values):
+            igraph_vector_set(value, i, self._to_numeric(v))
 
-    def get_bool_edge_attr(self, graph, name, es, value):
-        pass
+    def get_string_vertex_attr(self, graph, name: bytes, vs, value):
+        map = get_storage_from_graph(graph).get_vertex_attribute_map()
+
+        igraph_vs_as_vector(graph, vs, self._indices)
+        values = self._get_values_by_index(map[name.decode("utf-8")], self._indices)
+
+        igraph_strvector_resize(value, len(values))
+        for i, v in enumerate(values):
+            igraph_strvector_set(value, i, self._to_bytes(v))
+
+    def get_bool_vertex_attr(self, graph, name: bytes, vs, value):
+        map = get_storage_from_graph(graph).get_vertex_attribute_map()
+
+        igraph_vs_as_vector(graph, vs, self._indices)
+        values = self._get_values_by_index(map[name.decode("utf-8")], self._indices)
+
+        igraph_vector_bool_resize(value, len(values))
+        for i, v in enumerate(values):
+            igraph_vector_bool_set(value, i, bool(v))
+
+    def get_numeric_edge_attr(self, graph, name: bytes, es, value):
+        map = get_storage_from_graph(graph).get_edge_attribute_map()
+
+        igraph_es_as_vector(graph, es, self._indices)
+        values = self._get_values_by_index(map[name.decode("utf-8")], self._indices)
+
+        igraph_vector_resize(value, len(values))
+        for i, v in enumerate(values):
+            igraph_vector_set(value, i, self._to_numeric(v))
+
+    def get_string_edge_attr(self, graph, name: bytes, es, value):
+        map = get_storage_from_graph(graph).get_edge_attribute_map()
+
+        igraph_es_as_vector(graph, es, self._indices)
+        values = self._get_values_by_index(map[name.decode("utf-8")], self._indices)
+
+        igraph_strvector_resize(value, len(values))
+        for i, v in enumerate(values):
+            igraph_strvector_set(value, i, self._to_bytes(v))
+
+    def get_bool_edge_attr(self, graph, name: bytes, es, value):
+        map = get_storage_from_graph(graph).get_edge_attribute_map()
+
+        igraph_es_as_vector(graph, es, self._indices)
+        values = self._get_values_by_index(map[name.decode("utf-8")], self._indices)
+
+        igraph_vector_bool_resize(value, len(values))
+        for i, v in enumerate(values):
+            igraph_vector_bool_set(value, i, bool(v))
+
+    @staticmethod
+    def _get_values_by_index(values: AttributeValueList, indices: _VectorInt):
+        index_array = igraph_vector_int_t_to_numpy_array_view(indices)
+        return values[index_array]
 
     @staticmethod
     def _to_bytes(value: Any) -> bytes:

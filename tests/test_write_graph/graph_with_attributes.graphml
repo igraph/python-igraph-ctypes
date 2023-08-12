@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="g_date" for="graph" attr.name="date" attr.type="string"/>
+  <key id="v_name" for="node" attr.name="name" attr.type="string"/>
+  <key id="v_age" for="node" attr.name="age" attr.type="double"/>
+  <key id="v_gender" for="node" attr.name="gender" attr.type="string"/>
+  <key id="e_is_formal" for="edge" attr.name="is_formal" attr.type="boolean"/>
+  <graph id="G" edgedefault="undirected">
+    <data key="g_date">2009-01-10</data>
+    <node id="n0">
+      <data key="v_name">Alice</data>
+      <data key="v_age">25</data>
+      <data key="v_gender">f</data>
+    </node>
+    <node id="n1">
+      <data key="v_name">Bob</data>
+      <data key="v_age">31</data>
+      <data key="v_gender">m</data>
+    </node>
+    <node id="n2">
+      <data key="v_name">Claire</data>
+      <data key="v_age">18</data>
+      <data key="v_gender">f</data>
+    </node>
+    <node id="n3">
+      <data key="v_name">Dennis</data>
+      <data key="v_age">47</data>
+      <data key="v_gender">m</data>
+    </node>
+    <node id="n4">
+      <data key="v_name">Esther</data>
+      <data key="v_age">22</data>
+      <data key="v_gender">f</data>
+    </node>
+    <node id="n5">
+      <data key="v_name">Frank</data>
+      <data key="v_age">23</data>
+      <data key="v_gender">m</data>
+    </node>
+    <node id="n6">
+      <data key="v_name">George</data>
+      <data key="v_age">50</data>
+      <data key="v_gender">m</data>
+    </node>
+    <edge source="n0" target="n1">
+      <data key="e_is_formal">false</data>
+    </edge>
+    <edge source="n0" target="n2">
+      <data key="e_is_formal">false</data>
+    </edge>
+    <edge source="n2" target="n3">
+      <data key="e_is_formal">true</data>
+    </edge>
+    <edge source="n3" target="n4">
+      <data key="e_is_formal">true</data>
+    </edge>
+    <edge source="n2" target="n4">
+      <data key="e_is_formal">true</data>
+    </edge>
+    <edge source="n2" target="n5">
+      <data key="e_is_formal">false</data>
+    </edge>
+    <edge source="n0" target="n5">
+      <data key="e_is_formal">true</data>
+    </edge>
+    <edge source="n3" target="n6">
+      <data key="e_is_formal">false</data>
+    </edge>
+    <edge source="n5" target="n6">
+      <data key="e_is_formal">false</data>
+    </edge>
+  </graph>
+</graphml>

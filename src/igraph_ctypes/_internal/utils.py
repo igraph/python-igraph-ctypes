@@ -1,5 +1,6 @@
 from ctypes import byref, cast, c_char_p, c_ubyte, POINTER, sizeof
 from functools import wraps
+from traceback import print_exc
 from typing import Callable, Union
 
 from .errors import python_exception_to_igraph_error_t
@@ -42,6 +43,8 @@ def protect(func: Callable[..., None]) -> Callable[..., int]:
         try:
             func(*args, **kwds)
         except Exception as ex:
+            print("Exception in callback invoked from igraph's C core:")
+            print_exc()
             return python_exception_to_igraph_error_t(ex)
         else:
             return 0
@@ -65,14 +68,17 @@ def protect_with(
                 func(*args, **kwds)
                 return 0
             except Exception as ex:
-                print(repr(ex))
+                print("Exception in callback invoked from igraph's C core:")
+                print_exc()
                 code = python_exception_to_igraph_error_t(ex)
 
             try:
                 return handler(code)
-            except Exception as ex:
-                # TODO(ntamas): warn here!
-                print(repr(ex))
+            except Exception:
+                print(
+                    "\nWhile handling the above exception, another exception occurred:"
+                )
+                print_exc()
                 return code
 
         return wrapped
