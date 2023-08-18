@@ -3,21 +3,24 @@ import sys
 from dataclasses import dataclass
 from pycapi import PyErr_CheckSignals  # type: ignore
 from typing import Optional
+from warnings import warn
 
 from .attributes import AttributeHandler
-from .errors import igraph_error_t_to_python_exception_class
+from .errors import igraph_error_t_to_python_exception_class, IgraphWarning
 from .functions import strerror
 from .lib import (
     igraph_set_attribute_table,
     igraph_set_error_handler,
     igraph_set_fatal_handler,
     igraph_set_interruption_handler,
+    igraph_set_warning_handler,
 )
 from .rng import NumPyRNG
 from .types import (
     igraph_error_handler_t,
     igraph_fatal_handler_t,
     igraph_interruption_handler_t,
+    igraph_warning_handler_t,
 )
 
 __all__ = ("setup_igraph_library", "_get_last_error_state")
@@ -97,6 +100,15 @@ def _fatal_handler(message: bytes, filename: bytes, line: int):
     )
 
 
+@igraph_warning_handler_t
+def _warning_handler(message: bytes, filename: bytes, line: int):
+    filename_str = filename.decode("utf-8", "replace")
+    message_str = message.decode("utf-8", "replace")
+    warn(
+        f"Warning at {filename_str}:{line}: {message_str}", IgraphWarning, stacklevel=1
+    )
+
+
 def _get_last_error_state() -> Optional[IgraphErrorState]:
     global _last_error
     return _last_error if _last_error.has_error else None
@@ -108,6 +120,7 @@ def _setup_error_handlers() -> None:
     """
     igraph_set_error_handler(_error_handler)
     igraph_set_fatal_handler(_fatal_handler)
+    igraph_set_warning_handler(_warning_handler)
 
 
 @igraph_interruption_handler_t

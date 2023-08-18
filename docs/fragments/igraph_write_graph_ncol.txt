@@ -1,0 +1,15 @@
+Writes the graph in the NCOL format to an output stream.
+
+The NCOL format is essentially a two- or three-column named edge list format.
+Each line in the output corresponds to an edge. The first two columns contain
+the names of the source and target vertices of an edge. THe third column
+(if exists) contains the weight of each edge.
+
+Note that the file format does not store whether the graph is directed or not;
+this information has to be supplied when the graph is read back.
+
+Parameters:
+    graph: the graph to write
+{% include '_include/write_graph_outstream.txt' %}
+{% include '_include/write_graph_names.txt' %}
+{% include '_include/write_graph_weights.txt' %}

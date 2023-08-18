@@ -1,0 +1,4 @@
+    weights: name of the edge attribute that stores the weights of the edges
+        to be written into the output file. A warning will be thrown if the
+        attribute does not exist or is not a numeric attribute, and all weights
+        will be assumed to be equal to 1 if this is the case.

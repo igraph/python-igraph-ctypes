@@ -1,6 +1,6 @@
 Writes the graph in plain edge list format to an output stream.
 
-THe plain edge list format records the structure of the graph _only_ and the
+The plain edge list format records the structure of the graph _only_ and the
 vertices of the graph will be referred to as numeric vertex IDs instead of
 vertex names.
 

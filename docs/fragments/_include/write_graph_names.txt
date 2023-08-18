@@ -1,0 +1,4 @@
+    names: name of the string vertex attribute that stores the names of the
+        vertices to be written into the output file. A warning will be thrown if
+        the attribute does not exist or is not a string attribute, and the file
+        will contain numeric vertex IDs instead if this is the case.

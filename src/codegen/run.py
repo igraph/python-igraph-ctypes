@@ -325,6 +325,7 @@ def main():
             "BoolArray",
             "EdgeLike",
             "EdgeSelector",
+            "FileLike",
             "IntArray",
             "RealArray",
             "VertexLike",

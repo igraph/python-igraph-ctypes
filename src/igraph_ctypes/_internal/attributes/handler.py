@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ctypes import pointer
+from ctypes import pointer, c_int
 from math import nan
 from typing import Any, Callable, Optional, TYPE_CHECKING
 
@@ -27,8 +27,8 @@ from igraph_ctypes._internal.lib import (
     igraph_strvector_push_back,
     igraph_strvector_set,
 )
-from igraph_ctypes._internal.types import igraph_attribute_table_t
-from igraph_ctypes._internal.utils import nop, protect_with
+from igraph_ctypes._internal.types import igraph_attribute_table_t, igraph_bool_t
+from igraph_ctypes._internal.utils import nop, protect_with, protect_with_default
 
 from .storage import (
     DictAttributeStorage,
@@ -69,9 +69,17 @@ class AttributeHandlerBase:
         """Returns an ``igraph_attribute_table_t`` instance that can be used
         to register this attribute handler in the core igraph library.
         """
+        protectors: dict[str, Callable] = {
+            "has_attr": protect_with_default(igraph_bool_t, False)
+        }
         protect = protect_with(_trigger_error)
+
         return {
-            key: igraph_attribute_table_t.TYPES[key](protect(getattr(self, key, nop)))
+            key: igraph_attribute_table_t.TYPES[key](
+                protect(getattr(self, key, nop))
+                if key not in protectors
+                else protectors[key](getattr(self, key, nop))  # type: ignore
+            )
             for key in igraph_attribute_table_t.TYPES.keys()
         }
 
@@ -188,7 +196,7 @@ class AttributeHandler(AttributeHandlerBase):
         elif type == AttributeElementType.EDGE:
             map = storage.get_edge_attribute_map()
         else:
-            return False
+            return False  # pragma: no cover
 
         return name_str in map
 
@@ -196,20 +204,27 @@ class AttributeHandler(AttributeHandlerBase):
         storage = get_storage_from_graph(graph)
         name_str = name.decode("utf-8")
 
-        if type == AttributeElementType.GRAPH:
+        if elemtype == AttributeElementType.GRAPH:
             map = storage.get_graph_attribute_map()
-            if name_str in map:
-                return python_object_to_igraph_attribute_type(map[name_str])
-        elif type == AttributeElementType.VERTEX:
+            result = (
+                python_object_to_igraph_attribute_type(map[name_str])
+                if name_str in map
+                else AttributeType.UNSPECIFIED
+            )
+        elif elemtype == AttributeElementType.VERTEX:
             map = storage.get_vertex_attribute_map()
-            if name_str in map:
-                return map[name_str].type
-        elif type == AttributeElementType.EDGE:
+            result = (
+                map[name_str].type if name_str in map else AttributeType.UNSPECIFIED
+            )
+        elif elemtype == AttributeElementType.EDGE:
             map = storage.get_edge_attribute_map()
+            result = (
+                map[name_str].type if name_str in map else AttributeType.UNSPECIFIED
+            )
         else:
-            return AttributeType.UNSPECIFIED
+            result = AttributeType.UNSPECIFIED  # pragma: no cover
 
-        return map[name_str].type if name_str in map else AttributeType.UNSPECIFIED
+        type.contents.value = result
 
     def get_numeric_graph_attr(self, graph, name: bytes, value):
         map = get_storage_from_graph(graph).get_graph_attribute_map()
@@ -292,7 +307,7 @@ class AttributeHandler(AttributeHandlerBase):
         try:
             value_str = str(value)
             return value_str.encode("utf-8", errors="replace")
-        except Exception:
+        except Exception:  # pragma: no cover
             return b""
 
     @staticmethod
@@ -302,5 +317,5 @@ class AttributeHandler(AttributeHandlerBase):
         """
         try:
             return float(value)  # type: ignore
-        except Exception:
+        except Exception:  # pragma: no cover
             return nan

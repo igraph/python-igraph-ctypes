@@ -431,6 +431,7 @@ igraph_isocompat_t = CFUNCTYPE(
     igraph_integer_t,
     c_void_p,
 )
+igraph_warning_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int)
 
 
 p_attribute_combination_t = POINTER(igraph_attribute_combination_t)

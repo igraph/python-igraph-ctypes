@@ -5085,7 +5085,7 @@ def read_graph_dl(instream: FileLike, directed: bool = True) -> Graph:
 def write_graph_edgelist(graph: Graph, outstream: FileLike) -> None:
     """Writes the graph in plain edge list format to an output stream.
 
-    THe plain edge list format records the structure of the graph _only_ and the
+    The plain edge list format records the structure of the graph _only_ and the
     vertices of the graph will be referred to as numeric vertex IDs instead of
     vertex names.
 
@@ -5110,7 +5110,30 @@ def write_graph_edgelist(graph: Graph, outstream: FileLike) -> None:
 
 
 def write_graph_ncol(graph: Graph, outstream: FileLike, names: str = "name", weights: str = "weight") -> None:
-    """Type-annotated wrapper for ``igraph_write_graph_ncol``."""
+    """Writes the graph in the NCOL format to an output stream.
+
+    The NCOL format is essentially a two- or three-column named edge list format.
+    Each line in the output corresponds to an edge. The first two columns contain
+    the names of the source and target vertices of an edge. THe third column
+    (if exists) contains the weight of each edge.
+
+    Note that the file format does not store whether the graph is directed or not;
+    this information has to be supplied when the graph is read back.
+
+    Parameters:
+        graph: the graph to write
+        outstream: the output file or stream to write the graph to. May be a
+            filename, a path-like object or a file-like object if it is backed
+            by a low-level file handle
+        names: name of the string vertex attribute that stores the names of the
+            vertices to be written into the output file. A warning will be thrown if
+            the attribute does not exist or is not a string attribute, and the file
+            will contain numeric vertex IDs instead if this is the case.
+        weights: name of the edge attribute that stores the weights of the edges
+            to be written into the output file. A warning will be thrown if the
+            attribute does not exist or is not a numeric attribute, and all weights
+            will be assumed to be equal to 1 if this is the case.
+    """
     # Create exit stack for graceful cleanup
     with ExitStack() as py__stack:
 
@@ -5125,7 +5148,29 @@ def write_graph_ncol(graph: Graph, outstream: FileLike, names: str = "name", wei
 
 
 def write_graph_lgl(graph: Graph, outstream: FileLike, names: str = "name", weights: str = "weight", isolates: bool = True) -> None:
-    """Type-annotated wrapper for ``igraph_write_graph_lgl``."""
+    """Writes the graph in the LGL (Large Graph Layout) format to an output stream.
+
+    The LGL format can store the structure of a graph with named vertices and
+    weighted edges.
+
+    Note that the file format does not store whether the graph is directed or not;
+    this information has to be supplied when the graph is read back.
+
+    Parameters:
+        graph: the graph to write
+        outstream: the output file or stream to write the graph to. May be a
+            filename, a path-like object or a file-like object if it is backed
+            by a low-level file handle
+        names: name of the string vertex attribute that stores the names of the
+            vertices to be written into the output file. A warning will be thrown if
+            the attribute does not exist or is not a string attribute, and the file
+            will contain numeric vertex IDs instead if this is the case.
+        weights: name of the edge attribute that stores the weights of the edges
+            to be written into the output file. A warning will be thrown if the
+            attribute does not exist or is not a numeric attribute, and all weights
+            will be assumed to be equal to 1 if this is the case.
+        isolates: whether to save isolated vertices to the output
+    """
     # Create exit stack for graceful cleanup
     with ExitStack() as py__stack:
 

@@ -3,6 +3,7 @@ from pytest import raises
 
 from igraph_ctypes._internal.enums import NeighborMode
 from igraph_ctypes.constructors import create_empty_graph
+from igraph_ctypes.errors import IgraphError
 from igraph_ctypes.graph import Graph
 
 
@@ -130,7 +131,7 @@ def test_get_eid_directed():
         assert g.get_edge_id((i + 1) % n, i, error=False) == -1
         assert g.get_edge_id((i + 1) % n, i, directed=False) == i
 
-        with raises(RuntimeError, match="no such edge"):
+        with raises(IgraphError, match="no such edge"):
             assert g.get_edge_id((i + 1) % n, i) == i
 
 

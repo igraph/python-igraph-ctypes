@@ -6,6 +6,23 @@ from .types import igraph_error_t
 __all__ = ("handle_igraph_error_t",)
 
 
+class IgraphError(RuntimeError):
+    """Runtime error subclass that is used for all errors thrown by igraph's
+    C core if there is no more specific Python built-in exception that could
+    be used.
+    """
+
+    pass
+
+
+class IgraphWarning(UserWarning):
+    """Warning subclass that is used for all warnings emitted from igraph's
+    C core.
+    """
+
+    pass
+
+
 def handle_igraph_error_t(code: igraph_error_t) -> None:
     """Handles the given igraph error code, raising exceptions appropriately."""
     if code:
@@ -20,7 +37,7 @@ def handle_igraph_error_t(code: igraph_error_t) -> None:
         elif code == ErrorCode.INTERRUPTED:
             raise KeyboardInterrupt
         else:
-            raise RuntimeError(f"igraph returned error code {code}")
+            raise IgraphError(f"igraph returned error code {code}")
 
 
 def igraph_error_t_to_python_exception_class(code: int) -> Optional[Type[Exception]]:
@@ -35,7 +52,7 @@ def igraph_error_t_to_python_exception_class(code: int) -> Optional[Type[Excepti
     elif code == ErrorCode.ENOMEM:
         return MemoryError
     else:
-        return RuntimeError
+        return IgraphError
 
 
 def python_exception_to_igraph_error_t(

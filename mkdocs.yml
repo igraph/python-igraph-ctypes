@@ -5,9 +5,11 @@ nav:
   - Home: index.md
   - Notes: notes.md
   - API reference:
+      - api/types.md
       - api/graph.md
       - api/constructors.md
       - api/paths.md
+      - api/io.md
 
 exclude_docs: |
   fragments/

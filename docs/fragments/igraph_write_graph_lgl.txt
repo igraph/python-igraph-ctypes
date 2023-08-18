@@ -1,0 +1,14 @@
+Writes the graph in the LGL (Large Graph Layout) format to an output stream.
+
+The LGL format can store the structure of a graph with named vertices and
+weighted edges.
+
+Note that the file format does not store whether the graph is directed or not;
+this information has to be supplied when the graph is read back.
+
+Parameters:
+    graph: the graph to write
+{% include '_include/write_graph_outstream.txt' %}
+{% include '_include/write_graph_names.txt' %}
+{% include '_include/write_graph_weights.txt' %}
+    isolates: whether to save isolated vertices to the output

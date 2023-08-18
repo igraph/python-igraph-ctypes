@@ -1,11 +1,18 @@
 from ctypes import byref, cast, c_char_p, c_ubyte, POINTER, sizeof
 from functools import wraps
 from traceback import print_exc
-from typing import Callable, Union
+from typing import Callable, Union, TypeVar
 
 from .errors import python_exception_to_igraph_error_t
 
-__all__ = ("bytes_to_str", "get_raw_memory_view", "nop", "protect", "protect_with")
+__all__ = (
+    "bytes_to_str",
+    "get_raw_memory_view",
+    "nop",
+    "protect",
+    "protect_with",
+    "protect_with_default",
+)
 
 
 def bytes_to_str(
@@ -80,6 +87,58 @@ def protect_with(
                 )
                 print_exc()
                 return code
+
+        return wrapped
+
+    return decorator
+
+
+T = TypeVar("T")
+R = TypeVar("R")
+
+
+def protect_with_default(
+    handler: Callable[[T], R], default: T | Callable[[Exception], T]
+) -> Callable[[Callable[..., T]], Callable[..., R]]:
+    """Decorator factory that creates a decorator that takes a function that
+    can potentially throw a Python exception, and turns it into another function
+    that logs these exceptions and passes the result through a converter
+    function. This is useful in contexts where igraph's C core is not prepared
+    for the case that a function call into a higher level interface can throw an
+    exception.
+
+    When the wrapped function throws an exception, the wrapper will assume that
+    the wrapped function returned the specified default value instead.
+
+    Args:
+        handler: the handler function that converts the result from the Python
+            callback into the result type expected by the C core. Typically a
+            ctypes type.
+        default: the default value to assume from the callback if the callback
+            throws an exception. When it is a callable, it will be called with
+            the raised exception and its return value will be used instead.
+    """
+
+    def decorator(func: Callable[..., T]) -> Callable[..., R]:
+        @wraps(func)
+        def wrapped(*args, **kwds) -> R:
+            try:
+                result = func(*args, **kwds)
+            except Exception as ex:
+                print("Exception in callback invoked from igraph's C core:")
+                print_exc()
+                result = default(ex) if callable(default) else default
+
+            try:
+                return handler(result)
+            except Exception:
+                print(
+                    "\nWhile handling the above exception, another exception occurred:"
+                )
+                print_exc()
+                print("")
+                print("This is most likely a bug; please report it to the developers!")
+                return result  # type: ignore
 
         return wrapped
 
