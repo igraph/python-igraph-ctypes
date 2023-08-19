@@ -5,6 +5,7 @@ from ._internal.functions import (
     create as create_graph_from_edge_list,
     empty as create_empty_graph,
     famous as create_famous_graph,
+    full as create_full_graph,
     grg_game,
     square_lattice,
 )
@@ -12,6 +13,7 @@ from ._internal.functions import (
 __all__ = (
     "create_empty_graph",
     "create_famous_graph",
+    "create_full_graph",
     "create_geometric_random_graph",
     "create_graph_from_edge_list",
     "create_square_lattice",

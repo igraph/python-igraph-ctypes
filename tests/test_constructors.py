@@ -3,12 +3,13 @@ import pytest
 from numpy import array, ndarray
 from numpy.testing import assert_array_equal
 
+from igraph_ctypes.conversion import get_edge_list
 from igraph_ctypes.constructors import (
     create_famous_graph,
+    create_full_graph,
     create_graph_from_edge_list,
     create_square_lattice,
 )
-from igraph_ctypes._internal.functions import get_edgelist
 
 
 def test_create_famous_graph():
@@ -17,6 +18,33 @@ def test_create_famous_graph():
 
     g = create_famous_graph("petersen")
     assert not g.is_directed() and g.vcount() == 10 and g.ecount() == 15
+
+
+def test_create_full_graph():
+    g = create_full_graph(0)
+    assert g.vcount() == 0
+    assert g.ecount() == 0
+    assert not g.is_directed()
+
+    g = create_full_graph(1, directed=True)
+    assert g.vcount() == 1
+    assert g.ecount() == 0
+    assert g.is_directed()
+
+    g = create_full_graph(5, loops=True)
+    assert g.vcount() == 5
+    assert g.ecount() == 15
+    assert not g.is_directed()
+    # fmt: off
+    assert_array_equal(
+        get_edge_list(g).reshape(-1),
+        array([0, 0, 0, 1, 0, 2, 0, 3, 0, 4,
+               1, 1, 1, 2, 1, 3, 1, 4,
+               2, 2, 2, 3, 2, 4,
+               3, 3, 3, 4,
+               4, 4])
+    )
+    # fmt: on
 
 
 @pytest.mark.parametrize(
@@ -52,7 +80,7 @@ def test_create_square_lattice():
     assert g.vcount() == 12 and g.ecount() == 17
     # fmt: off
     assert_array_equal(
-        get_edgelist(g._instance),
+        get_edge_list(g).reshape(-1),
         array([0, 1, 0, 4, 1, 2, 1, 5, 2, 3, 2, 6, 3, 7,
                4, 5, 4, 8, 5, 6, 5, 9, 6, 7, 6, 10, 7, 11,
                8, 9, 9, 10, 10, 11])

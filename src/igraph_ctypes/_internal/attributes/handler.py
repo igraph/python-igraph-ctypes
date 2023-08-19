@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ctypes import pointer, c_int
+from ctypes import cast, pointer, c_void_p
 from math import nan
 from typing import Any, Callable, Optional, TYPE_CHECKING
 
@@ -10,6 +10,7 @@ from igraph_ctypes._internal.conversion import (
     numpy_array_to_igraph_vector_t_view,
 )
 from igraph_ctypes._internal.enums import AttributeElementType, AttributeType
+from igraph_ctypes._internal.functions import igraph_ecount, igraph_vcount
 from igraph_ctypes._internal.lib import (
     igraph_error,
     igraph_es_as_vector,
@@ -27,7 +28,10 @@ from igraph_ctypes._internal.lib import (
     igraph_strvector_push_back,
     igraph_strvector_set,
 )
-from igraph_ctypes._internal.types import igraph_attribute_table_t, igraph_bool_t
+from igraph_ctypes._internal.types import (
+    igraph_attribute_table_t,
+    igraph_bool_t,
+)
 from igraph_ctypes._internal.utils import nop, protect_with, protect_with_default
 
 from .storage import (
@@ -57,6 +61,10 @@ def _trigger_error(error: int) -> int:
             int(error),
         )
     )
+
+
+def _are_pointers_equal(foo, bar):
+    return cast(foo, c_void_p).value == cast(bar, c_void_p).value
 
 
 class AttributeHandlerBase:
@@ -122,9 +130,18 @@ class AttributeHandler(AttributeHandlerBase):
         copy_edge_attributes: bool,
     ):
         storage = get_storage_from_graph(graph)
-        new_storage = storage.copy(
-            copy_graph_attributes, copy_vertex_attributes, copy_edge_attributes
-        )
+
+        if copy_vertex_attributes:
+            new_vcount = -1
+        else:
+            new_vcount = int(igraph_vcount(to))
+
+        if copy_edge_attributes:
+            new_ecount = -1
+        else:
+            new_ecount = int(igraph_ecount(to))
+
+        new_storage = storage.copy(copy_graph_attributes, new_vcount, new_ecount)
         assign_storage_to_graph(to, new_storage)
 
     def add_vertices(self, graph, n: int, attr) -> None:
@@ -139,10 +156,17 @@ class AttributeHandler(AttributeHandlerBase):
         get_storage_from_graph(graph).add_vertices(graph, n)
 
     def permute_vertices(self, graph, to, mapping):
-        pass
+        mapping_array = igraph_vector_int_t_to_numpy_array_view(mapping)
+
+        old_attrs = get_storage_from_graph(graph).get_vertex_attribute_map()
+        new_attrs = get_storage_from_graph(to).get_vertex_attribute_map()
+
+        # The code below works for graph == to and graph != to as well
+        for name, values in old_attrs.items():
+            new_attrs.set(name, values[mapping_array], _check_length=False)
 
     def combine_vertices(self, graph, to, mapping, combinations):
-        pass
+        assert not _are_pointers_equal(graph, to)
 
     def add_edges(self, graph, edges, attr) -> None:
         # attr will only ever be NULL here so raise an error if it is not
@@ -157,10 +181,17 @@ class AttributeHandler(AttributeHandlerBase):
         get_storage_from_graph(graph).add_edges(graph, edge_array)
 
     def permute_edges(self, graph, to, mapping):
-        pass
+        mapping_array = igraph_vector_int_t_to_numpy_array_view(mapping)
+
+        old_attrs = get_storage_from_graph(graph).get_edge_attribute_map()
+        new_attrs = get_storage_from_graph(to).get_edge_attribute_map()
+
+        # The code below works for graph == to and graph != to as well
+        for name, values in old_attrs.items():
+            new_attrs.set(name, values[mapping_array], _check_length=False)
 
     def combine_edges(self, graph, to, mapping, combinations):
-        pass
+        assert not _are_pointers_equal(graph, to)
 
     def get_info(self, graph, gnames, gtypes, vnames, vtypes, enames, etypes):
         storage = get_storage_from_graph(graph)

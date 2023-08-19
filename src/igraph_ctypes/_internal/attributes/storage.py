@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from ctypes import py_object
 from dataclasses import dataclass, field
-from typing import Any, MutableMapping, Optional
+from typing import Any, MutableMapping, Optional, TypeVar
 
 from igraph_ctypes._internal.refcount import incref, decref
 from igraph_ctypes._internal.types import IntArray
@@ -15,6 +15,9 @@ __all__ = (
     "detach_storage_from_graph",
     "get_storage_from_graph",
 )
+
+
+C = TypeVar("C", bound="AttributeStorage")
 
 
 class AttributeStorage(ABC):
@@ -43,11 +46,11 @@ class AttributeStorage(ABC):
 
     @abstractmethod
     def copy(
-        self,
+        self: C,
         copy_graph_attributes: bool = True,
-        copy_vertex_attributes: bool = True,
-        copy_edge_attributes: bool = True,
-    ):
+        new_vcount: int = -1,
+        new_ecount: int = -1,
+    ) -> C:
         """Creates a shallow copy of the storage area."""
         raise NotImplementedError
 
@@ -101,17 +104,17 @@ class DictAttributeStorage(AttributeStorage):
     def copy(
         self,
         copy_graph_attributes: bool = True,
-        copy_vertex_attributes: bool = True,
-        copy_edge_attributes: bool = True,
+        new_vertex_count: int = -1,
+        new_edge_count: int = -1,
     ):
         return self.__class__(
             self.graph_attributes.copy() if copy_graph_attributes else {},
             self.vertex_attributes.copy()
-            if copy_vertex_attributes
-            else self.vertex_attributes.copy_empty(),
+            if new_vertex_count < 0
+            else self.vertex_attributes.copy_empty(new_vertex_count),
             self.edge_attributes.copy()
-            if copy_edge_attributes
-            else self.edge_attributes.copy_empty(),
+            if new_edge_count < 0
+            else self.edge_attributes.copy_empty(new_edge_count),
         )
 
     def get_graph_attribute_map(self) -> MutableMapping[str, Any]:

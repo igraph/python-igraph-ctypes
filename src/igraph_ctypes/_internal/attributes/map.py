@@ -42,16 +42,28 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
             self._common_length_of_values,
         )
 
-    def copy_empty(self: C) -> C:
-        """Returns another, empty attribute map with the same expected length
+    def copy_empty(self: C, expected_length: int = -1) -> C:
+        """Returns another, empty attribute map with the given expected length
         for any items being assigned in the future.
+
+        Args:
+            expected_length: the expected length for any items being assigned
+                to the new copy in the future; negative if the expected length
+                should be the same as for this instance
         """
-        return self.__class__.wrap_empty_dict(self._common_length_of_values)
+        return self.__class__.wrap_empty_dict(
+            expected_length if expected_length >= 0 else self._common_length_of_values
+        )
 
     def remove(self, key: str) -> None:
         del self._items[key]
 
-    def set(self, key: str, value: T | Iterable[T]) -> None:
+    def set(
+        self,
+        key: str,
+        value: T | Iterable[T],
+        _check_length: bool = True,
+    ) -> None:
         """Assigns a value to _all_ the attribute values corresponding to the
         given attribute.
 
@@ -79,7 +91,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
             # iterables are mapped to an AttributeValueList. Note that this
             # also takes care of copying existing AttributeValueList instances
             avl = AttributeValueList(value, fixed_length=True)  # type: ignore
-            if len(avl) != length:
+            if _check_length and len(avl) != length:
                 raise RuntimeError(
                     f"attribute value list length must be {length}, got {len(avl)}"
                 )
@@ -90,7 +102,9 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
                 [value] * length, fixed_length=True
             )  # type: ignore
 
-        assert avl.fixed_length and len(avl) == length
+        assert avl.fixed_length
+        assert not _check_length or len(avl) == length
+
         self._items[key] = avl
 
     def _extend_common_length(self, n: int) -> None:

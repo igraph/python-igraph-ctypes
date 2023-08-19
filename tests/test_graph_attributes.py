@@ -1,5 +1,9 @@
 from collections.abc import MutableMapping
-from igraph_ctypes.constructors import create_empty_graph, create_famous_graph
+from igraph_ctypes.constructors import (
+    create_empty_graph,
+    create_famous_graph,
+    create_full_graph,
+)
 
 
 def test_attribute_mapping_basic_operations():
@@ -37,3 +41,24 @@ def test_copying_graph_copies_attributes():
     del g2.attrs["age"]
     assert "age" not in g2.attrs
     assert g.attrs["age"] == 42
+
+
+def test_deleting_edges_updates_edge_attributes():
+    g = create_full_graph(6)
+    weights = [i + 10 for i in range(g.ecount())]
+    g.eattrs.set("weight", weights)
+
+    assert list(g.eattrs["weight"]) == weights
+    g.delete_edges([6, 4, 11])
+    assert list(g.eattrs["weight"]) == [10, 11, 12, 13, 15, 17, 18, 19, 20, 22, 23, 24]
+
+
+def test_deleting_vertices_updates_vertex_and_edge_attributes():
+    g = create_full_graph(5)
+    g.vattrs.set("name", list("ABCDE"))
+    weights = [i + 10 for i in range(g.ecount())]
+    g.eattrs.set("weight", weights)
+
+    assert list(g.vattrs["name"]) == ["A", "B", "C", "D", "E"]
+    g.delete_vertices([0, 3])
+    assert list(g.eattrs["weight"]) == [14, 16, 18]

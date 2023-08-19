@@ -559,7 +559,16 @@ def regular_tree(h: int, k: int = 3, type: TreeMode = TreeMode.UNDIRECTED) -> Gr
 
 
 def full(n: int, directed: bool = False, loops: bool = False) -> Graph:
-    """Type-annotated wrapper for ``igraph_full``."""
+    """Creates a full graph with the given number of vertices.
+
+    Parameters:
+        n: the number of vertices
+        directed: whether the graph is directed
+        loops: whether each vertex should also have a loop edge
+
+    Returns:
+        the newly created graph
+    """
     # Prepare input arguments
     c_graph = _Graph()
     c_n = n
