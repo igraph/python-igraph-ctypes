@@ -353,6 +353,8 @@ def main():
         SOURCE_FOLDER / "igraph_ctypes" / "types.py",
         "._internal.types",
         match=(
+            "AttributeCombinationSpecification",
+            "AttributeCombinationSpecificationEntry",
             "BoolArray",
             "EdgeLike",
             "EdgeSelector",

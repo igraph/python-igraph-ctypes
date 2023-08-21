@@ -6,6 +6,8 @@
 # The rest of this file is generated
 
 from ._internal.types import (
+    AttributeCombinationSpecification,
+    AttributeCombinationSpecificationEntry,
     BoolArray,
     EdgeLike,
     EdgeSelector,
@@ -18,6 +20,8 @@ from ._internal.types import (
 )
 
 __all__ = (
+    "AttributeCombinationSpecification",
+    "AttributeCombinationSpecificationEntry",
     "BoolArray",
     "EdgeLike",
     "EdgeSelector",

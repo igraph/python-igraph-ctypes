@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-from ctypes import cast, pointer, c_void_p
+from ctypes import cast, c_int, pointer, c_void_p
 from math import nan
 from typing import Any, Callable, Optional, TYPE_CHECKING
 
 from igraph_ctypes._internal.conversion import (
     igraph_vector_int_t_to_numpy_array_view,
+    igraph_vector_int_list_t_to_list_of_numpy_array_view,
     numpy_array_to_igraph_vector_bool_t_view,
     numpy_array_to_igraph_vector_t_view,
 )
 from igraph_ctypes._internal.enums import AttributeElementType, AttributeType
 from igraph_ctypes._internal.functions import igraph_ecount, igraph_vcount
 from igraph_ctypes._internal.lib import (
+    igraph_attribute_combination_query,
     igraph_error,
     igraph_es_as_vector,
     igraph_vector_resize,
@@ -34,6 +36,7 @@ from igraph_ctypes._internal.types import (
 )
 from igraph_ctypes._internal.utils import nop, protect_with, protect_with_default
 
+from .combinations import apply_attribute_combinations
 from .storage import (
     DictAttributeStorage,
     assign_storage_to_graph,
@@ -192,6 +195,28 @@ class AttributeHandler(AttributeHandlerBase):
 
     def combine_edges(self, graph, to, mapping, combinations):
         assert not _are_pointers_equal(graph, to)
+
+        mapping_arrays = igraph_vector_int_list_t_to_list_of_numpy_array_view(mapping)
+
+        old_attrs = get_storage_from_graph(graph).get_edge_attribute_map()
+        new_attrs = get_storage_from_graph(to).get_edge_attribute_map()
+
+        for name, values in old_attrs.items():
+            comb_type = c_int()
+            comb_func = c_void_p()
+
+            igraph_attribute_combination_query(
+                combinations,
+                name.encode("utf-8"),
+                comb_type,
+                comb_func,
+            )
+
+            new_values = apply_attribute_combinations(
+                values, mapping_arrays, comb_type.value, comb_func
+            )
+            if new_values is not None:
+                new_attrs.set(name, new_values, type=values.type, _check_length=False)
 
     def get_info(self, graph, gnames, gtypes, vnames, vtypes, enames, etypes):
         storage = get_storage_from_graph(graph)

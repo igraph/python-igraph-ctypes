@@ -420,7 +420,6 @@ class igraph_rng_t(Structure):
     ]
 
 
-igraph_function_pointer_t = CFUNCTYPE(None)
 igraph_error_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int, igraph_error_t)
 igraph_fatal_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int)
 igraph_interruption_handler_t = CFUNCTYPE(igraph_bool_t)
@@ -616,7 +615,12 @@ AttributeCombinationSpecificationEntry = (
 mapping.
 """
 
-AttributeCombinationSpecification = Mapping[str, AttributeCombinationSpecificationEntry]
+AttributeCombinationSpecification = (
+    Mapping[str | None, AttributeCombinationSpecificationEntry]
+    | AttributeCombinationSpecificationEntry
+)
 """Type alias for mappings that specify how to merge vertex or edge attributes
 during an operation that contracts multiple vertices or edge into a single one.
+
+``None`` specifies the default behaviour.
 """

@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from contextlib import contextmanager
-from ctypes import addressof, get_errno, memmove, POINTER
+from ctypes import addressof, cast, get_errno, memmove, POINTER
 from os import strerror
 from typing import (
     Any,
@@ -13,6 +13,7 @@ from typing import (
     IO,
     Iterable,
     Iterator,
+    Mapping,
     Optional,
     Sequence,
     TYPE_CHECKING,
@@ -472,12 +473,20 @@ def mapping_to_attribute_combination_t(
     """Converts a Python mapping from attribute names to attribute combination
     handlers to a low-level igraph attribute combination object.
     """
+    if mapping is None:
+        # Default behaviour: keep the first attribute from every collapsed group
+        mapping = "first"
+
+    if not isinstance(mapping, Mapping):
+        # Single attribute combination entry, to be applied for all attributes
+        return mapping_to_attribute_combination_t({None: mapping})  # type: ignore
+
     result = _AttributeCombination.create()
 
     for key, value in (mapping or {}).items():
         combination_type, func = _any_to_attribute_combination_type_and_func(value)
         igraph_attribute_combination_add(
-            result, key.encode("utf-8"), combination_type.value, func
+            result, key.encode("utf-8") if key else None, combination_type.value, func
         )
 
     return result
@@ -873,6 +882,24 @@ def igraph_vector_list_t_to_list_of_numpy_array(
     return result
 
 
+def igraph_vector_list_t_to_list_of_numpy_array_view(
+    vector_list: _VectorList,
+) -> list[RealArray]:
+    n = igraph_vector_list_size(vector_list)
+    vec = _Vector()
+    result = []
+
+    for i in range(n):
+        # We are re-using the same _Vector instance to wrap different
+        # low-level igraph_vector_t instances because it's only temporary
+        # until we convert it to a NumPy array
+        ptr = igraph_vector_list_get_ptr(vector_list, i)
+        vec._set_wrapped_instance(ptr.contents)
+        result.append(igraph_vector_t_to_numpy_array_view(vec))
+
+    return result
+
+
 def igraph_vector_int_list_t_to_list_of_numpy_array(
     vector_list: _VectorIntList,
 ) -> list[IntArray]:
@@ -887,5 +914,23 @@ def igraph_vector_int_list_t_to_list_of_numpy_array(
         ptr = igraph_vector_int_list_get_ptr(vector_list, i)
         vec._set_wrapped_instance(ptr.contents)
         result.append(igraph_vector_int_t_to_numpy_array(vec))
+
+    return result
+
+
+def igraph_vector_int_list_t_to_list_of_numpy_array_view(
+    vector_list: _VectorIntList,
+) -> list[IntArray]:
+    n = igraph_vector_int_list_size(vector_list)
+    vec = _VectorInt()
+    result = []
+
+    for i in range(n):
+        # We are re-using the same _VectorInt instance to wrap different
+        # low-level igraph_vector_int_t instances because it's only temporary
+        # until we convert it to a NumPy array
+        ptr = igraph_vector_int_list_get_ptr(vector_list, i)
+        vec._set_wrapped_instance(ptr.contents)
+        result.append(igraph_vector_int_t_to_numpy_array_view(vec))
 
     return result

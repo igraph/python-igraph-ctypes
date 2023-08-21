@@ -9,6 +9,7 @@ from .attributes import AttributeHandler
 from .errors import igraph_error_t_to_python_exception_class, IgraphWarning
 from .functions import strerror
 from .lib import (
+    IGRAPH_FINALLY_FREE,
     igraph_set_attribute_table,
     igraph_set_error_handler,
     igraph_set_fatal_handler,
@@ -88,6 +89,7 @@ _last_error = IgraphErrorState()
 @igraph_error_handler_t
 def _error_handler(message: bytes, filename: bytes, line: int, error: int):
     global _last_error
+    IGRAPH_FINALLY_FREE()
     _last_error._error_handler(message, filename, line, error)
 
 

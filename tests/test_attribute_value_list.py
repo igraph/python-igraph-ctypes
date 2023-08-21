@@ -4,6 +4,7 @@ from igraph_ctypes._internal.attributes.value_list import (
     _slice_length,
 )
 
+from itertools import count, islice
 from numpy import array, ndarray, bool_
 from numpy.testing import assert_array_equal
 from pytest import fixture, mark, raises
@@ -15,6 +16,27 @@ AVL = AttributeValueList
 @fixture
 def items() -> AVL:
     return AVL([1, 2, 3, 4, 5], fixed_length=True)
+
+
+def test_creation(items):
+    assert isinstance(items, AVL)
+    assert len(items) == 5
+    assert list(items) == [1, 2, 3, 4, 5]
+
+
+def test_creation_from_iterable():
+    # Creation without specifying an attribute type: this should not work
+    # because the iterable is consumed when the constructor infers the
+    # attribute type
+    items = AVL(islice(count(5), 5))
+    assert isinstance(items, AVL)
+    assert len(items) == 0
+
+    # Creation with an explicit attribute type; this should work.
+    items = AVL(islice(count(5), 5), type=AttributeType.NUMERIC)
+    assert isinstance(items, AVL)
+    assert len(items) == 5
+    assert list(items) == list(range(5, 10))
 
 
 def test_slice_length():

@@ -1,7 +1,7 @@
 import numpy as np
 
 from math import ceil
-from numpy.typing import NDArray
+from numpy.typing import DTypeLike, NDArray
 from types import EllipsisType
 from typing import (
     Any,
@@ -112,7 +112,23 @@ class AttributeValueList(Sequence[T | None]):
         fixed_length: bool = False,
         _wrap: bool = False,
     ):
-        """Constructor."""
+        """Constructor.
+
+        Creates a new attribute value list from an iterable of items.
+
+        The input should typically be a list, tuple, NumPy array or any other
+        iterable. However, if you have an iterable on which you can iterate
+        only _once_, you also need to specify the igraph attribute type
+        explicitly. This is because the constructor will attempt to infer the
+        attribute type if it is not given, but by doing so it will consume the
+        iterable once.
+
+        Args:
+            items: the iterable of items to store in the list
+            type: the igraph attribute type of the attribute that this list
+                will belong to
+            fixed_length: whether the list is fixed-length
+        """
         if _wrap:
             # Special case, not for public use. items is a NumPy array and
             # we can wrap it as is. Must be called only when no one else has
@@ -187,6 +203,11 @@ class AttributeValueList(Sequence[T | None]):
     def fixed_length(self) -> bool:
         """Returns whether the list is fixed-length."""
         return self._fixed_length
+
+    @property
+    def dtype(self) -> DTypeLike:
+        """Returns the NumPy attribute type of this list."""
+        return igraph_to_numpy_attribute_type(self._type)
 
     @property
     def type(self) -> AttributeType:

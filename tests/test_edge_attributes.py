@@ -2,7 +2,12 @@ from collections.abc import MutableMapping
 
 from pytest import raises
 
-from igraph_ctypes.constructors import create_full_graph, create_famous_graph
+from igraph_ctypes.constructors import (
+    create_graph_from_edge_list,
+    create_full_graph,
+    create_famous_graph,
+)
+from igraph_ctypes.types import AttributeCombinationSpecification
 
 
 def test_new_graph_has_no_edge_attributes():
@@ -88,3 +93,29 @@ def test_attempt_to_change_attribute_type():
 
     with raises(ValueError, match="could not convert"):
         g.eattrs["age"][2] = "test"
+
+
+def test_edge_attribute_combination():
+    g = create_graph_from_edge_list([0, 1, 1, 2, 2, 3, 0, 1, 0, 1, 3, 2], directed=True)
+    g.eattrs.set("weight", [1, 2, 3, 4, 5, 6])
+    g.eattrs.set("name", [f"E{i}" for i in range(1, g.ecount() + 1)])
+    g.eattrs.set("capacity", [1, 2, 3, 4, 5, 6])
+    g.eattrs.set("to_remove", [6, 5, 4, 3, 2, 1])
+    g.eattrs.set("should_keep", [True, True, False, True, False, False])
+
+    combinations: AttributeCombinationSpecification = {
+        "weight": "sum",
+        "name": "concat",
+        "capacity": "min",
+        "to_remove": "ignore",
+        None: "first",
+    }
+
+    g.convert_to_undirected("collapse", combinations)
+
+    assert list(g.eattrs["should_keep"]) == [True, True, False]  # 1, 2 and 3
+    assert list(g.eattrs["weight"]) == [1 + 4 + 5, 2, 3 + 6]
+    assert list(g.eattrs["name"]) == ["E1E4E5", "E2", "E3E6"]
+    assert list(g.eattrs["capacity"]) == [1, 2, 3]
+
+    # TODO(ntamas): test custom function!

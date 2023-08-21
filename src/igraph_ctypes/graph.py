@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import MutableMapping
-from typing import Any, Iterable, Optional, TypeVar
+from typing import Any, Iterable, Literal, Optional, TypeVar
 
-from .enums import NeighborMode
+from .enums import NeighborMode, ToDirected, ToUndirected
 from .types import (
+    AttributeCombinationSpecification,
     EdgeSelector,
     IntArray,
     VertexLike,
@@ -26,6 +27,8 @@ from ._internal.functions import (
     incident,
     is_directed,
     neighbors,
+    to_directed,
+    to_undirected,
     vcount,
 )
 from ._internal.wrappers import _Graph
@@ -55,7 +58,59 @@ class Graph:
         return self
 
     def add_vertices(self: C, n: int) -> C:
+        """Adds new vertices to the graph.
+
+        Args:
+            n: the number of vertices to add
+
+        Returns:
+            the graph itself
+        """
         add_vertices(self, n)
+        return self
+
+    def convert_to_directed(
+        self: C, mode: Literal["arbitrary", "mutual", "random", "acyclic"] = "mutual"
+    ) -> C:
+        """Converts the graph in-place to a directed graph if it is undirected.
+
+        Args:
+            mode: specifies how to convert the graph to directed.
+                `"arbitrary"` picks a direction for each edge in an arbitrary
+                but deterministic manner. `"mutual"` creates a mutual directed
+                edge pair for each undirected edge. `"random"` picks a direction
+                for each edge randomly. `"acyclic"` picks a direction for each
+                edge in a way that ensures that the directed graph is acyclic.
+
+        Returns:
+            the graph itself
+        """
+        to_directed(self, ToDirected.from_(mode))
+        return self
+
+    def convert_to_undirected(
+        self: C,
+        mode: Literal["collapse", "each", "mutual"] = "collapse",
+        edge_attr_comb: Optional[AttributeCombinationSpecification] = None,
+    ) -> C:
+        """Converts the graph in-place to an undirected graph if it is directed.
+
+        Args:
+            mode: specifies how to convert the graph to undirected.
+                `"each`` creates a single undirected edge for each directed edge.
+                ``mutual`` creates a single undirected edge for every directed
+                mutual edge pair and removes directed edges that do not have a
+                pair in the opposite direction. ``collapse`` collapses multiple
+                directed edges (irrespectively of their direction) between the
+                same vertex pair into a single undirected edge.
+            edge_attr_comb: specifies what to do with the attributes of edges
+                when multiple edges are collapsed into a single edge during the
+                conversion process.
+
+        Returns:
+            the graph itself
+        """
+        to_undirected(self, ToUndirected.from_(mode), edge_attr_comb)
         return self
 
     def copy(self) -> Graph:

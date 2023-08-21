@@ -1,6 +1,7 @@
 from collections.abc import MutableMapping
 from typing import Iterable, Iterator, TypeVar
 
+from .enums import AttributeType
 from .value_list import AttributeValueList
 
 __all__ = ("AttributeMap",)
@@ -62,6 +63,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
         self,
         key: str,
         value: T | Iterable[T],
+        type: AttributeType | None = None,
         _check_length: bool = True,
     ) -> None:
         """Assigns a value to _all_ the attribute values corresponding to the
@@ -85,12 +87,12 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
         if isinstance(value, (bytes, str)):
             # strings and bytes are iterable but they are treated as if not
             avl = AttributeValueList(
-                [value] * length, fixed_length=True
+                [value] * length, type=type, fixed_length=True
             )  # type: ignore
         elif isinstance(value, Iterable):
             # iterables are mapped to an AttributeValueList. Note that this
             # also takes care of copying existing AttributeValueList instances
-            avl = AttributeValueList(value, fixed_length=True)  # type: ignore
+            avl = AttributeValueList(value, type=type, fixed_length=True)  # type: ignore
             if _check_length and len(avl) != length:
                 raise RuntimeError(
                     f"attribute value list length must be {length}, got {len(avl)}"
@@ -99,7 +101,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
             # all other values are assumed to be a common value for all
             # vertices or edges
             avl = AttributeValueList(
-                [value] * length, fixed_length=True
+                [value] * length, type=type, fixed_length=True
             )  # type: ignore
 
         assert avl.fixed_length
