@@ -8,6 +8,7 @@ from .conversion import *  # noqa
 from .enums import *  # noqa
 from .lib import *  # noqa
 from .types import (
+    AttributeCombinationSpecification,
     BoolArray,
     EdgeLike,
     EdgeSelector,

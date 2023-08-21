@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypeVar
 
 from .lib import (
+    igraph_attribute_combination_init,
+    igraph_attribute_combination_destroy,
     igraph_destroy,
     igraph_es_destroy,
     igraph_matrix_destroy,
@@ -30,6 +32,7 @@ from .lib import (
 from .metamagic import Boxed
 from .types import (
     igraph_t,
+    igraph_attribute_combination_t,
     igraph_es_t,
     igraph_matrix_t,
     igraph_matrix_int_t,
@@ -47,6 +50,7 @@ if TYPE_CHECKING:
     from igraph_ctypes.graph import Graph
 
 __all__ = (
+    "_AttributeCombination",
     "_EdgeSelector",
     "_Graph",
     "_Matrix",
@@ -155,6 +159,14 @@ class _RNG(Boxed[igraph_rng_t]):
         "ctype": igraph_rng_t,
         "constructor": igraph_rng_init,
         "destructor": igraph_rng_destroy,
+    }
+
+
+class _AttributeCombination(Boxed[igraph_attribute_combination_t]):
+    boxed_config = {
+        "ctype": igraph_attribute_combination_t,
+        "constructor": igraph_attribute_combination_init,
+        "destructor": igraph_attribute_combination_destroy,
     }
 
 

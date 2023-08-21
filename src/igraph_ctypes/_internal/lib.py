@@ -34,6 +34,7 @@ from .types import (
     igraph_bliss_info_t,
     igraph_error_handler_t,
     igraph_fatal_handler_t,
+    igraph_function_pointer_t,
     igraph_hrg_t,
     igraph_layout_drl_options_t,
     igraph_maxflow_stats_t,
@@ -534,6 +535,22 @@ igraph_has_attribute_table.argtypes = []
 igraph_set_attribute_table = _lib.igraph_set_attribute_table
 igraph_set_attribute_table.restype = POINTER(igraph_attribute_table_t)
 igraph_set_attribute_table.argtypes = [POINTER(igraph_attribute_table_t)]
+
+igraph_attribute_combination_init = _lib.igraph_attribute_combination_init
+igraph_attribute_combination_init.restype = handle_igraph_error_t
+igraph_attribute_combination_init.argtypes = [POINTER(igraph_attribute_combination_t)]
+
+igraph_attribute_combination_destroy = _lib.igraph_attribute_combination_destroy
+igraph_attribute_combination_destroy.restype = None
+igraph_attribute_combination_destroy.argtypes = [POINTER(igraph_attribute_combination_t)]
+
+igraph_attribute_combination_add = _lib.igraph_attribute_combination_add
+igraph_attribute_combination_add.restype = handle_igraph_error_t
+igraph_attribute_combination_add.argtypes = [POINTER(igraph_attribute_combination_t), c_char_p, c_int, igraph_function_pointer_t]
+
+igraph_attribute_combination_query = _lib.igraph_attribute_combination_query
+igraph_attribute_combination_query.restype = handle_igraph_error_t
+igraph_attribute_combination_query.argtypes = [POINTER(igraph_attribute_combination_t), c_char_p, POINTER(c_int), POINTER(igraph_function_pointer_t)]
 
 # Error handling and interruptions
 

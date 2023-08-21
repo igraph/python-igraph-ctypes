@@ -7,13 +7,23 @@ import numpy as np
 from contextlib import contextmanager
 from ctypes import addressof, get_errno, memmove, POINTER
 from os import strerror
-from typing import Any, IO, Iterable, Iterator, Optional, Sequence, TYPE_CHECKING
+from typing import (
+    Any,
+    Callable,
+    IO,
+    Iterable,
+    Iterator,
+    Optional,
+    Sequence,
+    TYPE_CHECKING,
+)
 
 from .attributes.utils import python_type_to_igraph_attribute_type
-from .enums import MatrixStorage
+from .enums import AttributeCombinationType, MatrixStorage
 from .lib import (
     fdopen,
     fflush,
+    igraph_attribute_combination_add,
     igraph_es_all,
     igraph_es_none,
     igraph_es_vector_copy,
@@ -62,6 +72,8 @@ from .types import (
     np_type_of_igraph_bool_t,
     np_type_of_igraph_integer_t,
     np_type_of_igraph_real_t,
+    AttributeCombinationSpecification,
+    AttributeCombinationSpecificationEntry,
     BoolArray,
     EdgeLike,
     EdgeSelector,
@@ -76,6 +88,7 @@ from .types import (
 )
 from .utils import bytes_to_str
 from .wrappers import (
+    _AttributeCombination,
     _EdgeSelector,
     _Matrix,
     _MatrixInt,
@@ -130,6 +143,7 @@ __all__ = (
     "iterable_to_igraph_vector_t",
     "iterable_to_igraph_vector_t_view",
     "iterable_vertex_indices_to_igraph_vector_int_t",
+    "mapping_to_attribute_combination_t",
     "python_type_to_igraph_attribute_type",
     "sequence_to_igraph_matrix_int_t",
     "sequence_to_igraph_matrix_int_t_view",
@@ -440,6 +454,33 @@ def iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(
     items: Iterable[Iterable[VertexLike]],
 ) -> _VectorIntList:
     return iterable_of_iterable_to_igraph_vector_int_list_t(items)
+
+
+def _any_to_attribute_combination_type_and_func(
+    value: AttributeCombinationSpecificationEntry,
+) -> tuple[AttributeCombinationType, Callable | None]:
+    if callable(value):
+        # TODO(ntamas): need a Python-to-C wrapper around value!
+        return AttributeCombinationType.FUNCTION, value
+    else:
+        return AttributeCombinationType.from_(value), None
+
+
+def mapping_to_attribute_combination_t(
+    mapping: Optional[AttributeCombinationSpecification],
+) -> _AttributeCombination:
+    """Converts a Python mapping from attribute names to attribute combination
+    handlers to a low-level igraph attribute combination object.
+    """
+    result = _AttributeCombination.create()
+
+    for key, value in (mapping or {}).items():
+        combination_type, func = _any_to_attribute_combination_type_and_func(value)
+        igraph_attribute_combination_add(
+            result, key.encode("utf-8"), combination_type.value, func
+        )
+
+    return result
 
 
 def sequence_to_igraph_matrix_int_t(items: MatrixIntLike) -> _MatrixInt:

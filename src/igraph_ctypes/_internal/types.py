@@ -20,7 +20,7 @@ from ctypes import (
 )
 from io import IOBase
 from os import PathLike
-from typing import Iterable, Literal, Sequence
+from typing import Any, Callable, Iterable, Mapping, Literal, Sequence
 
 
 def vector_fields(base_type):
@@ -420,6 +420,7 @@ class igraph_rng_t(Structure):
     ]
 
 
+igraph_function_pointer_t = CFUNCTYPE(None)
 igraph_error_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int, igraph_error_t)
 igraph_fatal_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int)
 igraph_interruption_handler_t = CFUNCTYPE(igraph_bool_t)
@@ -555,9 +556,6 @@ class igraph_attribute_table_t(Structure):
 ###########################################################################
 # Type aliases used by the higher level interface
 
-EdgeLike = int
-"""Type alias for Python types that can be converted to an igraph edge ID"""
-
 BoolArray = npt.NDArray[np_type_of_igraph_bool_t]
 """Type alias for NumPy arrays containing igraph booleans"""
 
@@ -584,6 +582,9 @@ VertexSelector = Iterable[VertexLike] | Literal["all"] | VertexLike | None
 selector.
 """
 
+EdgeLike = int
+"""Type alias for Python types that can be converted to an igraph edge ID"""
+
 EdgeSelector = Iterable[EdgeLike] | Literal["all"] | EdgeLike | None
 """Type alias for Python types that can be converted to an igraph edge
 selector.
@@ -592,4 +593,30 @@ selector.
 FileLike = int | bytes | str | PathLike[bytes] | PathLike[str] | IOBase
 """Type alias for Python types that can be used in places where the C core
 expects a FILE* pointer.
+"""
+
+AttributeCombinationSpecificationEntry = (
+    Literal[
+        "default",
+        "ignore",
+        "sum",
+        "prod",
+        "min",
+        "max",
+        "random",
+        "first",
+        "last",
+        "mean",
+        "median",
+        "concat",
+    ]
+    | Callable[[Sequence[Any]], Any]
+)
+"""Type alias for values that can be accepted in an AttributeCombinationSpecification_
+mapping.
+"""
+
+AttributeCombinationSpecification = Mapping[str, AttributeCombinationSpecificationEntry]
+"""Type alias for mappings that specify how to merge vertex or edge attributes
+during an operation that contracts multiple vertices or edge into a single one.
 """

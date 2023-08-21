@@ -1,3 +1,5 @@
+# Basic types
+
 ERROR:
   PY_TYPE: int
   CTYPES_RETURN_TYPE: handle_igraph_error_t
@@ -34,6 +36,8 @@ CSTRING:
     IN: '%C% = %I%.encode("utf-8")'
     OUT: "%C% = c_char_p()"
   OUTCONV: "%I% = bytes_to_str(%C%)"
+
+# Vectors, matrices
 
 VECTOR:
   PY_TYPE: Iterable[float]
@@ -91,6 +95,8 @@ MATRIX_INT:
     OUT: "%C% = _MatrixInt.create(0)"
   OUTCONV: "%I% = igraph_matrix_int_t_to_numpy_array(%C%)"
 
+# Graph, vertex and edge related classes
+
 GRAPH:
   PY_TYPE: Graph
   INCONV:
@@ -99,9 +105,6 @@ GRAPH:
     OUT: |-
       %I% = _create_graph_from_boxed(%C%)
     INOUT: ~
-
-ATTRIBUTES:
-  PY_TYPE: ~
 
 VERTEX:
   PY_TYPE: VertexLike
@@ -233,6 +236,27 @@ BIPARTITE_TYPES:
     INOUT: "%C% = iterable_to_igraph_vector_bool_t(%I%) if %I% is not None else None"
     OUT: "%C% = _VectorBool.create(0)"
 
+# Attribute handling
+
+ATTRIBUTES:
+  PY_TYPE: ~
+
+EDGE_ATTRIBUTE_COMBINATION:
+  PY_TYPE: AttributeCombinationSpecification
+  INCONV:
+    IN: "%C% = mapping_to_attribute_combination_t(%I%)"
+  DEFAULT:
+    Default: "None"
+
+VERTEX_ATTRIBUTE_COMBINATION:
+  PY_TYPE: AttributeCombinationSpecification
+  INCONV:
+    IN: "%C% = mapping_to_attribute_combination_t(%I%)"
+  DEFAULT:
+    Default: "None"
+
+# File I/O
+
 INFILE:
   PY_TYPE: FileLike
   PY_RETURN_TYPE: c_int
@@ -246,6 +270,8 @@ OUTFILE:
   INCONV:
     IN: '%C% = %S%.enter_context(any_to_file_ptr(%I%, "w"))'
   FLAGS: stack
+
+# Enums
 
 ADJACENCY_MODE:
   PY_TYPE: AdjacencyMode
@@ -359,6 +385,16 @@ SUBGRAPH_IMPL:
 
 TRANSITIVITY_MODE:
   PY_TYPE: TransitivityMode
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+TODIRECTED:
+  PY_TYPE: ToDirected
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+TOUNDIRECTED:
+  PY_TYPE: ToUndirected
   INCONV:
     IN: "%C% = c_int(%I%)"
 

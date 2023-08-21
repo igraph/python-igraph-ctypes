@@ -8,6 +8,7 @@ from .conversion import *  # noqa
 from .enums import *  # noqa
 from .lib import *  # noqa
 from .types import (
+    AttributeCombinationSpecification,
     BoolArray,
     EdgeLike,
     EdgeSelector,
@@ -2391,7 +2392,17 @@ def path_length_hist(graph: Graph, directed: bool = True) -> tuple[RealArray, fl
     # Construct return value
     return res, unconnected
 
-# igraph_simplify: no Python type known for type: EDGE_ATTRIBUTE_COMBINATION
+
+def simplify(graph: Graph, remove_multiple: bool = True, remove_loops: bool = True, edge_attr_comb: Optional[AttributeCombinationSpecification] = None) -> None:
+    """Type-annotated wrapper for ``igraph_simplify``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_remove_multiple = any_to_igraph_bool_t(remove_multiple)
+    c_remove_loops = any_to_igraph_bool_t(remove_loops)
+    c_edge_attr_comb = mapping_to_attribute_combination_t(edge_attr_comb)
+
+    # Call wrapped function
+    igraph_simplify(c_graph, c_remove_multiple, c_remove_loops, c_edge_attr_comb)
 
 
 def transitivity_undirected(graph: Graph, mode: TransitivityMode = TransitivityMode.NAN) -> float:
@@ -3167,7 +3178,16 @@ def assortativity_degree(graph: Graph, directed: bool = True) -> float:
     # Construct return value
     return res
 
-# igraph_contract_vertices: no Python type known for type: VERTEX_ATTRIBUTE_COMBINATION
+
+def contract_vertices(graph: Graph, mapping: Iterable[int], vertex_attr_comb: Optional[AttributeCombinationSpecification] = None) -> None:
+    """Type-annotated wrapper for ``igraph_contract_vertices``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_mapping = iterable_to_igraph_vector_int_t_view(mapping)
+    c_vertex_attr_comb = mapping_to_attribute_combination_t(vertex_attr_comb)
+
+    # Call wrapped function
+    igraph_contract_vertices(c_graph, c_mapping, c_vertex_attr_comb)
 
 
 def eccentricity(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> RealArray:
@@ -3836,6 +3856,9 @@ def maximal_cliques_subset(graph: Graph, subset: Iterable[VertexLike], outfile: 
 
         # Construct return value
         return res, no
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 # igraph_maximal_cliques_callback: no Python type known for type: CLIQUE_FUNC
 
@@ -4961,9 +4984,26 @@ def get_stochastic(graph: Graph, column_wise: bool = False, weights: Optional[It
 
 # igraph_get_stochastic_sparse: no Python type known for type: SPARSEMAT
 
-# igraph_to_directed: no Python type known for type: TODIRECTED
 
-# igraph_to_undirected: no Python type known for type: TOUNDIRECTED
+def to_directed(graph: Graph, mode: ToDirected = ToDirected.MUTUAL) -> None:
+    """Type-annotated wrapper for ``igraph_to_directed``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_to_directed(c_graph, c_mode)
+
+
+def to_undirected(graph: Graph, mode: ToUndirected = ToUndirected.COLLAPSE, edge_attr_comb: Optional[AttributeCombinationSpecification] = None) -> None:
+    """Type-annotated wrapper for ``igraph_to_undirected``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_mode = c_int(mode)
+    c_edge_attr_comb = mapping_to_attribute_combination_t(edge_attr_comb)
+
+    # Call wrapped function
+    igraph_to_undirected(c_graph, c_mode, c_edge_attr_comb)
 
 
 def read_graph_edgelist(instream: FileLike, n: int = 0, directed: bool = True) -> Graph:
@@ -4985,6 +5025,9 @@ def read_graph_edgelist(instream: FileLike, n: int = 0, directed: bool = True) -
 
         # Construct return value
         return graph
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 # igraph_read_graph_ncol: no Python type known for type: VECTOR_STR
 
@@ -5009,6 +5052,9 @@ def read_graph_pajek(instream: FileLike) -> Graph:
         # Construct return value
         return graph
 
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
+
 
 def read_graph_graphml(instream: FileLike, index: int = 0) -> Graph:
     """Type-annotated wrapper for ``igraph_read_graph_graphml``."""
@@ -5028,6 +5074,9 @@ def read_graph_graphml(instream: FileLike, index: int = 0) -> Graph:
 
         # Construct return value
         return graph
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 # igraph_read_graph_dimacs_flow: no Python type known for type: VECTOR_STR
 
@@ -5051,6 +5100,9 @@ def read_graph_graphdb(instream: FileLike, directed: bool = False) -> Graph:
         # Construct return value
         return graph
 
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
+
 
 def read_graph_gml(instream: FileLike) -> Graph:
     """Type-annotated wrapper for ``igraph_read_graph_gml``."""
@@ -5069,6 +5121,9 @@ def read_graph_gml(instream: FileLike) -> Graph:
 
         # Construct return value
         return graph
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 
 def read_graph_dl(instream: FileLike, directed: bool = True) -> Graph:
@@ -5089,6 +5144,9 @@ def read_graph_dl(instream: FileLike, directed: bool = True) -> Graph:
 
         # Construct return value
         return graph
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 
 def write_graph_edgelist(graph: Graph, outstream: FileLike) -> None:
