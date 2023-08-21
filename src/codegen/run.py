@@ -180,6 +180,7 @@ def generate_enums(  # noqa: C901
         fp.write(f'    """Python counterpart of an ``{orig_name}`` enum."""\n\n')
 
         last_value = -1
+        all_members: dict[str, str] = {}
         for entry in entries:
             key, sep, value = entry.replace(" ", "").partition("=")
             if key.startswith("UNUSED_"):
@@ -208,12 +209,42 @@ def generate_enums(  # noqa: C901
                     )
 
             fp.write(f"    {key} = {value_int}\n")
+            all_members[key.lower()] = key
             last_value = value_int
 
         for key, value_int in EXTRA_ENUM_MEMBERS.get(name, ()):
             fp.write(f"    {key} = {value_int}\n")
+            all_members[key.lower()] = key
 
+        fp.write("\n")
+        fp.write(f"    _string_map: ClassVar[dict[str, {name}]]\n")
+        fp.write("\n")
+        fp.write("    @classmethod\n")
+        fp.write("    def from_(cls, value: Any):\n")
+        fp.write('        """Converts an arbitrary Python object into this enum.\n')
+        fp.write("\n")
+        fp.write("        Raises:\n")
+        fp.write("            ValueError: if the object cannot be converted\n")
+        fp.write('        """\n')
+        fp.write(f"        if isinstance(value, {name}):\n")
+        fp.write("            return value\n")
+        fp.write("        elif isinstance(value, int):\n")
+        fp.write("            return cls(value)\n")
+        fp.write("        else:\n")
+        fp.write("            try:\n")
+        fp.write("                return cls._string_map[value]\n")
+        fp.write("            except KeyError:\n")
+        fp.write(
+            f'                raise ValueError(f"{{value!r}} cannot be '
+            f'converted to {name}") from None\n'
+        )
         fp.write("\n\n")
+        fp.write(f"{name}._string_map = {{\n")
+        for key in sorted(all_members.keys()):
+            fp.write(f"    {key!r}: {name}.{all_members[key]},\n")
+        fp.write("}\n")
+        fp.write("\n\n")
+
         return name
 
     def process_file(outfp: TextIO, infp: TextIO) -> list[str]:
