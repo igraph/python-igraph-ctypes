@@ -157,6 +157,8 @@ __all__ = (
     "vertex_colors_to_igraph_vector_t_view",
     "vertex_qtys_to_igraph_vector_t",
     "vertex_qtys_to_igraph_vector_t_view",
+    "vertex_weights_to_igraph_vector_t",
+    "vertex_weights_to_igraph_vector_t_view",
 )
 
 
@@ -774,6 +776,28 @@ def vertex_qtys_to_igraph_vector_t_view(
     interpreted by the C core of igraph as all edges having equal weight.
     """
     return iterable_to_igraph_vector_t_view(weights) if weights else None
+
+
+def vertex_weights_to_igraph_vector_t(
+    weights: Iterable[float], graph: Graph
+) -> _Vector:
+    """Converts a Python iterable of floating-point numbers to a vector of
+    vertex weights.
+    """
+    return iterable_to_igraph_vector_t(weights)
+
+
+def vertex_weights_to_igraph_vector_t_view(
+    weights: Optional[Iterable[float]], graph: Graph
+) -> Optional[_Vector]:
+    """Converts a Python iterable of floating-point numbers to a vector of
+    vertex weights, possibly creating a shallow view if the input is an
+    appropriate NumPy array.
+
+    When the input is `None`, the return value will also be `None`, which is
+    interpreted by the C core of igraph as all vertices having equal weight.
+    """
+    return iterable_to_igraph_vector_t_view(weights) if weights is not None else None
 
 
 ################################################################################

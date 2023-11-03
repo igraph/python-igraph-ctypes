@@ -161,6 +161,15 @@ VERTEX_QTYS:
     OUT: "%C% = _Vector.create(0)"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
+VERTEX_WEIGHTS:
+  PY_TYPE: Iterable[float]
+  PY_RETURN_TYPE: RealArray
+  INCONV:
+    IN: "%C% = vertex_weights_to_igraph_vector_t_view(%I%, %I1%)"
+    INOUT: "%C% = vertex_weights_to_igraph_vector_t(%I%, %I1%)"
+    OUT: "%C% = _Vector.create(0)"
+  OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
+
 EDGE:
   PY_TYPE: EdgeLike
   PY_RETURN_TYPE: int
@@ -303,6 +312,11 @@ EIGENALGO:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
+ERDOS_RENYI_TYPE:
+  PY_TYPE: ErdosRenyiType
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
 FAS_ALGORITHM:
   PY_TYPE: FeedbackArcSetAlgorithm
   INCONV:
@@ -313,8 +327,18 @@ FWALGORITHM:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
+GREEDY_COLORING_HEURISTIC:
+  PY_TYPE: GreedyColoringHeuristics
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
 IMITATE_ALGORITHM:
   PY_TYPE: ImitateAlgorithm
+  INCONV:
+    IN: "%C% = c_int(%I%)"
+
+LAYOUT_GRID:
+  PY_TYPE: LayoutGrid
   INCONV:
     IN: "%C% = c_int(%I%)"
 

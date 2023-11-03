@@ -140,13 +140,14 @@ AttributeCombinationType._string_map = {
 }
 
 
-class ColoringGreedy(IntEnum):
+class GreedyColoringHeuristics(IntEnum):
     """Python counterpart of an ``igraph_coloring_greedy_t`` enum."""
 
     COLORED_NEIGHBORS = 0
     DSATUR = 1
+    NEIGHBORS = COLORED_NEIGHBORS
 
-    _string_map: ClassVar[dict[str, ColoringGreedy]]
+    _string_map: ClassVar[dict[str, GreedyColoringHeuristics]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -155,7 +156,7 @@ class ColoringGreedy(IntEnum):
         Raises:
             ValueError: if the object cannot be converted
         """
-        if isinstance(value, ColoringGreedy):
+        if isinstance(value, GreedyColoringHeuristics):
             return value
         elif isinstance(value, int):
             return cls(value)
@@ -163,12 +164,13 @@ class ColoringGreedy(IntEnum):
             try:
                 return cls._string_map[value]
             except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to ColoringGreedy") from None
+                raise ValueError(f"{value!r} cannot be converted to GreedyColoringHeuristics") from None
 
 
-ColoringGreedy._string_map = {
-    'colored_neighbors': ColoringGreedy.COLORED_NEIGHBORS,
-    'dsatur': ColoringGreedy.DSATUR,
+GreedyColoringHeuristics._string_map = {
+    'colored_neighbors': GreedyColoringHeuristics.COLORED_NEIGHBORS,
+    'dsatur': GreedyColoringHeuristics.DSATUR,
+    'neighbors': GreedyColoringHeuristics.COLORED_NEIGHBORS,
 }
 
 
@@ -820,13 +822,13 @@ TreeMode._string_map = {
 }
 
 
-class ErdosRenyi(IntEnum):
+class ErdosRenyiType(IntEnum):
     """Python counterpart of an ``igraph_erdos_renyi_t`` enum."""
 
     GNP = 0
     GNM = 1
 
-    _string_map: ClassVar[dict[str, ErdosRenyi]]
+    _string_map: ClassVar[dict[str, ErdosRenyiType]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -835,7 +837,7 @@ class ErdosRenyi(IntEnum):
         Raises:
             ValueError: if the object cannot be converted
         """
-        if isinstance(value, ErdosRenyi):
+        if isinstance(value, ErdosRenyiType):
             return value
         elif isinstance(value, int):
             return cls(value)
@@ -843,12 +845,12 @@ class ErdosRenyi(IntEnum):
             try:
                 return cls._string_map[value]
             except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to ErdosRenyi") from None
+                raise ValueError(f"{value!r} cannot be converted to ErdosRenyiType") from None
 
 
-ErdosRenyi._string_map = {
-    'gnm': ErdosRenyi.GNM,
-    'gnp': ErdosRenyi.GNP,
+ErdosRenyiType._string_map = {
+    'gnm': ErdosRenyiType.GNM,
+    'gnp': ErdosRenyiType.GNP,
 }
 
 
@@ -1540,6 +1542,8 @@ class LayoutGrid(IntEnum):
     GRID = 0
     NOGRID = 1
     AUTOGRID = 2
+    NO_GRID = NOGRID
+    AUTO_GRID = AUTOGRID
 
     _string_map: ClassVar[dict[str, LayoutGrid]]
 
@@ -1562,8 +1566,10 @@ class LayoutGrid(IntEnum):
 
 
 LayoutGrid._string_map = {
+    'auto_grid': LayoutGrid.AUTOGRID,
     'autogrid': LayoutGrid.AUTOGRID,
     'grid': LayoutGrid.GRID,
+    'no_grid': LayoutGrid.NOGRID,
     'nogrid': LayoutGrid.NOGRID,
 }
 
@@ -2072,7 +2078,6 @@ __all__ = (
     'AttributeType',
     'BLISSSplittingHeuristics',
     'BarabasiAlgorithm',
-    'ColoringGreedy',
     'CommunityComparison',
     'Connectedness',
     'DRLLayoutPreset',
@@ -2081,12 +2086,13 @@ __all__ = (
     'EdgeOrder',
     'EdgeSequenceType',
     'EigenAlgorithm',
-    'ErdosRenyi',
+    'ErdosRenyiType',
     'ErrorCode',
     'FeedbackArcSetAlgorithm',
     'FileFormat',
     'FloydWarshallAlgorithm',
     'GetAdjacency',
+    'GreedyColoringHeuristics',
     'ImitateAlgorithm',
     'LaplacianNormalization',
     'LaplacianSpectralEmbeddingType',

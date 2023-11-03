@@ -3733,7 +3733,29 @@ def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: N
     # Construct return value
     return graph, types
 
-# igraph_bipartite_game: no Python type known for type: ERDOS_RENYI_TYPE
+
+def bipartite_game(type: ErdosRenyiType, n1: int, n2: int, p: float = 0.0, m: int = 0, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> tuple[Graph, BoolArray]:
+    """Type-annotated wrapper for ``igraph_bipartite_game``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_types = _VectorBool.create(0)
+    c_type = c_int(type)
+    c_n1 = n1
+    c_n2 = n2
+    c_p = p
+    c_m = m
+    c_directed = any_to_igraph_bool_t(directed)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_bipartite_game(c_graph, c_types, c_type, c_n1, c_n2, c_p, c_m, c_directed, c_mode)
+
+    # Prepare output arguments
+    graph = _create_graph_from_boxed(c_graph)
+    types = c_types.value
+
+    # Construct return value
+    return graph, types
 
 # igraph_get_laplacian: no Python type known for type: LAPLACIAN_NORMALIZATION
 
@@ -4004,11 +4026,59 @@ def clique_number(graph: Graph) -> int:
     # Construct return value
     return no
 
-# igraph_weighted_cliques: no Python type known for type: VERTEX_WEIGHTS
 
-# igraph_largest_weighted_cliques: no Python type known for type: VERTEX_WEIGHTS
+def weighted_cliques(graph: Graph, vertex_weights: Optional[Iterable[float]] = None, min_weight: float = 0, max_weight: float = 0, maximal: bool = False) -> list[IntArray]:
+    """Type-annotated wrapper for ``igraph_weighted_cliques``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertex_weights = vertex_weights_to_igraph_vector_t_view(vertex_weights, graph)
+    c_res = _VectorIntList.create(0)
+    c_min_weight = min_weight
+    c_max_weight = max_weight
+    c_maximal = any_to_igraph_bool_t(maximal)
 
-# igraph_weighted_clique_number: no Python type known for type: VERTEX_WEIGHTS
+    # Call wrapped function
+    igraph_weighted_cliques(c_graph, c_vertex_weights, c_res, c_min_weight, c_max_weight, c_maximal)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def largest_weighted_cliques(graph: Graph, vertex_weights: Optional[Iterable[float]] = None) -> list[IntArray]:
+    """Type-annotated wrapper for ``igraph_largest_weighted_cliques``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertex_weights = vertex_weights_to_igraph_vector_t_view(vertex_weights, graph)
+    c_res = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_largest_weighted_cliques(c_graph, c_vertex_weights, c_res)
+
+    # Prepare output arguments
+    res = igraph_vector_int_list_t_to_list_of_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def weighted_clique_number(graph: Graph, vertex_weights: Optional[Iterable[float]] = None) -> float:
+    """Type-annotated wrapper for ``igraph_weighted_clique_number``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vertex_weights = vertex_weights_to_igraph_vector_t_view(vertex_weights, graph)
+    c_res = igraph_real_t()
+
+    # Call wrapped function
+    igraph_weighted_clique_number(c_graph, c_vertex_weights, c_res)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
 
 
 def independent_vertex_sets(graph: Graph, min_size: int = 0, max_size: int = 0) -> list[IntArray]:
@@ -4144,7 +4214,7 @@ def layout_grid_3d(graph: Graph, width: int = 0, height: int = 0) -> RealArray:
     # Construct return value
     return res
 
-# igraph_layout_fruchterman_reingold: no Python type known for type: LAYOUT_GRID
+# igraph_layout_fruchterman_reingold: No such type: 'DEPRECATED'
 
 
 def layout_reingold_tilford(graph: Graph, mode: NeighborMode = NeighborMode.OUT, roots: Optional[Iterable[VertexLike]] = None, rootlevel: Optional[Iterable[int]] = None) -> RealArray:
@@ -4895,7 +4965,31 @@ def community_optimal_modularity(graph: Graph, weights: Optional[Iterable[float]
     # Construct return value
     return modularity, membership
 
-# igraph_community_leiden: no Python type known for type: VERTEX_WEIGHTS
+
+def community_leiden(graph: Graph, resolution: float, start: bool, weights: Optional[Iterable[float]] = None, vertex_weights: Optional[Iterable[float]] = None, beta: float = 0.01, n_iterations: int = 2, membership: Optional[Iterable[int]] = None) -> tuple[int, float]:
+    """Type-annotated wrapper for ``igraph_community_leiden``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+    c_vertex_weights = vertex_weights_to_igraph_vector_t_view(vertex_weights, graph) if vertex_weights is not None else None
+    c_resolution = resolution
+    c_beta = beta
+    c_start = any_to_igraph_bool_t(start)
+    c_n_iterations = n_iterations
+    c_membership = iterable_to_igraph_vector_int_t(membership) if membership is not None else None
+    c_nb_clusters = igraph_integer_t()
+    c_quality = igraph_real_t()
+
+    # Call wrapped function
+    igraph_community_leiden(c_graph, c_weights, c_vertex_weights, c_resolution, c_beta, c_start, c_n_iterations, c_membership, c_nb_clusters, c_quality)
+
+    # Prepare output arguments
+    membership = igraph_vector_int_t_to_numpy_array(c_membership)
+    nb_clusters = c_nb_clusters.value
+    quality = c_quality.value
+
+    # Construct return value
+    return nb_clusters, quality
 
 
 def split_join_distance(comm1: Iterable[int], comm2: Iterable[int]) -> tuple[int, int]:
@@ -4916,7 +5010,26 @@ def split_join_distance(comm1: Iterable[int], comm2: Iterable[int]) -> tuple[int
     # Construct return value
     return distance12, distance21
 
-# igraph_community_infomap: no Python type known for type: VERTEX_WEIGHTS
+
+def community_infomap(graph: Graph, e_weights: Optional[Iterable[float]] = None, v_weights: Optional[Iterable[float]] = None, nb_trials: int = 10) -> tuple[IntArray, float]:
+    """Type-annotated wrapper for ``igraph_community_infomap``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_e_weights = edge_weights_to_igraph_vector_t_view(e_weights, graph)
+    c_v_weights = vertex_weights_to_igraph_vector_t_view(v_weights, graph)
+    c_nb_trials = nb_trials
+    c_membership = _VectorInt.create(0)
+    c_codelength = igraph_real_t()
+
+    # Call wrapped function
+    igraph_community_infomap(c_graph, c_e_weights, c_v_weights, c_nb_trials, c_membership, c_codelength)
+
+    # Prepare output arguments
+    membership = igraph_vector_int_t_to_numpy_array(c_membership)
+    codelength = c_codelength.value
+
+    # Construct return value
+    return membership, codelength
 
 
 def community_voronoi(graph: Graph, lengths: Optional[Iterable[float]] = None, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, radius: float = -1) -> tuple[IntArray, IntArray, float]:
@@ -6876,7 +6989,22 @@ def tree_game(n: int, directed: bool = False, method: RandomTreeMethod = RandomT
     # Construct return value
     return graph
 
-# igraph_vertex_coloring_greedy: no Python type known for type: GREEDY_COLORING_HEURISTIC
+
+def vertex_coloring_greedy(graph: Graph, heuristic: GreedyColoringHeuristics = GreedyColoringHeuristics.NEIGHBORS) -> IntArray:
+    """Type-annotated wrapper for ``igraph_vertex_coloring_greedy``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_colors = _VectorInt.create(0)
+    c_heuristic = c_int(heuristic)
+
+    # Call wrapped function
+    igraph_vertex_coloring_greedy(c_graph, c_colors, c_heuristic)
+
+    # Prepare output arguments
+    colors = igraph_vector_int_t_to_numpy_array(c_colors)
+
+    # Construct return value
+    return colors
 
 
 def deterministic_optimal_imitation(graph: Graph, vid: VertexLike, quantities: Iterable[float], strategies: Iterable[int], optimality: Optimality = Optimality.MAXIMUM, mode: NeighborMode = NeighborMode.OUT) -> None:

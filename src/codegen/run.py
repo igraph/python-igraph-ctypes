@@ -117,9 +117,11 @@ def generate_enums(  # noqa: C901
         "Adjacency": "AdjacencyMode",
         "AttributeElemtype": "AttributeElementType",
         "BlissSh": "BLISSSplittingHeuristics",
+        "ColoringGreedy": "GreedyColoringHeuristics",
         "Degseq": "DegreeSequenceMode",
         "EdgeorderType": "EdgeOrder",
         "EitType": "EdgeIteratorType",
+        "ErdosRenyi": "ErdosRenyiType",
         "ErrorType": "ErrorCode",
         "EsType": "EdgeSequenceType",
         "FasAlgorithm": "FeedbackArcSetAlgorithm",
@@ -137,8 +139,10 @@ def generate_enums(  # noqa: C901
         "VitType": "VertexIteratorType",
         "VsType": "VertexSequenceType",
     }
-    EXTRA_ENUM_MEMBERS: dict[str, Sequence[tuple[str, int]]] = {
-        "Loops": [("IGNORE", 0)]
+    EXTRA_ENUM_MEMBERS: dict[str, Sequence[tuple[str, Union[int, str]]]] = {
+        "GreedyColoringHeuristics": [("NEIGHBORS", "COLORED_NEIGHBORS")],
+        "LayoutGrid": [("NO_GRID", "NOGRID"), ("AUTO_GRID", "AUTOGRID")],
+        "Loops": [("IGNORE", 0)],
     }
 
     def process_enum(fp: TextIO, spec) -> Optional[str]:  # noqa: C901
@@ -181,6 +185,7 @@ def generate_enums(  # noqa: C901
 
         last_value = -1
         all_members: dict[str, str] = {}
+        all_values: dict[str, int] = {}
         for entry in entries:
             key, sep, value = entry.replace(" ", "").partition("=")
             if key.startswith("UNUSED_"):
@@ -210,11 +215,18 @@ def generate_enums(  # noqa: C901
 
             fp.write(f"    {key} = {value_int}\n")
             all_members[key.lower()] = key
+            all_values[key.lower()] = value_int
             last_value = value_int
 
-        for key, value_int in EXTRA_ENUM_MEMBERS.get(name, ()):
+        for key, value_int_or_str in EXTRA_ENUM_MEMBERS.get(name, ()):
+            if isinstance(value_int_or_str, str):
+                value_int = all_members[value_int_or_str.lower()]
+                aliased_to = value_int_or_str
+            else:
+                value_int = value_int_or_str
+                aliased_to = key
             fp.write(f"    {key} = {value_int}\n")
-            all_members[key.lower()] = key
+            all_members[key.lower()] = aliased_to
 
         fp.write("\n")
         fp.write(f"    _string_map: ClassVar[dict[str, {name}]]\n")
