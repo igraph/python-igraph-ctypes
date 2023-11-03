@@ -2946,6 +2946,26 @@ def avg_nearest_neighbor_degree(graph: Graph, vids: VertexSelector = "all", mode
     return knn, knnk
 
 
+def degree_correlation_vector(graph: Graph, weights: Optional[Iterable[float]] = None, from_mode: NeighborMode = NeighborMode.OUT, to_mode: NeighborMode = NeighborMode.IN, directed_neighbors: bool = True) -> RealArray:
+    """Type-annotated wrapper for ``igraph_degree_correlation_vector``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_knnk = _Vector.create(0)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_from_mode = c_int(from_mode)
+    c_to_mode = c_int(to_mode)
+    c_directed_neighbors = any_to_igraph_bool_t(directed_neighbors)
+
+    # Call wrapped function
+    igraph_degree_correlation_vector(c_graph, c_knnk, c_weights, c_from_mode, c_to_mode, c_directed_neighbors)
+
+    # Prepare output arguments
+    knnk = igraph_vector_t_to_numpy_array(c_knnk)
+
+    # Construct return value
+    return knnk
+
+
 def strength(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
     """Type-annotated wrapper for ``igraph_strength``."""
     # Prepare input arguments
@@ -3179,6 +3199,25 @@ def assortativity_degree(graph: Graph, directed: bool = True) -> float:
     return res
 
 
+def joint_degree_matrix(graph: Graph, max_out_degree: int = -1, max_in_degree: int = -1, weights: Optional[Iterable[float]] = None) -> RealArray:
+    """Type-annotated wrapper for ``igraph_joint_degree_matrix``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_jdm = _Matrix.create(0)
+    c_max_out_degree = max_out_degree
+    c_max_in_degree = max_in_degree
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+
+    # Call wrapped function
+    igraph_joint_degree_matrix(c_graph, c_jdm, c_max_out_degree, c_max_in_degree, c_weights)
+
+    # Prepare output arguments
+    jdm = igraph_matrix_t_to_numpy_array(c_jdm)
+
+    # Construct return value
+    return jdm
+
+
 def contract_vertices(graph: Graph, mapping: Iterable[int], vertex_attr_comb: Optional[AttributeCombinationSpecification] = None) -> None:
     """Type-annotated wrapper for ``igraph_contract_vertices``."""
     # Prepare input arguments
@@ -3244,6 +3283,24 @@ def graph_center(graph: Graph, mode: NeighborMode = NeighborMode.ALL) -> IntArra
     return res
 
 
+def graph_center_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
+    """Type-annotated wrapper for ``igraph_graph_center_dijkstra``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_res = _VectorInt.create(0)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_graph_center_dijkstra(c_graph, c_weights, c_res, c_mode)
+
+    # Prepare output arguments
+    res = igraph_vector_int_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
 def radius(graph: Graph, mode: NeighborMode = NeighborMode.ALL) -> float:
     """Type-annotated wrapper for ``igraph_radius``."""
     # Prepare input arguments
@@ -3253,6 +3310,24 @@ def radius(graph: Graph, mode: NeighborMode = NeighborMode.ALL) -> float:
 
     # Call wrapped function
     igraph_radius(c_graph, c_radius, c_mode)
+
+    # Prepare output arguments
+    radius = c_radius.value
+
+    # Construct return value
+    return radius
+
+
+def radius_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.ALL) -> float:
+    """Type-annotated wrapper for ``igraph_radius_dijkstra``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_radius = igraph_real_t()
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_radius_dijkstra(c_graph, c_weights, c_radius, c_mode)
 
     # Prepare output arguments
     radius = c_radius.value
@@ -5776,6 +5851,29 @@ def gomory_hu_tree(graph: Graph, capacity: Optional[Iterable[float]] = None) -> 
 # igraph_maxflow_value: no Python type known for type: MAXFLOW_STATS
 
 
+def mincut(graph: Graph, capacity: Optional[Iterable[float]] = None) -> tuple[float, IntArray, IntArray, IntArray]:
+    """Type-annotated wrapper for ``igraph_mincut``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_value = igraph_real_t()
+    c_partition1 = _VectorInt.create(0)
+    c_partition2 = _VectorInt.create(0)
+    c_cut = _VectorInt.create(0)
+    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph) if capacity is not None else None
+
+    # Call wrapped function
+    igraph_mincut(c_graph, c_value, c_partition1, c_partition2, c_cut, c_capacity)
+
+    # Prepare output arguments
+    value = c_value.value
+    partition1 = igraph_vector_int_t_to_numpy_array(c_partition1)
+    partition2 = igraph_vector_int_t_to_numpy_array(c_partition2)
+    cut = igraph_vector_int_t_to_numpy_array(c_cut)
+
+    # Construct return value
+    return value, partition1, partition2, cut
+
+
 def mincut_value(graph: Graph, capacity: Optional[Iterable[float]] = None) -> float:
     """Type-annotated wrapper for ``igraph_mincut_value``."""
     # Prepare input arguments
@@ -5791,6 +5889,44 @@ def mincut_value(graph: Graph, capacity: Optional[Iterable[float]] = None) -> fl
 
     # Construct return value
     return res
+
+
+def residual_graph(graph: Graph, capacity: Iterable[float], flow: Iterable[float]) -> tuple[Graph, RealArray]:
+    """Type-annotated wrapper for ``igraph_residual_graph``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph)
+    c_residual = _Graph()
+    c_residual_capacity = _Vector.create(0)
+    c_flow = iterable_to_igraph_vector_t_view(flow)
+
+    # Call wrapped function
+    igraph_residual_graph(c_graph, c_capacity, c_residual, c_residual_capacity, c_flow)
+
+    # Prepare output arguments
+    residual = _create_graph_from_boxed(c_residual)
+    residual_capacity = igraph_vector_t_to_numpy_array(c_residual_capacity)
+
+    # Construct return value
+    return residual, residual_capacity
+
+
+def reverse_residual_graph(graph: Graph, capacity: Iterable[float], flow: Iterable[float]) -> Graph:
+    """Type-annotated wrapper for ``igraph_reverse_residual_graph``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph)
+    c_residual = _Graph()
+    c_flow = iterable_to_igraph_vector_t_view(flow)
+
+    # Call wrapped function
+    igraph_reverse_residual_graph(c_graph, c_capacity, c_residual, c_flow)
+
+    # Prepare output arguments
+    residual = _create_graph_from_boxed(c_residual)
+
+    # Construct return value
+    return residual
 
 
 def st_mincut(graph: Graph, source: VertexLike, target: VertexLike, capacity: Optional[Iterable[float]] = None) -> tuple[float, IntArray, IntArray, IntArray]:
@@ -5835,67 +5971,6 @@ def st_mincut_value(graph: Graph, source: VertexLike, target: VertexLike, capaci
 
     # Construct return value
     return res
-
-
-def mincut(graph: Graph, capacity: Optional[Iterable[float]] = None) -> tuple[float, IntArray, IntArray, IntArray]:
-    """Type-annotated wrapper for ``igraph_mincut``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_value = igraph_real_t()
-    c_partition1 = _VectorInt.create(0)
-    c_partition2 = _VectorInt.create(0)
-    c_cut = _VectorInt.create(0)
-    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph) if capacity is not None else None
-
-    # Call wrapped function
-    igraph_mincut(c_graph, c_value, c_partition1, c_partition2, c_cut, c_capacity)
-
-    # Prepare output arguments
-    value = c_value.value
-    partition1 = igraph_vector_int_t_to_numpy_array(c_partition1)
-    partition2 = igraph_vector_int_t_to_numpy_array(c_partition2)
-    cut = igraph_vector_int_t_to_numpy_array(c_cut)
-
-    # Construct return value
-    return value, partition1, partition2, cut
-
-
-def residual_graph(graph: Graph, capacity: Iterable[float], flow: Iterable[float]) -> tuple[Graph, RealArray]:
-    """Type-annotated wrapper for ``igraph_residual_graph``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph)
-    c_residual = _Graph()
-    c_residual_capacity = _Vector.create(0)
-    c_flow = iterable_to_igraph_vector_t_view(flow)
-
-    # Call wrapped function
-    igraph_residual_graph(c_graph, c_capacity, c_residual, c_residual_capacity, c_flow)
-
-    # Prepare output arguments
-    residual = _create_graph_from_boxed(c_residual)
-    residual_capacity = igraph_vector_t_to_numpy_array(c_residual_capacity)
-
-    # Construct return value
-    return residual, residual_capacity
-
-
-def reverse_residual_graph(graph: Graph, capacity: Iterable[float], flow: Iterable[float]) -> Graph:
-    """Type-annotated wrapper for ``igraph_reverse_residual_graph``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_capacity = edge_capacities_to_igraph_vector_t_view(capacity, graph)
-    c_residual = _Graph()
-    c_flow = iterable_to_igraph_vector_t_view(flow)
-
-    # Call wrapped function
-    igraph_reverse_residual_graph(c_graph, c_capacity, c_residual, c_flow)
-
-    # Prepare output arguments
-    residual = _create_graph_from_boxed(c_residual)
-
-    # Construct return value
-    return residual
 
 # igraph_st_vertex_connectivity: no Python type known for type: VCONNNEI
 
@@ -6821,23 +6896,6 @@ def deterministic_optimal_imitation(graph: Graph, vid: VertexLike, quantities: I
     strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
 
 
-def stochastic_imitation(graph: Graph, vid: VertexLike, algo: ImitateAlgorithm, quantities: Iterable[float], strategies: Iterable[int], mode: NeighborMode = NeighborMode.OUT) -> None:
-    """Type-annotated wrapper for ``igraph_stochastic_imitation``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_vid = vertexlike_to_igraph_integer_t(vid)
-    c_algo = c_int(algo)
-    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
-    c_strategies = iterable_to_igraph_vector_int_t(strategies)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_stochastic_imitation(c_graph, c_vid, c_algo, c_quantities, c_strategies, c_mode)
-
-    # Prepare output arguments
-    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
-
-
 def moran_process(graph: Graph, quantities: Iterable[float], strategies: Iterable[int], weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> None:
     """Type-annotated wrapper for ``igraph_moran_process``."""
     # Prepare input arguments
@@ -6867,6 +6925,23 @@ def roulette_wheel_imitation(graph: Graph, vid: VertexLike, is_local: bool, quan
 
     # Call wrapped function
     igraph_roulette_wheel_imitation(c_graph, c_vid, c_is_local, c_quantities, c_strategies, c_mode)
+
+    # Prepare output arguments
+    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
+
+
+def stochastic_imitation(graph: Graph, vid: VertexLike, algo: ImitateAlgorithm, quantities: Iterable[float], strategies: Iterable[int], mode: NeighborMode = NeighborMode.OUT) -> None:
+    """Type-annotated wrapper for ``igraph_stochastic_imitation``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_vid = vertexlike_to_igraph_integer_t(vid)
+    c_algo = c_int(algo)
+    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
+    c_strategies = iterable_to_igraph_vector_int_t(strategies)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_stochastic_imitation(c_graph, c_vid, c_algo, c_quantities, c_strategies, c_mode)
 
     # Prepare output arguments
     strategies = igraph_vector_int_t_to_numpy_array(c_strategies)

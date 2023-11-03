@@ -1295,6 +1295,10 @@ igraph_avg_nearest_neighbor_degree = _lib.igraph_avg_nearest_neighbor_degree
 igraph_avg_nearest_neighbor_degree.restype = handle_igraph_error_t
 igraph_avg_nearest_neighbor_degree.argtypes = [POINTER(igraph_t), igraph_vs_t, igraph_neimode_t, igraph_neimode_t, POINTER(igraph_vector_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t)]
 
+igraph_degree_correlation_vector = _lib.igraph_degree_correlation_vector
+igraph_degree_correlation_vector.restype = handle_igraph_error_t
+igraph_degree_correlation_vector.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_neimode_t, igraph_neimode_t, igraph_bool_t]
+
 igraph_strength = _lib.igraph_strength
 igraph_strength.restype = handle_igraph_error_t
 igraph_strength.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), igraph_vs_t, igraph_neimode_t, igraph_bool_t, POINTER(igraph_vector_t)]
@@ -1347,6 +1351,10 @@ igraph_assortativity_degree = _lib.igraph_assortativity_degree
 igraph_assortativity_degree.restype = handle_igraph_error_t
 igraph_assortativity_degree.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_bool_t]
 
+igraph_joint_degree_matrix = _lib.igraph_joint_degree_matrix
+igraph_joint_degree_matrix.restype = handle_igraph_error_t
+igraph_joint_degree_matrix.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t)]
+
 igraph_contract_vertices = _lib.igraph_contract_vertices
 igraph_contract_vertices.restype = handle_igraph_error_t
 igraph_contract_vertices.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_attribute_combination_t)]
@@ -1363,9 +1371,17 @@ igraph_graph_center = _lib.igraph_graph_center
 igraph_graph_center.restype = handle_igraph_error_t
 igraph_graph_center.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
 
+igraph_graph_center_dijkstra = _lib.igraph_graph_center_dijkstra
+igraph_graph_center_dijkstra.restype = handle_igraph_error_t
+igraph_graph_center_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
+
 igraph_radius = _lib.igraph_radius
 igraph_radius.restype = handle_igraph_error_t
 igraph_radius.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_neimode_t]
+
+igraph_radius_dijkstra = _lib.igraph_radius_dijkstra
+igraph_radius_dijkstra.restype = handle_igraph_error_t
+igraph_radius_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_neimode_t]
 
 igraph_pseudo_diameter = _lib.igraph_pseudo_diameter
 igraph_pseudo_diameter.restype = handle_igraph_error_t
@@ -2039,21 +2055,13 @@ igraph_maxflow_value = _lib.igraph_maxflow_value
 igraph_maxflow_value.restype = handle_igraph_error_t
 igraph_maxflow_value.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t), POINTER(igraph_maxflow_stats_t)]
 
-igraph_mincut_value = _lib.igraph_mincut_value
-igraph_mincut_value.restype = handle_igraph_error_t
-igraph_mincut_value.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_t)]
-
-igraph_st_mincut = _lib.igraph_st_mincut
-igraph_st_mincut.restype = handle_igraph_error_t
-igraph_st_mincut.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t)]
-
-igraph_st_mincut_value = _lib.igraph_st_mincut_value
-igraph_st_mincut_value.restype = handle_igraph_error_t
-igraph_st_mincut_value.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t)]
-
 igraph_mincut = _lib.igraph_mincut
 igraph_mincut.restype = handle_igraph_error_t
 igraph_mincut.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_t)]
+
+igraph_mincut_value = _lib.igraph_mincut_value
+igraph_mincut_value.restype = handle_igraph_error_t
+igraph_mincut_value.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_t)]
 
 igraph_residual_graph = _lib.igraph_residual_graph
 igraph_residual_graph.restype = handle_igraph_error_t
@@ -2062,6 +2070,14 @@ igraph_residual_graph.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), P
 igraph_reverse_residual_graph = _lib.igraph_reverse_residual_graph
 igraph_reverse_residual_graph.restype = handle_igraph_error_t
 igraph_reverse_residual_graph.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_t), POINTER(igraph_vector_t)]
+
+igraph_st_mincut = _lib.igraph_st_mincut
+igraph_st_mincut.restype = handle_igraph_error_t
+igraph_st_mincut.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t)]
+
+igraph_st_mincut_value = _lib.igraph_st_mincut_value
+igraph_st_mincut_value.restype = handle_igraph_error_t
+igraph_st_mincut_value.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t)]
 
 igraph_st_vertex_connectivity = _lib.igraph_st_vertex_connectivity
 igraph_st_vertex_connectivity.restype = handle_igraph_error_t
@@ -2335,10 +2351,6 @@ igraph_deterministic_optimal_imitation = _lib.igraph_deterministic_optimal_imita
 igraph_deterministic_optimal_imitation.restype = handle_igraph_error_t
 igraph_deterministic_optimal_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_optimal_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
 
-igraph_stochastic_imitation = _lib.igraph_stochastic_imitation
-igraph_stochastic_imitation.restype = handle_igraph_error_t
-igraph_stochastic_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_imitate_algorithm_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
-
 igraph_moran_process = _lib.igraph_moran_process
 igraph_moran_process.restype = handle_igraph_error_t
 igraph_moran_process.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
@@ -2346,6 +2358,10 @@ igraph_moran_process.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), PO
 igraph_roulette_wheel_imitation = _lib.igraph_roulette_wheel_imitation
 igraph_roulette_wheel_imitation.restype = handle_igraph_error_t
 igraph_roulette_wheel_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
+
+igraph_stochastic_imitation = _lib.igraph_stochastic_imitation
+igraph_stochastic_imitation.restype = handle_igraph_error_t
+igraph_stochastic_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_imitate_algorithm_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
 
 igraph_convergence_degree = _lib.igraph_convergence_degree
 igraph_convergence_degree.restype = handle_igraph_error_t
