@@ -1353,7 +1353,15 @@ igraph_assortativity_degree.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t
 
 igraph_joint_degree_matrix = _lib.igraph_joint_degree_matrix
 igraph_joint_degree_matrix.restype = handle_igraph_error_t
-igraph_joint_degree_matrix.argtypes = [POINTER(igraph_t), POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_vector_t)]
+igraph_joint_degree_matrix.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t]
+
+igraph_joint_degree_distribution = _lib.igraph_joint_degree_distribution
+igraph_joint_degree_distribution.restype = handle_igraph_error_t
+igraph_joint_degree_distribution.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_t), igraph_neimode_t, igraph_neimode_t, igraph_bool_t, igraph_bool_t, igraph_integer_t, igraph_integer_t]
+
+igraph_joint_type_distribution = _lib.igraph_joint_type_distribution
+igraph_joint_type_distribution.restype = handle_igraph_error_t
+igraph_joint_type_distribution.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bool_t, igraph_bool_t]
 
 igraph_contract_vertices = _lib.igraph_contract_vertices
 igraph_contract_vertices.restype = handle_igraph_error_t
@@ -1721,7 +1729,7 @@ igraph_community_spinglass.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_
 
 igraph_community_spinglass_single = _lib.igraph_community_spinglass_single
 igraph_community_spinglass_single.restype = handle_igraph_error_t
-igraph_community_spinglass_single.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), igraph_integer_t, POINTER(igraph_vector_int_t), POINTER(igraph_real_t), POINTER(igraph_real_t), POINTER(igraph_integer_t), POINTER(igraph_integer_t), igraph_integer_t, igraph_spincomm_update_t, igraph_real_t]
+igraph_community_spinglass_single.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), igraph_integer_t, POINTER(igraph_vector_int_t), POINTER(igraph_real_t), POINTER(igraph_real_t), POINTER(igraph_real_t), POINTER(igraph_real_t), igraph_integer_t, igraph_spincomm_update_t, igraph_real_t]
 
 igraph_community_walktrap = _lib.igraph_community_walktrap
 igraph_community_walktrap.restype = handle_igraph_error_t

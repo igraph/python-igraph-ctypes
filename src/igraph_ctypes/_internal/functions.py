@@ -2950,14 +2950,14 @@ def degree_correlation_vector(graph: Graph, weights: Optional[Iterable[float]] =
     """Type-annotated wrapper for ``igraph_degree_correlation_vector``."""
     # Prepare input arguments
     c_graph = graph
-    c_knnk = _Vector.create(0)
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_knnk = _Vector.create(0)
     c_from_mode = c_int(from_mode)
     c_to_mode = c_int(to_mode)
     c_directed_neighbors = any_to_igraph_bool_t(directed_neighbors)
 
     # Call wrapped function
-    igraph_degree_correlation_vector(c_graph, c_knnk, c_weights, c_from_mode, c_to_mode, c_directed_neighbors)
+    igraph_degree_correlation_vector(c_graph, c_weights, c_knnk, c_from_mode, c_to_mode, c_directed_neighbors)
 
     # Prepare output arguments
     knnk = igraph_vector_t_to_numpy_array(c_knnk)
@@ -3199,23 +3199,67 @@ def assortativity_degree(graph: Graph, directed: bool = True) -> float:
     return res
 
 
-def joint_degree_matrix(graph: Graph, max_out_degree: int = -1, max_in_degree: int = -1, weights: Optional[Iterable[float]] = None) -> RealArray:
+def joint_degree_matrix(graph: Graph, weights: Optional[Iterable[float]] = None, max_out_degree: int = -1, max_in_degree: int = -1) -> RealArray:
     """Type-annotated wrapper for ``igraph_joint_degree_matrix``."""
     # Prepare input arguments
     c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
     c_jdm = _Matrix.create(0)
     c_max_out_degree = max_out_degree
     c_max_in_degree = max_in_degree
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
 
     # Call wrapped function
-    igraph_joint_degree_matrix(c_graph, c_jdm, c_max_out_degree, c_max_in_degree, c_weights)
+    igraph_joint_degree_matrix(c_graph, c_weights, c_jdm, c_max_out_degree, c_max_in_degree)
 
     # Prepare output arguments
     jdm = igraph_matrix_t_to_numpy_array(c_jdm)
 
     # Construct return value
     return jdm
+
+
+def joint_degree_distribution(graph: Graph, weights: Optional[Iterable[float]] = None, from_mode: NeighborMode = NeighborMode.OUT, to_mode: NeighborMode = NeighborMode.IN, directed_neighbors: bool = True, normalized: bool = True, max_from_degree: int = -1, max_to_degree: int = -1) -> RealArray:
+    """Type-annotated wrapper for ``igraph_joint_degree_distribution``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_p = _Matrix.create(0)
+    c_from_mode = c_int(from_mode)
+    c_to_mode = c_int(to_mode)
+    c_directed_neighbors = any_to_igraph_bool_t(directed_neighbors)
+    c_normalized = any_to_igraph_bool_t(normalized)
+    c_max_from_degree = max_from_degree
+    c_max_to_degree = max_to_degree
+
+    # Call wrapped function
+    igraph_joint_degree_distribution(c_graph, c_weights, c_p, c_from_mode, c_to_mode, c_directed_neighbors, c_normalized, c_max_from_degree, c_max_to_degree)
+
+    # Prepare output arguments
+    p = igraph_matrix_t_to_numpy_array(c_p)
+
+    # Construct return value
+    return p
+
+
+def joint_type_distribution(graph: Graph, from_types: Iterable[int], weights: Optional[Iterable[float]] = None, to_types: Optional[Iterable[int]] = None, directed: bool = True, normalized: bool = True) -> RealArray:
+    """Type-annotated wrapper for ``igraph_joint_type_distribution``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_p = _Matrix.create(0)
+    c_from_types = iterable_to_igraph_vector_int_t_view(from_types)
+    c_to_types = iterable_to_igraph_vector_int_t_view(to_types)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_normalized = any_to_igraph_bool_t(normalized)
+
+    # Call wrapped function
+    igraph_joint_type_distribution(c_graph, c_weights, c_p, c_from_types, c_to_types, c_directed, c_normalized)
+
+    # Prepare output arguments
+    p = igraph_matrix_t_to_numpy_array(c_p)
+
+    # Construct return value
+    return p
 
 
 def contract_vertices(graph: Graph, mapping: Iterable[int], vertex_attr_comb: Optional[AttributeCombinationSpecification] = None) -> None:
@@ -4664,7 +4708,7 @@ def community_spinglass(graph: Graph, weights: Optional[Iterable[float]] = None,
     return modularity, temperature, membership, csize
 
 
-def community_spinglass_single(graph: Graph, vertex: int, weights: Optional[Iterable[float]] = None, spins: int = 25, update_rule: SpinglassUpdateMode = SpinglassUpdateMode.CONFIG, gamma: float = 1.0) -> tuple[IntArray, float, float, int, int]:
+def community_spinglass_single(graph: Graph, vertex: int, weights: Optional[Iterable[float]] = None, spins: int = 25, update_rule: SpinglassUpdateMode = SpinglassUpdateMode.CONFIG, gamma: float = 1.0) -> tuple[IntArray, float, float, float, float]:
     """Type-annotated wrapper for ``igraph_community_spinglass_single``."""
     # Prepare input arguments
     c_graph = graph
@@ -4673,8 +4717,8 @@ def community_spinglass_single(graph: Graph, vertex: int, weights: Optional[Iter
     c_community = _VectorInt.create(0)
     c_cohesion = igraph_real_t()
     c_adhesion = igraph_real_t()
-    c_inner_links = igraph_integer_t()
-    c_outer_links = igraph_integer_t()
+    c_inner_links = igraph_real_t()
+    c_outer_links = igraph_real_t()
     c_spins = spins
     c_update_rule = c_int(update_rule)
     c_gamma = gamma
