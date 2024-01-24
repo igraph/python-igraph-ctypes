@@ -6534,7 +6534,7 @@ def subisomorphic(graph1: Graph, graph2: Graph) -> bool:
 
 # igraph_subisomorphic_vf2: no Python type known for type: ISOCOMPAT_FUNC
 
-# igraph_subisomorphic_function_vf2: no Python type known for type: ISOMORPHISM_FUNC
+# igraph_get_subisomorphisms_vf2_callback: no Python type known for type: ISOMORPHISM_FUNC
 
 # igraph_count_subisomorphisms_vf2: no Python type known for type: ISOCOMPAT_FUNC
 
@@ -6561,7 +6561,7 @@ def permute_vertices(graph: Graph, permutation: Iterable[int]) -> Graph:
 
 # igraph_isomorphic_bliss: no Python type known for type: BLISSSH
 
-# igraph_automorphisms: no Python type known for type: BLISSSH
+# igraph_count_automorphisms: no Python type known for type: BLISSSH
 
 # igraph_automorphism_group: no Python type known for type: BLISSSH
 
@@ -7226,3 +7226,9 @@ def version() -> tuple[str, int, int, int]:
 
     # Construct return value
     return version_string, major, minor, subminor
+
+
+def subisomorphic_function_vf2() -> None:
+    """Type-annotated wrapper for ``igraph_subisomorphic_function_vf2``."""
+    # Call wrapped function
+    igraph_subisomorphic_function_vf2()

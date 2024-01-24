@@ -9,6 +9,7 @@ from .errors import handle_igraph_error_t
 from .types import (
     FILE,
     igraph_attribute_combination_t,
+    igraph_attribute_record_list_t,
     igraph_attribute_table_t,
     igraph_bool_t,
     igraph_integer_t,
@@ -39,6 +40,7 @@ from .types import (
     igraph_maxflow_stats_t,
     igraph_interruption_handler_t,
     igraph_isocompat_t,
+    igraph_isohandler_t,
     igraph_plfit_result_t,
     igraph_rng_t,
     igraph_rng_type_t,
@@ -633,11 +635,11 @@ igraph_empty.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_bool_t]
 
 igraph_add_edges = _lib.igraph_add_edges
 igraph_add_edges.restype = handle_igraph_error_t
-igraph_add_edges.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), c_void_p]
+igraph_add_edges.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_attribute_record_list_t)]
 
 igraph_add_vertices = _lib.igraph_add_vertices
 igraph_add_vertices.restype = handle_igraph_error_t
-igraph_add_vertices.argtypes = [POINTER(igraph_t), igraph_integer_t, c_void_p]
+igraph_add_vertices.argtypes = [POINTER(igraph_t), igraph_integer_t, POINTER(igraph_attribute_record_list_t)]
 
 igraph_copy = _lib.igraph_copy
 igraph_copy.restype = handle_igraph_error_t
@@ -2195,6 +2197,10 @@ igraph_subisomorphic_vf2 = _lib.igraph_subisomorphic_vf2
 igraph_subisomorphic_vf2.restype = handle_igraph_error_t
 igraph_subisomorphic_vf2.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_bool_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_isocompat_t, igraph_isocompat_t, c_void_p]
 
+igraph_get_subisomorphisms_vf2_callback = _lib.igraph_get_subisomorphisms_vf2_callback
+igraph_get_subisomorphisms_vf2_callback.restype = handle_igraph_error_t
+igraph_get_subisomorphisms_vf2_callback.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_isohandler_t, igraph_isocompat_t, igraph_isocompat_t, c_void_p]
+
 igraph_count_subisomorphisms_vf2 = _lib.igraph_count_subisomorphisms_vf2
 igraph_count_subisomorphisms_vf2.restype = handle_igraph_error_t
 igraph_count_subisomorphisms_vf2.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_integer_t), igraph_isocompat_t, igraph_isocompat_t, c_void_p]
@@ -2215,9 +2221,9 @@ igraph_isomorphic_bliss = _lib.igraph_isomorphic_bliss
 igraph_isomorphic_bliss.restype = handle_igraph_error_t
 igraph_isomorphic_bliss.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_bool_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t), POINTER(igraph_bliss_info_t)]
 
-igraph_automorphisms = _lib.igraph_automorphisms
-igraph_automorphisms.restype = handle_igraph_error_t
-igraph_automorphisms.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
+igraph_count_automorphisms = _lib.igraph_count_automorphisms
+igraph_count_automorphisms.restype = handle_igraph_error_t
+igraph_count_automorphisms.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
 
 igraph_automorphism_group = _lib.igraph_automorphism_group
 igraph_automorphism_group.restype = handle_igraph_error_t

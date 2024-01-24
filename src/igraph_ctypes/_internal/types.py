@@ -282,6 +282,40 @@ class igraph_attribute_combination_record_t(Structure):
     _fields_ = [("name", c_char_p), ("type", c_int), ("func", CFUNCTYPE(c_void_p))]
 
 
+class _igraph_attribute_record_value_t(CUnion):
+    _fields_ = [
+        ("as_raw", c_void_p),
+        ("as_vector", POINTER(igraph_vector_t)),
+        ("as_strvector", POINTER(igraph_strvector_t)),
+        ("as_vector_bool", POINTER(igraph_vector_bool_t)),
+    ]
+
+
+class _igraph_attribute_record_default_value_t(CUnion):
+    _fields_ = [
+        ("numeric", igraph_real_t),
+        ("boolean", igraph_bool_t),
+        ("string", c_char_p),
+    ]
+
+
+class igraph_attribute_record_t(Structure):
+    """ctypes representation of ``igraph_attribute_record_t``"""
+
+    _fields_ = [
+        ("name", c_char_p),
+        ("type", c_int),
+        ("value", _igraph_attribute_record_value_t),
+        ("default_value", _igraph_attribute_record_default_value_t),
+    ]
+
+
+class igraph_attribute_record_list_t(Structure):
+    """ctypes representation of ``igraph_attribute_record_list_t``"""
+
+    _fields_ = vector_fields(igraph_attribute_record_t)
+
+
 class igraph_bliss_info_t(Structure):
     """ctypes representation of an ``igraph_bliss_info_t`` object"""
 
@@ -429,6 +463,12 @@ igraph_isocompat_t = CFUNCTYPE(
     POINTER(igraph_t),
     igraph_integer_t,
     igraph_integer_t,
+    c_void_p,
+)
+igraph_isohandler_t = CFUNCTYPE(
+    igraph_error_t,
+    POINTER(igraph_vector_int_t),
+    POINTER(igraph_vector_int_t),
     c_void_p,
 )
 igraph_warning_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int)

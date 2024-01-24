@@ -9,6 +9,7 @@ from .errors import handle_igraph_error_t
 from .types import (
     FILE,
     igraph_attribute_combination_t,
+    igraph_attribute_record_list_t,
     igraph_attribute_table_t,
     igraph_bool_t,
     igraph_integer_t,
@@ -39,6 +40,7 @@ from .types import (
     igraph_maxflow_stats_t,
     igraph_interruption_handler_t,
     igraph_isocompat_t,
+    igraph_isohandler_t,
     igraph_plfit_result_t,
     igraph_rng_t,
     igraph_rng_type_t,
