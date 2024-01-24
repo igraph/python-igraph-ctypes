@@ -14,6 +14,7 @@ from igraph_ctypes._internal.enums import AttributeElementType, AttributeType
 from igraph_ctypes._internal.functions import igraph_ecount, igraph_vcount
 from igraph_ctypes._internal.lib import (
     igraph_attribute_combination_query,
+    igraph_attribute_record_list_size,
     igraph_error,
     igraph_es_as_vector,
     igraph_vector_resize,
@@ -117,6 +118,9 @@ class AttributeHandler(AttributeHandlerBase):
         assign_storage_to_graph(graph, DictAttributeStorage())
         self._indices = _VectorInt.create(0)
 
+        if attr and igraph_attribute_record_list_size(attr) != 0:
+            raise RuntimeError("attribute initialization not implemented yet")
+
     def destroy(self, graph) -> None:
         storage = get_storage_from_graph(graph)
         if storage:
@@ -148,12 +152,8 @@ class AttributeHandler(AttributeHandlerBase):
         assign_storage_to_graph(to, new_storage)
 
     def add_vertices(self, graph, n: int, attr) -> None:
-        # attr will only ever be NULL here so raise an error if it is not
-        if attr:
-            raise RuntimeError(
-                "add_vertices() attribute handler called with non-null attr; "
-                "this is most likely a bug"
-            )  # pragma: no cover
+        if attr and igraph_attribute_record_list_size(attr) != 0:
+            raise RuntimeError("attribute initialization not implemented yet")
 
         # Extend the existing attribute containers
         get_storage_from_graph(graph).add_vertices(graph, n)
@@ -172,12 +172,8 @@ class AttributeHandler(AttributeHandlerBase):
         assert not _are_pointers_equal(graph, to)
 
     def add_edges(self, graph, edges, attr) -> None:
-        # attr will only ever be NULL here so raise an error if it is not
-        if attr:
-            raise RuntimeError(
-                "add_edges() attribute handler called with non-null attr; "
-                "this is most likely a bug"
-            )  # pragma: no cover
+        if attr and igraph_attribute_record_list_size(attr) != 0:
+            raise RuntimeError("attribute initialization not implemented yet")
 
         # Extend the existing attribute containers
         edge_array = igraph_vector_int_t_to_numpy_array_view(edges).reshape((-1, 2))

@@ -475,6 +475,7 @@ igraph_warning_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int)
 
 
 p_attribute_combination_t = POINTER(igraph_attribute_combination_t)
+p_attribute_record_list_t = POINTER(igraph_attribute_record_list_t)
 p_igraph_t = POINTER(igraph_t)
 p_strvector_t = POINTER(igraph_strvector_t)
 p_vector_t = POINTER(igraph_vector_t)
@@ -488,7 +489,7 @@ class igraph_attribute_table_t(Structure):
     """ctypes representation of ``igraph_attribute_table_t``"""
 
     TYPES = {
-        "init": CFUNCTYPE(igraph_error_t, p_igraph_t, p_vector_ptr_t),
+        "init": CFUNCTYPE(igraph_error_t, p_igraph_t, p_attribute_record_list_t),
         "destroy": CFUNCTYPE(None, p_igraph_t),
         "copy": CFUNCTYPE(
             igraph_error_t,
@@ -499,7 +500,7 @@ class igraph_attribute_table_t(Structure):
             igraph_bool_t,
         ),
         "add_vertices": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, igraph_integer_t, p_vector_ptr_t
+            igraph_error_t, p_igraph_t, igraph_integer_t, p_attribute_record_list_t
         ),
         "permute_vertices": CFUNCTYPE(
             igraph_error_t, p_igraph_t, p_igraph_t, p_vector_int_t
@@ -512,7 +513,7 @@ class igraph_attribute_table_t(Structure):
             p_attribute_combination_t,
         ),
         "add_edges": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, p_vector_int_t, p_vector_ptr_t
+            igraph_error_t, p_igraph_t, p_vector_int_t, p_attribute_record_list_t
         ),
         "permute_edges": CFUNCTYPE(
             igraph_error_t, p_igraph_t, p_igraph_t, p_vector_int_t

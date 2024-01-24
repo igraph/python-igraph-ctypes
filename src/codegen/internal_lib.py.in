@@ -9,6 +9,7 @@ from .errors import handle_igraph_error_t
 from .types import (
     FILE,
     igraph_attribute_combination_t,
+    igraph_attribute_record_t,
     igraph_attribute_record_list_t,
     igraph_attribute_table_t,
     igraph_bool_t,
@@ -552,6 +553,14 @@ igraph_attribute_combination_add.argtypes = [POINTER(igraph_attribute_combinatio
 igraph_attribute_combination_query = _lib.igraph_attribute_combination_query
 igraph_attribute_combination_query.restype = handle_igraph_error_t
 igraph_attribute_combination_query.argtypes = [POINTER(igraph_attribute_combination_t), c_char_p, POINTER(c_int), POINTER(c_void_p)]
+
+igraph_attribute_record_list_get_ptr = _lib.igraph_attribute_record_list_get_ptr
+igraph_attribute_record_list_get_ptr.restype = POINTER(igraph_attribute_record_t)
+igraph_attribute_record_list_get_ptr.argtypes = [POINTER(igraph_attribute_record_list_t), igraph_integer_t]
+
+igraph_attribute_record_list_size = _lib.igraph_attribute_record_list_size
+igraph_attribute_record_list_size.restype = igraph_integer_t
+igraph_attribute_record_list_size.argtypes = [POINTER(igraph_attribute_record_list_t)]
 
 # Error handling and interruptions
 
