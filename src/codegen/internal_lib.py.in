@@ -336,14 +336,6 @@ igraph_matrix_nrow = _lib.igraph_matrix_nrow
 igraph_matrix_nrow.restype = igraph_integer_t
 igraph_matrix_nrow.argtypes = [POINTER(igraph_matrix_t)]
 
-igraph_matrix_e = _lib.igraph_matrix_e
-igraph_matrix_e.restype = igraph_real_t
-igraph_matrix_e.argtypes = [POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t]
-
-igraph_matrix_e_ptr = _lib.igraph_matrix_e_ptr
-igraph_matrix_e_ptr.restype = POINTER(igraph_real_t)
-igraph_matrix_e_ptr.argtypes = [POINTER(igraph_matrix_t), igraph_integer_t, igraph_integer_t]
-
 # Integer matrix type
 
 igraph_matrix_int_init = _lib.igraph_matrix_int_init
@@ -384,14 +376,6 @@ igraph_matrix_int_ncol.argtypes = [POINTER(igraph_matrix_int_t)]
 igraph_matrix_int_nrow = _lib.igraph_matrix_int_nrow
 igraph_matrix_int_nrow.restype = igraph_integer_t
 igraph_matrix_int_nrow.argtypes = [POINTER(igraph_matrix_int_t)]
-
-igraph_matrix_int_e = _lib.igraph_matrix_int_e
-igraph_matrix_int_e.restype = igraph_integer_t
-igraph_matrix_int_e.argtypes = [POINTER(igraph_matrix_int_t), igraph_integer_t, igraph_integer_t]
-
-igraph_matrix_int_e_ptr = _lib.igraph_matrix_int_e_ptr
-igraph_matrix_int_e_ptr.restype = POINTER(igraph_integer_t)
-igraph_matrix_int_e_ptr.argtypes = [POINTER(igraph_matrix_int_t), igraph_integer_t, igraph_integer_t]
 
 # List of vectors type
 

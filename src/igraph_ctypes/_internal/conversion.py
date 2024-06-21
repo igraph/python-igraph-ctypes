@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from contextlib import contextmanager
-from ctypes import addressof, cast, get_errno, memmove, POINTER
+from ctypes import addressof, get_errno, memmove, POINTER
 from os import strerror
 from typing import (
     Any,
@@ -32,11 +32,9 @@ from .lib import (
     igraph_matrix_int_init_array,
     igraph_matrix_int_ncol,
     igraph_matrix_int_nrow,
-    igraph_matrix_int_e_ptr,
     igraph_matrix_init_array,
     igraph_matrix_ncol,
     igraph_matrix_nrow,
-    igraph_matrix_e_ptr,
     igraph_vector_bool_get,
     igraph_vector_bool_get_ptr,
     igraph_vector_bool_init_array,
@@ -824,7 +822,7 @@ def igraph_matrix_t_to_numpy_array(matrix: _Matrix) -> RealArray:
     shape = igraph_matrix_nrow(matrix), igraph_matrix_ncol(matrix)
     result = np.zeros(shape, dtype=np_type_of_igraph_real_t)
     if result.size > 0:
-        memmove(result.ctypes.data, igraph_matrix_e_ptr(matrix, 0, 0), result.nbytes)
+        memmove(result.ctypes.data, matrix.unwrap().data.stor_begin, result.nbytes)
     return result
 
 
@@ -832,9 +830,7 @@ def igraph_matrix_int_t_to_numpy_array(matrix: _MatrixInt) -> IntArray:
     shape = igraph_matrix_int_nrow(matrix), igraph_matrix_int_ncol(matrix)
     result = np.zeros(shape, dtype=np_type_of_igraph_integer_t)
     if result.size > 0:
-        memmove(
-            result.ctypes.data, igraph_matrix_int_e_ptr(matrix, 0, 0), result.nbytes
-        )
+        memmove(result.ctypes.data, matrix.unwrap().data.stor_begin, result.nbytes)
     return result
 
 
