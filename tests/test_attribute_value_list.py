@@ -187,7 +187,7 @@ def test_getitem_numpy_boolean_mask(items: AVL):
     assert isinstance(sublist, ndarray)
     assert sublist.tolist() == [1, 2, 4]
 
-    with raises(IndexError, match="boolean dimension"):
+    with raises(IndexError, match="boolean index"):
         mask = array([False] * (len(items) - 1))
         sublist[mask]
 
