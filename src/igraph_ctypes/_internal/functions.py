@@ -449,6 +449,23 @@ def wheel(n: int, mode: WheelMode = WheelMode.OUT, center: int = 0) -> Graph:
     return graph
 
 
+def hypercube(n: int, directed: bool = False) -> Graph:
+    """Type-annotated wrapper for ``igraph_hypercube``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_n = n
+    c_directed = any_to_igraph_bool_t(directed)
+
+    # Call wrapped function
+    igraph_hypercube(c_graph, c_n, c_directed)
+
+    # Prepare output arguments
+    graph = _create_graph_from_boxed(c_graph)
+
+    # Construct return value
+    return graph
+
+
 def square_lattice(dimvector: Iterable[int], nei: int = 1, directed: bool = False, mutual: bool = False, periodic: Optional[Iterable[bool]] = None) -> Graph:
     """Type-annotated wrapper for ``igraph_square_lattice``."""
     # Prepare input arguments
@@ -803,6 +820,8 @@ def full_multipartite(n: Iterable[int], directed: bool = False, mode: NeighborMo
     return graph, types
 
 # igraph_realize_degree_sequence: no Python type known for type: EDGE_TYPE_SW
+
+# igraph_realize_bipartite_degree_sequence: no Python type known for type: EDGE_TYPE_SW
 
 
 def circulant(n: int, shifts: Iterable[int], directed: bool = False) -> Graph:
@@ -1296,6 +1315,8 @@ def simple_interconnected_islands_game(islands_n: int, islands_size: int, island
     # Construct return value
     return graph
 
+# igraph_chung_lu_game: no Python type known for type: CHUNG_LU_VARIANT
+
 
 def static_fitness_game(no_of_edges: int, fitness_out: Iterable[float], fitness_in: Optional[Iterable[float]] = None, loops: bool = False, multiple: bool = False) -> Graph:
     """Type-annotated wrapper for ``igraph_static_fitness_game``."""
@@ -1472,6 +1493,24 @@ def sample_dirichlet(n: int, alpha: Iterable[float]) -> RealArray:
     return res
 
 
+def are_adjacent(graph: Graph, v1: VertexLike, v2: VertexLike) -> bool:
+    """Type-annotated wrapper for ``igraph_are_adjacent``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_v1 = vertexlike_to_igraph_integer_t(v1)
+    c_v2 = vertexlike_to_igraph_integer_t(v2)
+    c_res = igraph_bool_t()
+
+    # Call wrapped function
+    igraph_are_adjacent(c_graph, c_v1, c_v2, c_res)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
 def are_connected(graph: Graph, v1: VertexLike, v2: VertexLike) -> bool:
     """Type-annotated wrapper for ``igraph_are_connected``."""
     # Prepare input arguments
@@ -1542,54 +1581,9 @@ def diameter_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, d
     # Construct return value
     return res, from_, to, vertex_path, edge_path
 
+# igraph_closeness: no Python type known for type: VERTEX_QTY
 
-def closeness(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> tuple[RealArray, IntArray, bool]:
-    """Type-annotated wrapper for ``igraph_closeness``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_reachable_count = _VectorInt.create(0)
-    c_all_reachable = igraph_bool_t()
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_normalized = any_to_igraph_bool_t(normalized)
-
-    # Call wrapped function
-    igraph_closeness(c_graph, c_res, c_reachable_count, c_all_reachable, c_vids.unwrap(), c_mode, c_weights, c_normalized)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-    reachable_count = igraph_vector_int_t_to_numpy_array(c_reachable_count)
-    all_reachable = c_all_reachable.value
-
-    # Construct return value
-    return res, reachable_count, all_reachable
-
-
-def closeness_cutoff(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> tuple[RealArray, IntArray, bool]:
-    """Type-annotated wrapper for ``igraph_closeness_cutoff``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_reachable_count = _VectorInt.create(0)
-    c_all_reachable = igraph_bool_t()
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_normalized = any_to_igraph_bool_t(normalized)
-    c_cutoff = cutoff
-
-    # Call wrapped function
-    igraph_closeness_cutoff(c_graph, c_res, c_reachable_count, c_all_reachable, c_vids.unwrap(), c_mode, c_weights, c_normalized, c_cutoff)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-    reachable_count = igraph_vector_int_t_to_numpy_array(c_reachable_count)
-    all_reachable = c_all_reachable.value
-
-    # Construct return value
-    return res, reachable_count, all_reachable
+# igraph_closeness_cutoff: no Python type known for type: VERTEX_QTY
 
 
 def distances(graph: Graph, from_: VertexSelector = "all", to: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT) -> RealArray:
@@ -2075,13 +2069,13 @@ def widest_path_widths_floyd_warshall(graph: Graph, weights: Iterable[float], fr
     return res
 
 
-def spanner(graph: Graph, stretch: float, weights: Iterable[float]) -> IntArray:
+def spanner(graph: Graph, stretch: float, weights: Optional[Iterable[float]] = None) -> IntArray:
     """Type-annotated wrapper for ``igraph_spanner``."""
     # Prepare input arguments
     c_graph = graph
     c_spanner = _VectorInt.create(0)
     c_stretch = stretch
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
 
     # Call wrapped function
     igraph_spanner(c_graph, c_spanner, c_stretch, c_weights)
@@ -2110,65 +2104,11 @@ def subcomponent(graph: Graph, vid: VertexLike, mode: NeighborMode = NeighborMod
     # Construct return value
     return res
 
+# igraph_betweenness: no Python type known for type: VERTEX_QTY
 
-def betweenness(graph: Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
-    """Type-annotated wrapper for ``igraph_betweenness``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_directed = any_to_igraph_bool_t(directed)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+# igraph_betweenness_cutoff: no Python type known for type: VERTEX_QTY
 
-    # Call wrapped function
-    igraph_betweenness(c_graph, c_res, c_vids.unwrap(), c_directed, c_weights)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-
-def betweenness_cutoff(graph: Graph, vids: VertexSelector = "all", directed: bool = True, weights: Optional[Iterable[float]] = None, cutoff: float = -1) -> RealArray:
-    """Type-annotated wrapper for ``igraph_betweenness_cutoff``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_directed = any_to_igraph_bool_t(directed)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_cutoff = cutoff
-
-    # Call wrapped function
-    igraph_betweenness_cutoff(c_graph, c_res, c_vids.unwrap(), c_directed, c_weights, c_cutoff)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-
-def betweenness_subset(graph: Graph, vids: VertexSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> RealArray:
-    """Type-annotated wrapper for ``igraph_betweenness_subset``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_directed = any_to_igraph_bool_t(directed)
-    c_sources = vertex_selector_to_igraph_vs_t(sources, graph)
-    c_targets = vertex_selector_to_igraph_vs_t(targets, graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-
-    # Call wrapped function
-    igraph_betweenness_subset(c_graph, c_res, c_vids.unwrap(), c_directed, c_sources.unwrap(), c_targets.unwrap(), c_weights)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
+# igraph_betweenness_subset: no Python type known for type: VERTEX_QTY
 
 
 def edge_betweenness(graph: Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
@@ -2207,73 +2147,17 @@ def edge_betweenness_cutoff(graph: Graph, directed: bool = True, weights: Option
     # Construct return value
     return res
 
+# igraph_edge_betweenness_subset: no Python type known for type: VERTEX_QTY
 
-def edge_betweenness_subset(graph: Graph, eids: EdgeSelector = "all", directed: bool = True, sources: VertexSelector = "all", targets: VertexSelector = "all", weights: Optional[Iterable[float]] = None) -> RealArray:
-    """Type-annotated wrapper for ``igraph_edge_betweenness_subset``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_eids = edge_selector_to_igraph_es_t(eids, graph)
-    c_directed = any_to_igraph_bool_t(directed)
-    c_sources = vertex_selector_to_igraph_vs_t(sources, graph)
-    c_targets = vertex_selector_to_igraph_vs_t(targets, graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
+# igraph_harmonic_centrality: no Python type known for type: VERTEX_QTY
 
-    # Call wrapped function
-    igraph_edge_betweenness_subset(c_graph, c_res, c_eids.unwrap(), c_directed, c_sources.unwrap(), c_targets.unwrap(), c_weights)
+# igraph_harmonic_centrality_cutoff: no Python type known for type: VERTEX_QTY
 
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
+# igraph_pagerank: no Python type known for type: VERTEX_QTY
 
-    # Construct return value
-    return res
+# igraph_personalized_pagerank: no Python type known for type: VERTEX_QTY
 
-
-def harmonic_centrality(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False) -> RealArray:
-    """Type-annotated wrapper for ``igraph_harmonic_centrality``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_normalized = any_to_igraph_bool_t(normalized)
-
-    # Call wrapped function
-    igraph_harmonic_centrality(c_graph, c_res, c_vids.unwrap(), c_mode, c_weights, c_normalized)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-
-def harmonic_centrality_cutoff(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.OUT, weights: Optional[Iterable[float]] = None, normalized: bool = False, cutoff: float = -1) -> RealArray:
-    """Type-annotated wrapper for ``igraph_harmonic_centrality_cutoff``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_normalized = any_to_igraph_bool_t(normalized)
-    c_cutoff = cutoff
-
-    # Call wrapped function
-    igraph_harmonic_centrality_cutoff(c_graph, c_res, c_vids.unwrap(), c_mode, c_weights, c_normalized, c_cutoff)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-# igraph_pagerank: no Python type known for type: PAGERANKOPT
-
-# igraph_personalized_pagerank: no Python type known for type: PAGERANKOPT
-
-# igraph_personalized_pagerank_vs: no Python type known for type: PAGERANKOPT
+# igraph_personalized_pagerank_vs: no Python type known for type: VERTEX_QTY
 
 
 def rewire(rewire: Graph, n: int, mode: Rewiring = Rewiring.SIMPLE) -> None:
@@ -2568,6 +2452,23 @@ def density(graph: Graph, loops: bool = False) -> float:
     return res
 
 
+def mean_degree(graph: Graph, loops: bool = True) -> float:
+    """Type-annotated wrapper for ``igraph_mean_degree``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = igraph_real_t()
+    c_loops = any_to_igraph_bool_t(loops)
+
+    # Call wrapped function
+    igraph_mean_degree(c_graph, c_res, c_loops)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
 def neighborhood_size(graph: Graph, vids: VertexSelector, order: int, mode: NeighborMode = NeighborMode.ALL, mindist: int = 0) -> IntArray:
     """Type-annotated wrapper for ``igraph_neighborhood_size``."""
     # Prepare input arguments
@@ -2759,6 +2660,22 @@ def has_multiple(graph: Graph) -> bool:
     return res
 
 
+def count_loops(graph: Graph) -> int:
+    """Type-annotated wrapper for ``igraph_count_loops``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_loop_count = igraph_integer_t()
+
+    # Call wrapped function
+    igraph_count_loops(c_graph, c_loop_count)
+
+    # Prepare output arguments
+    loop_count = c_loop_count.value
+
+    # Construct return value
+    return loop_count
+
+
 def count_multiple(graph: Graph, es: EdgeSelector = "all") -> IntArray:
     """Type-annotated wrapper for ``igraph_count_multiple``."""
     # Prepare input arguments
@@ -2820,13 +2737,9 @@ def add_edge(graph: Graph, from_: int, to: int) -> None:
     # Call wrapped function
     igraph_add_edge(c_graph, c_from, c_to)
 
-# igraph_eigenvector_centrality: no Python type known for type: ARPACK_OPTIONS
+# igraph_eigenvector_centrality: no Python type known for type: ALL_VERTEX_QTY
 
-# igraph_hub_score: no Python type known for type: ARPACK_OPTIONS
-
-# igraph_authority_score: no Python type known for type: ARPACK_OPTIONS
-
-# igraph_hub_and_authority_scores: no Python type known for type: ARPACK_OPTIONS
+# igraph_hub_and_authority_scores: no Python type known for type: ALL_VERTEX_QTY
 
 
 def unfold_tree(graph: Graph, roots: Iterable[int], mode: NeighborMode = NeighborMode.ALL) -> tuple[Graph, IntArray]:
@@ -2923,27 +2836,7 @@ def is_chordal(graph: Graph, alpha: Optional[Iterable[int]] = None, alpham1: Opt
     # Construct return value
     return chordal, fillin, newgraph
 
-
-def avg_nearest_neighbor_degree(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, neighbor_degree_mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None) -> tuple[RealArray, RealArray]:
-    """Type-annotated wrapper for ``igraph_avg_nearest_neighbor_degree``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-    c_neighbor_degree_mode = c_int(neighbor_degree_mode)
-    c_knn = _Vector.create(0)
-    c_knnk = _Vector.create(0)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-
-    # Call wrapped function
-    igraph_avg_nearest_neighbor_degree(c_graph, c_vids.unwrap(), c_mode, c_neighbor_degree_mode, c_knn, c_knnk, c_weights)
-
-    # Prepare output arguments
-    knn = igraph_vector_t_to_numpy_array(c_knn)
-    knnk = igraph_vector_t_to_numpy_array(c_knnk)
-
-    # Construct return value
-    return knn, knnk
+# igraph_avg_nearest_neighbor_degree: no Python type known for type: VERTEX_QTY
 
 
 def degree_correlation_vector(graph: Graph, weights: Optional[Iterable[float]] = None, from_mode: NeighborMode = NeighborMode.OUT, to_mode: NeighborMode = NeighborMode.IN, directed_neighbors: bool = True) -> RealArray:
@@ -2965,25 +2858,7 @@ def degree_correlation_vector(graph: Graph, weights: Optional[Iterable[float]] =
     # Construct return value
     return knnk
 
-
-def strength(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL, loops: bool = True, weights: Optional[Iterable[float]] = None) -> RealArray:
-    """Type-annotated wrapper for ``igraph_strength``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-    c_loops = any_to_igraph_bool_t(loops)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-
-    # Call wrapped function
-    igraph_strength(c_graph, c_res, c_vids.unwrap(), c_mode, c_loops, c_weights)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
+# igraph_strength: no Python type known for type: VERTEX_QTY
 
 
 def centralization(scores: Iterable[float], theoretical_max: float = 0, normalized: bool = True) -> float:
@@ -3124,17 +2999,16 @@ def centralization_closeness_tmax(graph: Optional[Graph] = None, nodes: int = 0,
 # igraph_centralization_eigenvector_centrality: no Python type known for type: ARPACK_OPTIONS
 
 
-def centralization_eigenvector_centrality_tmax(graph: Optional[Graph] = None, nodes: int = 0, directed: bool = False, scale: bool = True) -> float:
+def centralization_eigenvector_centrality_tmax(graph: Optional[Graph] = None, nodes: int = 0, mode: NeighborMode = NeighborMode.OUT) -> float:
     """Type-annotated wrapper for ``igraph_centralization_eigenvector_centrality_tmax``."""
     # Prepare input arguments
     c_graph = graph if graph is not None else None
     c_nodes = nodes
-    c_directed = any_to_igraph_bool_t(directed)
-    c_scale = any_to_igraph_bool_t(scale)
+    c_mode = c_int(mode)
     c_res = igraph_real_t()
 
     # Call wrapped function
-    igraph_centralization_eigenvector_centrality_tmax(c_graph, c_nodes, c_directed, c_scale, c_res)
+    igraph_centralization_eigenvector_centrality_tmax(c_graph, c_nodes, c_mode, c_res)
 
     # Prepare output arguments
     res = c_res.value
@@ -3272,42 +3146,9 @@ def contract_vertices(graph: Graph, mapping: Iterable[int], vertex_attr_comb: Op
     # Call wrapped function
     igraph_contract_vertices(c_graph, c_mapping, c_vertex_attr_comb)
 
+# igraph_eccentricity: no Python type known for type: VERTEX_QTY
 
-def eccentricity(graph: Graph, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> RealArray:
-    """Type-annotated wrapper for ``igraph_eccentricity``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_eccentricity(c_graph, c_res, c_vids.unwrap(), c_mode)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-
-def eccentricity_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all", mode: NeighborMode = NeighborMode.ALL) -> RealArray:
-    """Type-annotated wrapper for ``igraph_eccentricity_dijkstra``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_eccentricity_dijkstra(c_graph, c_weights, c_res, c_vids.unwrap(), c_mode)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
+# igraph_eccentricity_dijkstra: no Python type known for type: VERTEX_QTY
 
 
 def graph_center(graph: Graph, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
@@ -3426,23 +3267,7 @@ def pseudo_diameter_dijkstra(graph: Graph, start_vid: VertexLike, weights: Optio
     # Construct return value
     return diameter, from_, to
 
-
-def diversity(graph: Graph, weights: Optional[Iterable[float]] = None, vids: VertexSelector = "all") -> RealArray:
-    """Type-annotated wrapper for ``igraph_diversity``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-
-    # Call wrapped function
-    igraph_diversity(c_graph, c_weights, c_res, c_vids.unwrap())
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
+# igraph_diversity: no Python type known for type: VERTEX_QTY
 
 
 def random_walk(graph: Graph, start: VertexLike, steps: int, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT, stuck: RandomWalkStuck = RandomWalkStuck.RETURN) -> tuple[IntArray, IntArray]:
@@ -3506,25 +3331,7 @@ def global_efficiency(graph: Graph, weights: Optional[Iterable[float]] = None, d
     # Construct return value
     return res
 
-
-def local_efficiency(graph: Graph, vids: VertexSelector = "all", weights: Optional[Iterable[float]] = None, directed: bool = True, mode: NeighborMode = NeighborMode.ALL) -> RealArray:
-    """Type-annotated wrapper for ``igraph_local_efficiency``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = _Vector.create(0)
-    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_directed = any_to_igraph_bool_t(directed)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_local_efficiency(c_graph, c_res, c_vids.unwrap(), c_weights, c_directed, c_mode)
-
-    # Prepare output arguments
-    res = igraph_vector_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
+# igraph_local_efficiency: no Python type known for type: VERTEX_QTY
 
 
 def average_local_efficiency(graph: Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, mode: NeighborMode = NeighborMode.ALL) -> float:
@@ -3554,6 +3361,22 @@ def transitive_closure_dag(graph: Graph) -> Graph:
 
     # Call wrapped function
     igraph_transitive_closure_dag(c_graph, c_closure)
+
+    # Prepare output arguments
+    closure = _create_graph_from_boxed(c_closure)
+
+    # Construct return value
+    return closure
+
+
+def transitive_closure(graph: Graph) -> Graph:
+    """Type-annotated wrapper for ``igraph_transitive_closure``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_closure = _Graph()
+
+    # Call wrapped function
+    igraph_transitive_closure(c_graph, c_closure)
 
     # Prepare output arguments
     closure = _create_graph_from_boxed(c_closure)
@@ -3673,18 +3496,18 @@ def create_bipartite(types: Iterable[Any], edges: Iterable[int], directed: bool 
     return graph
 
 
-def biadjacency(incidence: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> tuple[Graph, BoolArray]:
+def biadjacency(biadjmatrix: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL, multiple: bool = False) -> tuple[Graph, BoolArray]:
     """Type-annotated wrapper for ``igraph_biadjacency``."""
     # Prepare input arguments
     c_graph = _Graph()
     c_types = _VectorBool.create(0)
-    c_incidence = sequence_to_igraph_matrix_t_view(incidence)
+    c_biadjmatrix = sequence_to_igraph_matrix_t_view(biadjmatrix)
     c_directed = any_to_igraph_bool_t(directed)
     c_mode = c_int(mode)
     c_multiple = any_to_igraph_bool_t(multiple)
 
     # Call wrapped function
-    igraph_biadjacency(c_graph, c_types, c_incidence, c_directed, c_mode, c_multiple)
+    igraph_biadjacency(c_graph, c_types, c_biadjmatrix, c_directed, c_mode, c_multiple)
 
     # Prepare output arguments
     graph = _create_graph_from_boxed(c_graph)
@@ -3694,17 +3517,40 @@ def biadjacency(incidence: MatrixLike, directed: bool = False, mode: NeighborMod
     return graph, types
 
 
-def get_biadjacency(graph: Graph, types: Optional[Iterable[Any]] = None) -> tuple[RealArray, IntArray, IntArray]:
+def weighted_biadjacency(biadjmatrix: MatrixLike, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> tuple[Graph, BoolArray, RealArray]:
+    """Type-annotated wrapper for ``igraph_weighted_biadjacency``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_types = _VectorBool.create(0)
+    c_weights = _Vector.create(0)
+    c_biadjmatrix = sequence_to_igraph_matrix_t_view(biadjmatrix)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_weighted_biadjacency(c_graph, c_types, c_weights, c_biadjmatrix, c_directed, c_mode)
+
+    # Prepare output arguments
+    graph = _create_graph_from_boxed(c_graph)
+    types = c_types.value
+    weights = igraph_vector_t_to_numpy_array(c_weights)
+
+    # Construct return value
+    return graph, types, weights
+
+
+def get_biadjacency(graph: Graph, types: Optional[Iterable[Any]] = None, weights: Optional[Iterable[float]] = None) -> tuple[RealArray, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_get_biadjacency``."""
     # Prepare input arguments
     c_graph = graph
     c_types = iterable_to_igraph_vector_bool_t_view(types) if types is not None else None
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_res = _Matrix.create(0)
     c_row_ids = _VectorInt.create(0)
     c_col_ids = _VectorInt.create(0)
 
     # Call wrapped function
-    igraph_get_biadjacency(c_graph, c_types, c_res, c_row_ids, c_col_ids)
+    igraph_get_biadjacency(c_graph, c_types, c_weights, c_res, c_row_ids, c_col_ids)
 
     # Prepare output arguments
     res = igraph_matrix_t_to_numpy_array(c_res)
@@ -3769,30 +3615,6 @@ def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: N
 
     # Call wrapped function
     igraph_bipartite_game_gnm(c_graph, c_types, c_n1, c_n2, c_m, c_directed, c_mode, c_multiple)
-
-    # Prepare output arguments
-    graph = _create_graph_from_boxed(c_graph)
-    types = c_types.value
-
-    # Construct return value
-    return graph, types
-
-
-def bipartite_game(type: ErdosRenyiType, n1: int, n2: int, p: float = 0.0, m: int = 0, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> tuple[Graph, BoolArray]:
-    """Type-annotated wrapper for ``igraph_bipartite_game``."""
-    # Prepare input arguments
-    c_graph = _Graph()
-    c_types = _VectorBool.create(0)
-    c_type = c_int(type)
-    c_n1 = n1
-    c_n2 = n2
-    c_p = p
-    c_m = m
-    c_directed = any_to_igraph_bool_t(directed)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_bipartite_game(c_graph, c_types, c_type, c_n1, c_n2, c_p, c_m, c_directed, c_mode)
 
     # Prepare output arguments
     graph = _create_graph_from_boxed(c_graph)
@@ -3897,6 +3719,57 @@ def bridges(graph: Graph) -> IntArray:
 
     # Prepare output arguments
     res = igraph_vector_int_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def is_biconnected(graph: Graph) -> bool:
+    """Type-annotated wrapper for ``igraph_is_biconnected``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = igraph_bool_t()
+
+    # Call wrapped function
+    igraph_is_biconnected(c_graph, c_res)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
+def count_reachable(graph: Graph, mode: NeighborMode) -> IntArray:
+    """Type-annotated wrapper for ``igraph_count_reachable``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_counts = _VectorInt.create(0)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_count_reachable(c_graph, c_counts, c_mode)
+
+    # Prepare output arguments
+    counts = igraph_vector_int_t_to_numpy_array(c_counts)
+
+    # Construct return value
+    return counts
+
+
+def is_clique(graph: Graph, candidate: VertexSelector, directed: bool = False) -> bool:
+    """Type-annotated wrapper for ``igraph_is_clique``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_candidate = vertex_selector_to_igraph_vs_t(candidate, graph)
+    c_directed = any_to_igraph_bool_t(directed)
+    c_res = igraph_bool_t()
+
+    # Call wrapped function
+    igraph_is_clique(c_graph, c_candidate.unwrap(), c_directed, c_res)
+
+    # Prepare output arguments
+    res = c_res.value
 
     # Construct return value
     return res
@@ -4117,6 +3990,23 @@ def weighted_clique_number(graph: Graph, vertex_weights: Optional[Iterable[float
 
     # Call wrapped function
     igraph_weighted_clique_number(c_graph, c_vertex_weights, c_res)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
+def is_independent_vertex_set(graph: Graph, candidate: VertexSelector) -> bool:
+    """Type-annotated wrapper for ``igraph_is_independent_vertex_set``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_candidate = vertex_selector_to_igraph_vs_t(candidate, graph)
+    c_res = igraph_bool_t()
+
+    # Call wrapped function
+    igraph_is_independent_vertex_set(c_graph, c_candidate.unwrap(), c_res)
 
     # Prepare output arguments
     res = c_res.value
@@ -4759,11 +4649,11 @@ def community_walktrap(graph: Graph, weights: Optional[Iterable[float]] = None, 
     return merges, modularity, membership
 
 
-def community_edge_betweenness(graph: Graph, directed: bool = True, weights: Optional[Iterable[float]] = None) -> tuple[IntArray, RealArray, IntArray, IntArray, RealArray, IntArray]:
+def community_edge_betweenness(graph: Graph, directed: bool = True, weights: Optional[Iterable[float]] = None, lengths: Optional[Iterable[float]] = None) -> tuple[IntArray, RealArray, IntArray, IntArray, RealArray, IntArray]:
     """Type-annotated wrapper for ``igraph_community_edge_betweenness``."""
     # Prepare input arguments
     c_graph = graph
-    c_result = _VectorInt.create(0)
+    c_removed_edges = _VectorInt.create(0)
     c_edge_betweenness = _Vector.create(0)
     c_merges = _MatrixInt.create(0)
     c_bridges = _VectorInt.create(0)
@@ -4771,12 +4661,13 @@ def community_edge_betweenness(graph: Graph, directed: bool = True, weights: Opt
     c_membership = _VectorInt.create(0)
     c_directed = any_to_igraph_bool_t(directed)
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+    c_lengths = edge_lengths_to_igraph_vector_t_view(lengths, graph) if lengths is not None else None
 
     # Call wrapped function
-    igraph_community_edge_betweenness(c_graph, c_result, c_edge_betweenness, c_merges, c_bridges, c_modularity, c_membership, c_directed, c_weights)
+    igraph_community_edge_betweenness(c_graph, c_removed_edges, c_edge_betweenness, c_merges, c_bridges, c_modularity, c_membership, c_directed, c_weights, c_lengths)
 
     # Prepare output arguments
-    result = igraph_vector_int_t_to_numpy_array(c_result)
+    removed_edges = igraph_vector_int_t_to_numpy_array(c_removed_edges)
     edge_betweenness = igraph_vector_t_to_numpy_array(c_edge_betweenness)
     merges = igraph_matrix_int_t_to_numpy_array(c_merges)
     bridges = igraph_vector_int_t_to_numpy_array(c_bridges)
@@ -4784,7 +4675,7 @@ def community_edge_betweenness(graph: Graph, directed: bool = True, weights: Opt
     membership = igraph_vector_int_t_to_numpy_array(c_membership)
 
     # Construct return value
-    return result, edge_betweenness, merges, bridges, modularity, membership
+    return removed_edges, edge_betweenness, merges, bridges, modularity, membership
 
 
 def community_eb_get_merges(graph: Graph, directed: bool, edges: Iterable[EdgeLike], weights: Optional[Iterable[float]] = None) -> tuple[IntArray, IntArray, RealArray, IntArray]:
@@ -4948,25 +4839,7 @@ def community_fluid_communities(graph: Graph, no_of_communities: int) -> IntArra
     # Construct return value
     return membership
 
-
-def community_label_propagation(graph: Graph, mode: NeighborMode = NeighborMode.ALL, weights: Optional[Iterable[float]] = None, initial: Optional[Iterable[int]] = None, fixed: Optional[Iterable[bool]] = None) -> IntArray:
-    """Type-annotated wrapper for ``igraph_community_label_propagation``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_membership = _VectorInt.create(0)
-    c_mode = c_int(mode)
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
-    c_initial = iterable_to_igraph_vector_int_t_view(initial) if initial is not None else None
-    c_fixed = iterable_to_igraph_vector_bool_t_view(fixed) if fixed is not None else None
-
-    # Call wrapped function
-    igraph_community_label_propagation(c_graph, c_membership, c_mode, c_weights, c_initial, c_fixed)
-
-    # Prepare output arguments
-    membership = igraph_vector_int_t_to_numpy_array(c_membership)
-
-    # Construct return value
-    return membership
+# igraph_community_label_propagation: no Python type known for type: LPA_VARIANT
 
 
 def community_multilevel(graph: Graph, weights: Optional[Iterable[float]] = None, resolution: float = 1.0) -> tuple[IntArray, IntArray, RealArray]:
@@ -5862,6 +5735,23 @@ def disjoint_union(left: Graph, right: Graph) -> Graph:
 # igraph_disjoint_union_many: no Python type known for type: GRAPH_PTR_LIST
 
 
+def join(left: Graph, right: Graph) -> Graph:
+    """Type-annotated wrapper for ``igraph_join``."""
+    # Prepare input arguments
+    c_res = _Graph()
+    c_left = left
+    c_right = right
+
+    # Call wrapped function
+    igraph_join(c_res, c_left, c_right)
+
+    # Prepare output arguments
+    res = _create_graph_from_boxed(c_res)
+
+    # Construct return value
+    return res
+
+
 def union(left: Graph, right: Graph) -> tuple[Graph, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_union``."""
     # Prepare input arguments
@@ -6475,6 +6365,40 @@ def isomorphic(graph1: Graph, graph2: Graph) -> bool:
     return iso
 
 
+def automorphism_group(graph: Graph, colors: Optional[Iterable[int]] = None) -> list[IntArray]:
+    """Type-annotated wrapper for ``igraph_automorphism_group``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_colors = vertex_colors_to_igraph_vector_int_t_view(colors, graph) if colors is not None else None
+    c_generators = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_automorphism_group(c_graph, c_colors, c_generators)
+
+    # Prepare output arguments
+    generators = igraph_vector_int_list_t_to_list_of_numpy_array(c_generators)
+
+    # Construct return value
+    return generators
+
+
+def count_automorphisms(graph: Graph, colors: Optional[Iterable[int]] = None) -> float:
+    """Type-annotated wrapper for ``igraph_count_automorphisms``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_colors = vertex_colors_to_igraph_vector_int_t_view(colors, graph) if colors is not None else None
+    c_result = igraph_real_t()
+
+    # Call wrapped function
+    igraph_count_automorphisms(c_graph, c_colors, c_result)
+
+    # Prepare output arguments
+    result = c_result.value
+
+    # Construct return value
+    return result
+
+
 def isoclass_subgraph(graph: Graph, vids: Iterable[int]) -> int:
     """Type-annotated wrapper for ``igraph_isoclass_subgraph``."""
     # Prepare input arguments
@@ -6540,7 +6464,24 @@ def subisomorphic(graph1: Graph, graph2: Graph) -> bool:
 
 # igraph_get_subisomorphisms_vf2: no Python type known for type: VECTOR_INT_LIST
 
-# igraph_canonical_permutation: no Python type known for type: BLISSSH
+
+def canonical_permutation(graph: Graph, colors: Optional[Iterable[int]] = None) -> IntArray:
+    """Type-annotated wrapper for ``igraph_canonical_permutation``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_colors = vertex_colors_to_igraph_vector_int_t_view(colors, graph) if colors is not None else None
+    c_labeling = _VectorInt.create(0)
+
+    # Call wrapped function
+    igraph_canonical_permutation(c_graph, c_colors, c_labeling)
+
+    # Prepare output arguments
+    labeling = igraph_vector_int_t_to_numpy_array(c_labeling)
+
+    # Construct return value
+    return labeling
+
+# igraph_canonical_permutation_bliss: no Python type known for type: BLISSSH
 
 
 def permute_vertices(graph: Graph, permutation: Iterable[int]) -> Graph:
@@ -6561,9 +6502,9 @@ def permute_vertices(graph: Graph, permutation: Iterable[int]) -> Graph:
 
 # igraph_isomorphic_bliss: no Python type known for type: BLISSSH
 
-# igraph_count_automorphisms: no Python type known for type: BLISSSH
+# igraph_count_automorphisms_bliss: no Python type known for type: BLISSSH
 
-# igraph_automorphism_group: no Python type known for type: BLISSSH
+# igraph_automorphism_group_bliss: no Python type known for type: BLISSSH
 
 # igraph_subisomorphic_lad: no Python type known for type: VECTOR_INT_LIST
 
@@ -6949,6 +6890,22 @@ def tree_from_parent_vector(parents: Iterable[int], type: TreeMode = TreeMode.OU
     return graph
 
 
+def is_complete(graph: Graph) -> bool:
+    """Type-annotated wrapper for ``igraph_is_complete``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = igraph_bool_t()
+
+    # Call wrapped function
+    igraph_is_complete(c_graph, c_res)
+
+    # Prepare output arguments
+    res = c_res.value
+
+    # Construct return value
+    return res
+
+
 def minimum_spanning_tree(graph: Graph, weights: Optional[Iterable[float]] = None) -> IntArray:
     """Type-annotated wrapper for ``igraph_minimum_spanning_tree``."""
     # Prepare input arguments
@@ -7050,73 +7007,13 @@ def vertex_coloring_greedy(graph: Graph, heuristic: GreedyColoringHeuristics = G
     # Construct return value
     return colors
 
+# igraph_deterministic_optimal_imitation: no Python type known for type: ALL_VERTEX_QTY
 
-def deterministic_optimal_imitation(graph: Graph, vid: VertexLike, quantities: Iterable[float], strategies: Iterable[int], optimality: Optimality = Optimality.MAXIMUM, mode: NeighborMode = NeighborMode.OUT) -> None:
-    """Type-annotated wrapper for ``igraph_deterministic_optimal_imitation``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_vid = vertexlike_to_igraph_integer_t(vid)
-    c_optimality = c_int(optimality)
-    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
-    c_strategies = iterable_to_igraph_vector_int_t(strategies)
-    c_mode = c_int(mode)
+# igraph_moran_process: no Python type known for type: ALL_VERTEX_QTY
 
-    # Call wrapped function
-    igraph_deterministic_optimal_imitation(c_graph, c_vid, c_optimality, c_quantities, c_strategies, c_mode)
+# igraph_roulette_wheel_imitation: no Python type known for type: ALL_VERTEX_QTY
 
-    # Prepare output arguments
-    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
-
-
-def moran_process(graph: Graph, quantities: Iterable[float], strategies: Iterable[int], weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.OUT) -> None:
-    """Type-annotated wrapper for ``igraph_moran_process``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph)
-    c_quantities = vertex_qtys_to_igraph_vector_t(quantities, graph)
-    c_strategies = iterable_to_igraph_vector_int_t(strategies)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_moran_process(c_graph, c_weights, c_quantities, c_strategies, c_mode)
-
-    # Prepare output arguments
-    quantities = igraph_vector_t_to_numpy_array(c_quantities)
-    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
-
-
-def roulette_wheel_imitation(graph: Graph, vid: VertexLike, is_local: bool, quantities: Iterable[float], strategies: Iterable[int], mode: NeighborMode = NeighborMode.OUT) -> None:
-    """Type-annotated wrapper for ``igraph_roulette_wheel_imitation``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_vid = vertexlike_to_igraph_integer_t(vid)
-    c_is_local = any_to_igraph_bool_t(is_local)
-    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
-    c_strategies = iterable_to_igraph_vector_int_t(strategies)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_roulette_wheel_imitation(c_graph, c_vid, c_is_local, c_quantities, c_strategies, c_mode)
-
-    # Prepare output arguments
-    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
-
-
-def stochastic_imitation(graph: Graph, vid: VertexLike, algo: ImitateAlgorithm, quantities: Iterable[float], strategies: Iterable[int], mode: NeighborMode = NeighborMode.OUT) -> None:
-    """Type-annotated wrapper for ``igraph_stochastic_imitation``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_vid = vertexlike_to_igraph_integer_t(vid)
-    c_algo = c_int(algo)
-    c_quantities = vertex_qtys_to_igraph_vector_t_view(quantities, graph)
-    c_strategies = iterable_to_igraph_vector_int_t(strategies)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_stochastic_imitation(c_graph, c_vid, c_algo, c_quantities, c_strategies, c_mode)
-
-    # Prepare output arguments
-    strategies = igraph_vector_int_t_to_numpy_array(c_strategies)
+# igraph_stochastic_imitation: no Python type known for type: ALL_VERTEX_QTY
 
 
 def convergence_degree(graph: Graph) -> tuple[RealArray, RealArray, RealArray]:

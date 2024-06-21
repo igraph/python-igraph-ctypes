@@ -580,12 +580,12 @@ igraph_add_weights_t = c_int
 igraph_adjacency_t = c_int
 igraph_barabasi_algorithm_t = c_int
 igraph_bliss_sh_t = c_int
+igraph_chung_lu_t = c_int
 igraph_coloring_greedy_t = c_int
 igraph_community_comparison_t = c_int
 igraph_connectedness_t = c_int
 igraph_degseq_t = c_int
 igraph_eigen_which_position_t = c_int
-igraph_erdos_renyi_t = c_int
 igraph_fas_algorithm_t = c_int
 igraph_floyd_warshall_algorithm_t = c_int
 igraph_get_adjacency_t = c_int
@@ -594,6 +594,7 @@ igraph_laplacian_normalization_t = c_int
 igraph_laplacian_spectral_embedding_type_t = c_int
 igraph_layout_grid_t = c_int
 igraph_loops_t = c_int
+igraph_lpa_variant_t = c_int
 igraph_neimode_t = c_int
 igraph_optimal_t = c_int
 igraph_pagerank_algo_t = c_int
@@ -726,6 +727,10 @@ igraph_wheel = _lib.igraph_wheel
 igraph_wheel.restype = handle_igraph_error_t
 igraph_wheel.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_wheel_mode_t, igraph_integer_t]
 
+igraph_hypercube = _lib.igraph_hypercube
+igraph_hypercube.restype = handle_igraph_error_t
+igraph_hypercube.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_bool_t]
+
 igraph_square_lattice = _lib.igraph_square_lattice
 igraph_square_lattice.restype = handle_igraph_error_t
 igraph_square_lattice.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_bool_t, igraph_bool_t, POINTER(igraph_vector_bool_t)]
@@ -809,6 +814,10 @@ igraph_full_multipartite.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_in
 igraph_realize_degree_sequence = _lib.igraph_realize_degree_sequence
 igraph_realize_degree_sequence.restype = handle_igraph_error_t
 igraph_realize_degree_sequence.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_edge_type_sw_t, igraph_realize_degseq_t]
+
+igraph_realize_bipartite_degree_sequence = _lib.igraph_realize_bipartite_degree_sequence
+igraph_realize_bipartite_degree_sequence.restype = handle_igraph_error_t
+igraph_realize_bipartite_degree_sequence.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_edge_type_sw_t, igraph_realize_degseq_t]
 
 igraph_circulant = _lib.igraph_circulant
 igraph_circulant.restype = handle_igraph_error_t
@@ -910,6 +919,10 @@ igraph_simple_interconnected_islands_game = _lib.igraph_simple_interconnected_is
 igraph_simple_interconnected_islands_game.restype = handle_igraph_error_t
 igraph_simple_interconnected_islands_game.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_t, igraph_real_t, igraph_integer_t]
 
+igraph_chung_lu_game = _lib.igraph_chung_lu_game
+igraph_chung_lu_game.restype = handle_igraph_error_t
+igraph_chung_lu_game.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_bool_t, igraph_chung_lu_t]
+
 igraph_static_fitness_game = _lib.igraph_static_fitness_game
 igraph_static_fitness_game.restype = handle_igraph_error_t
 igraph_static_fitness_game.argtypes = [POINTER(igraph_t), igraph_integer_t, POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_bool_t, igraph_bool_t]
@@ -957,6 +970,10 @@ igraph_sample_sphere_volume.argtypes = [igraph_integer_t, igraph_integer_t, igra
 igraph_sample_dirichlet = _lib.igraph_sample_dirichlet
 igraph_sample_dirichlet.restype = handle_igraph_error_t
 igraph_sample_dirichlet.argtypes = [igraph_integer_t, POINTER(igraph_vector_t), POINTER(igraph_matrix_t)]
+
+igraph_are_adjacent = _lib.igraph_are_adjacent
+igraph_are_adjacent.restype = handle_igraph_error_t
+igraph_are_adjacent.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_t, POINTER(igraph_bool_t)]
 
 igraph_are_connected = _lib.igraph_are_connected
 igraph_are_connected.restype = handle_igraph_error_t
@@ -1186,6 +1203,10 @@ igraph_density = _lib.igraph_density
 igraph_density.restype = handle_igraph_error_t
 igraph_density.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_bool_t]
 
+igraph_mean_degree = _lib.igraph_mean_degree
+igraph_mean_degree.restype = handle_igraph_error_t
+igraph_mean_degree.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_bool_t]
+
 igraph_neighborhood_size = _lib.igraph_neighborhood_size
 igraph_neighborhood_size.restype = handle_igraph_error_t
 igraph_neighborhood_size.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_vs_t, igraph_integer_t, igraph_neimode_t, igraph_integer_t]
@@ -1234,6 +1255,10 @@ igraph_has_multiple = _lib.igraph_has_multiple
 igraph_has_multiple.restype = handle_igraph_error_t
 igraph_has_multiple.argtypes = [POINTER(igraph_t), POINTER(igraph_bool_t)]
 
+igraph_count_loops = _lib.igraph_count_loops
+igraph_count_loops.restype = handle_igraph_error_t
+igraph_count_loops.argtypes = [POINTER(igraph_t), POINTER(igraph_integer_t)]
+
 igraph_count_multiple = _lib.igraph_count_multiple
 igraph_count_multiple.restype = handle_igraph_error_t
 igraph_count_multiple.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_es_t]
@@ -1252,19 +1277,11 @@ igraph_add_edge.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_
 
 igraph_eigenvector_centrality = _lib.igraph_eigenvector_centrality
 igraph_eigenvector_centrality.restype = handle_igraph_error_t
-igraph_eigenvector_centrality.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t, igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_arpack_options_t)]
-
-igraph_hub_score = _lib.igraph_hub_score
-igraph_hub_score.restype = handle_igraph_error_t
-igraph_hub_score.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_arpack_options_t)]
-
-igraph_authority_score = _lib.igraph_authority_score
-igraph_authority_score.restype = handle_igraph_error_t
-igraph_authority_score.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_arpack_options_t)]
+igraph_eigenvector_centrality.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_neimode_t, POINTER(igraph_vector_t), POINTER(igraph_arpack_options_t)]
 
 igraph_hub_and_authority_scores = _lib.igraph_hub_and_authority_scores
 igraph_hub_and_authority_scores.restype = handle_igraph_error_t
-igraph_hub_and_authority_scores.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_arpack_options_t)]
+igraph_hub_and_authority_scores.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), POINTER(igraph_vector_t), POINTER(igraph_arpack_options_t)]
 
 igraph_unfold_tree = _lib.igraph_unfold_tree
 igraph_unfold_tree.restype = handle_igraph_error_t
@@ -1328,11 +1345,11 @@ igraph_centralization_closeness_tmax.argtypes = [POINTER(igraph_t), igraph_integ
 
 igraph_centralization_eigenvector_centrality = _lib.igraph_centralization_eigenvector_centrality
 igraph_centralization_eigenvector_centrality.restype = handle_igraph_error_t
-igraph_centralization_eigenvector_centrality.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t, igraph_bool_t, POINTER(igraph_arpack_options_t), POINTER(igraph_real_t), POINTER(igraph_real_t), igraph_bool_t]
+igraph_centralization_eigenvector_centrality.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_neimode_t, POINTER(igraph_arpack_options_t), POINTER(igraph_real_t), POINTER(igraph_real_t), igraph_bool_t]
 
 igraph_centralization_eigenvector_centrality_tmax = _lib.igraph_centralization_eigenvector_centrality_tmax
 igraph_centralization_eigenvector_centrality_tmax.restype = handle_igraph_error_t
-igraph_centralization_eigenvector_centrality_tmax.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_bool_t, igraph_bool_t, POINTER(igraph_real_t)]
+igraph_centralization_eigenvector_centrality_tmax.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_neimode_t, POINTER(igraph_real_t)]
 
 igraph_assortativity_nominal = _lib.igraph_assortativity_nominal
 igraph_assortativity_nominal.restype = handle_igraph_error_t
@@ -1422,6 +1439,10 @@ igraph_transitive_closure_dag = _lib.igraph_transitive_closure_dag
 igraph_transitive_closure_dag.restype = handle_igraph_error_t
 igraph_transitive_closure_dag.argtypes = [POINTER(igraph_t), POINTER(igraph_t)]
 
+igraph_transitive_closure = _lib.igraph_transitive_closure
+igraph_transitive_closure.restype = handle_igraph_error_t
+igraph_transitive_closure.argtypes = [POINTER(igraph_t), POINTER(igraph_t)]
+
 igraph_trussness = _lib.igraph_trussness
 igraph_trussness.restype = handle_igraph_error_t
 igraph_trussness.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t)]
@@ -1454,9 +1475,13 @@ igraph_biadjacency = _lib.igraph_biadjacency
 igraph_biadjacency.restype = handle_igraph_error_t
 igraph_biadjacency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_matrix_t), igraph_bool_t, igraph_neimode_t, igraph_bool_t]
 
+igraph_weighted_biadjacency = _lib.igraph_weighted_biadjacency
+igraph_weighted_biadjacency.restype = handle_igraph_error_t
+igraph_weighted_biadjacency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_t), igraph_bool_t, igraph_neimode_t]
+
 igraph_get_biadjacency = _lib.igraph_get_biadjacency
 igraph_get_biadjacency.restype = handle_igraph_error_t
-igraph_get_biadjacency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
+igraph_get_biadjacency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
 
 igraph_is_bipartite = _lib.igraph_is_bipartite
 igraph_is_bipartite.restype = handle_igraph_error_t
@@ -1469,10 +1494,6 @@ igraph_bipartite_game_gnp.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_b
 igraph_bipartite_game_gnm = _lib.igraph_bipartite_game_gnm
 igraph_bipartite_game_gnm.restype = handle_igraph_error_t
 igraph_bipartite_game_gnm.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_neimode_t, igraph_bool_t]
-
-igraph_bipartite_game = _lib.igraph_bipartite_game
-igraph_bipartite_game.restype = handle_igraph_error_t
-igraph_bipartite_game.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), igraph_erdos_renyi_t, igraph_integer_t, igraph_integer_t, igraph_real_t, igraph_integer_t, igraph_bool_t, igraph_neimode_t]
 
 igraph_get_laplacian = _lib.igraph_get_laplacian
 igraph_get_laplacian.restype = handle_igraph_error_t
@@ -1505,6 +1526,18 @@ igraph_biconnected_components.argtypes = [POINTER(igraph_t), POINTER(igraph_inte
 igraph_bridges = _lib.igraph_bridges
 igraph_bridges.restype = handle_igraph_error_t
 igraph_bridges.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t)]
+
+igraph_is_biconnected = _lib.igraph_is_biconnected
+igraph_is_biconnected.restype = handle_igraph_error_t
+igraph_is_biconnected.argtypes = [POINTER(igraph_t), POINTER(igraph_bool_t)]
+
+igraph_count_reachable = _lib.igraph_count_reachable
+igraph_count_reachable.restype = handle_igraph_error_t
+igraph_count_reachable.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
+
+igraph_is_clique = _lib.igraph_is_clique
+igraph_is_clique.restype = handle_igraph_error_t
+igraph_is_clique.argtypes = [POINTER(igraph_t), igraph_vs_t, igraph_bool_t, POINTER(igraph_bool_t)]
 
 igraph_cliques = _lib.igraph_cliques
 igraph_cliques.restype = handle_igraph_error_t
@@ -1553,6 +1586,10 @@ igraph_largest_weighted_cliques.argtypes = [POINTER(igraph_t), POINTER(igraph_ve
 igraph_weighted_clique_number = _lib.igraph_weighted_clique_number
 igraph_weighted_clique_number.restype = handle_igraph_error_t
 igraph_weighted_clique_number.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t)]
+
+igraph_is_independent_vertex_set = _lib.igraph_is_independent_vertex_set
+igraph_is_independent_vertex_set.restype = handle_igraph_error_t
+igraph_is_independent_vertex_set.argtypes = [POINTER(igraph_t), igraph_vs_t, POINTER(igraph_bool_t)]
 
 igraph_independent_vertex_sets = _lib.igraph_independent_vertex_sets
 igraph_independent_vertex_sets.restype = handle_igraph_error_t
@@ -1732,7 +1769,7 @@ igraph_community_walktrap.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t
 
 igraph_community_edge_betweenness = _lib.igraph_community_edge_betweenness
 igraph_community_edge_betweenness.restype = handle_igraph_error_t
-igraph_community_edge_betweenness.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_bool_t, POINTER(igraph_vector_t)]
+igraph_community_edge_betweenness.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_t), POINTER(igraph_matrix_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_vector_t)]
 
 igraph_community_eb_get_merges = _lib.igraph_community_eb_get_merges
 igraph_community_eb_get_merges.restype = handle_igraph_error_t
@@ -1768,7 +1805,7 @@ igraph_community_fluid_communities.argtypes = [POINTER(igraph_t), igraph_integer
 
 igraph_community_label_propagation = _lib.igraph_community_label_propagation
 igraph_community_label_propagation.restype = handle_igraph_error_t
-igraph_community_label_propagation.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_neimode_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_bool_t)]
+igraph_community_label_propagation.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_neimode_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_bool_t), igraph_lpa_variant_t]
 
 igraph_community_multilevel = _lib.igraph_community_multilevel
 igraph_community_multilevel.restype = handle_igraph_error_t
@@ -2014,6 +2051,10 @@ igraph_disjoint_union_many = _lib.igraph_disjoint_union_many
 igraph_disjoint_union_many.restype = handle_igraph_error_t
 igraph_disjoint_union_many.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_ptr_t)]
 
+igraph_join = _lib.igraph_join
+igraph_join.restype = handle_igraph_error_t
+igraph_join.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_t)]
+
 igraph_union = _lib.igraph_union
 igraph_union.restype = handle_igraph_error_t
 igraph_union.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
@@ -2162,6 +2203,14 @@ igraph_isomorphic = _lib.igraph_isomorphic
 igraph_isomorphic.restype = handle_igraph_error_t
 igraph_isomorphic.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_bool_t)]
 
+igraph_automorphism_group = _lib.igraph_automorphism_group
+igraph_automorphism_group.restype = handle_igraph_error_t
+igraph_automorphism_group.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_list_t)]
+
+igraph_count_automorphisms = _lib.igraph_count_automorphisms
+igraph_count_automorphisms.restype = handle_igraph_error_t
+igraph_count_automorphisms.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_real_t)]
+
 igraph_isoclass_subgraph = _lib.igraph_isoclass_subgraph
 igraph_isoclass_subgraph.restype = handle_igraph_error_t
 igraph_isoclass_subgraph.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_integer_t)]
@@ -2204,7 +2253,11 @@ igraph_get_subisomorphisms_vf2.argtypes = [POINTER(igraph_t), POINTER(igraph_t),
 
 igraph_canonical_permutation = _lib.igraph_canonical_permutation
 igraph_canonical_permutation.restype = handle_igraph_error_t
-igraph_canonical_permutation.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
+igraph_canonical_permutation.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
+
+igraph_canonical_permutation_bliss = _lib.igraph_canonical_permutation_bliss
+igraph_canonical_permutation_bliss.restype = handle_igraph_error_t
+igraph_canonical_permutation_bliss.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
 
 igraph_permute_vertices = _lib.igraph_permute_vertices
 igraph_permute_vertices.restype = handle_igraph_error_t
@@ -2214,17 +2267,17 @@ igraph_isomorphic_bliss = _lib.igraph_isomorphic_bliss
 igraph_isomorphic_bliss.restype = handle_igraph_error_t
 igraph_isomorphic_bliss.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), POINTER(igraph_bool_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t), POINTER(igraph_bliss_info_t)]
 
-igraph_count_automorphisms = _lib.igraph_count_automorphisms
-igraph_count_automorphisms.restype = handle_igraph_error_t
-igraph_count_automorphisms.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
+igraph_count_automorphisms_bliss = _lib.igraph_count_automorphisms_bliss
+igraph_count_automorphisms_bliss.restype = handle_igraph_error_t
+igraph_count_automorphisms_bliss.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
 
-igraph_automorphism_group = _lib.igraph_automorphism_group
-igraph_automorphism_group.restype = handle_igraph_error_t
-igraph_automorphism_group.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_list_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
+igraph_automorphism_group_bliss = _lib.igraph_automorphism_group_bliss
+igraph_automorphism_group_bliss.restype = handle_igraph_error_t
+igraph_automorphism_group_bliss.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_list_t), igraph_bliss_sh_t, POINTER(igraph_bliss_info_t)]
 
 igraph_subisomorphic_lad = _lib.igraph_subisomorphic_lad
 igraph_subisomorphic_lad.restype = handle_igraph_error_t
-igraph_subisomorphic_lad.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_list_t), POINTER(igraph_bool_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_list_t), igraph_bool_t, igraph_integer_t]
+igraph_subisomorphic_lad.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_vector_int_list_t), POINTER(igraph_bool_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_list_t), igraph_bool_t]
 
 igraph_simplify_and_colorize = _lib.igraph_simplify_and_colorize
 igraph_simplify_and_colorize.restype = handle_igraph_error_t
@@ -2329,6 +2382,10 @@ igraph_to_prufer.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t)]
 igraph_tree_from_parent_vector = _lib.igraph_tree_from_parent_vector
 igraph_tree_from_parent_vector.restype = handle_igraph_error_t
 igraph_tree_from_parent_vector.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_tree_mode_t]
+
+igraph_is_complete = _lib.igraph_is_complete
+igraph_is_complete.restype = handle_igraph_error_t
+igraph_is_complete.argtypes = [POINTER(igraph_t), POINTER(igraph_bool_t)]
 
 igraph_minimum_spanning_tree = _lib.igraph_minimum_spanning_tree
 igraph_minimum_spanning_tree.restype = handle_igraph_error_t

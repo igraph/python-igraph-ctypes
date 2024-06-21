@@ -1640,6 +1640,40 @@ VoronoiTiebreaker._string_map = {
 }
 
 
+class ChungLu(IntEnum):
+    """Python counterpart of an ``igraph_chung_lu_t`` enum."""
+
+    ORIGINAL = 0
+    GRG = 1
+    NR = 2
+
+    _string_map: ClassVar[dict[str, ChungLu]]
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, ChungLu):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return cls._string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to ChungLu") from None
+
+
+ChungLu._string_map = {
+    'grg': ChungLu.GRG,
+    'nr': ChungLu.NR,
+    'original': ChungLu.ORIGINAL,
+}
+
+
 class MatrixStorage(IntEnum):
     """Python counterpart of an ``igraph_matrix_storage_t`` enum."""
 
@@ -1672,6 +1706,40 @@ MatrixStorage._string_map = {
 }
 
 
+class LpaVariant(IntEnum):
+    """Python counterpart of an ``igraph_lpa_variant_t`` enum."""
+
+    DOMINANCE = 0
+    RETENTION = 1
+    FAST = 2
+
+    _string_map: ClassVar[dict[str, LpaVariant]]
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, LpaVariant):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return cls._string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to LpaVariant") from None
+
+
+LpaVariant._string_map = {
+    'dominance': LpaVariant.DOMINANCE,
+    'fast': LpaVariant.FAST,
+    'retention': LpaVariant.RETENTION,
+}
+
+
 class ErrorCode(IntEnum):
     """Python counterpart of an ``igraph_error_type_t`` enum."""
 
@@ -1681,57 +1749,18 @@ class ErrorCode(IntEnum):
     PARSEERROR = 3
     EINVAL = 4
     EXISTS = 5
-    EINVEVECTOR = 6
     EINVVID = 7
-    NONSQUARE = 8
+    EINVEID = 8
     EINVMODE = 9
     EFILE = 10
     UNIMPLEMENTED = 12
     INTERRUPTED = 13
     DIVERGED = 14
-    ARPACK_PROD = 15
-    ARPACK_NPOS = 16
-    ARPACK_NEVNPOS = 17
-    ARPACK_NCVSMALL = 18
-    ARPACK_NONPOSI = 19
-    ARPACK_WHICHINV = 20
-    ARPACK_BMATINV = 21
-    ARPACK_WORKLSMALL = 22
-    ARPACK_TRIDERR = 23
-    ARPACK_ZEROSTART = 24
-    ARPACK_MODEINV = 25
-    ARPACK_MODEBMAT = 26
-    ARPACK_ISHIFT = 27
-    ARPACK_NEVBE = 28
-    ARPACK_NOFACT = 29
-    ARPACK_FAILED = 30
-    ARPACK_HOWMNY = 31
-    ARPACK_HOWMNYS = 32
-    ARPACK_EVDIFF = 33
-    ARPACK_SHUR = 34
-    ARPACK_LAPACK = 35
-    ARPACK_UNKNOWN = 36
+    EARPACK = 15
     ENEGLOOP = 37
     EINTERNAL = 38
-    ARPACK_MAXIT = 39
-    ARPACK_NOSHIFT = 40
-    ARPACK_REORDER = 41
-    EDIVZERO = 42
-    GLP_EBOUND = 43
-    GLP_EROOT = 44
-    GLP_ENOPFS = 45
-    GLP_ENODFS = 46
-    GLP_EFAIL = 47
-    GLP_EMIPGAP = 48
-    GLP_ETMLIM = 49
-    GLP_ESTOP = 50
-    EATTRIBUTES = 51
     EATTRCOMBINE = 52
-    ELAPACK = 53
-    EDRL = 54
     EOVERFLOW = 55
-    EGLP = 56
-    CPUTIME = 57
     EUNDERFLOW = 58
     ERWSTUCK = 59
     STOP = 60
@@ -1759,45 +1788,15 @@ class ErrorCode(IntEnum):
 
 
 ErrorCode._string_map = {
-    'arpack_bmatinv': ErrorCode.ARPACK_BMATINV,
-    'arpack_evdiff': ErrorCode.ARPACK_EVDIFF,
-    'arpack_failed': ErrorCode.ARPACK_FAILED,
-    'arpack_howmny': ErrorCode.ARPACK_HOWMNY,
-    'arpack_howmnys': ErrorCode.ARPACK_HOWMNYS,
-    'arpack_ishift': ErrorCode.ARPACK_ISHIFT,
-    'arpack_lapack': ErrorCode.ARPACK_LAPACK,
-    'arpack_maxit': ErrorCode.ARPACK_MAXIT,
-    'arpack_modebmat': ErrorCode.ARPACK_MODEBMAT,
-    'arpack_modeinv': ErrorCode.ARPACK_MODEINV,
-    'arpack_ncvsmall': ErrorCode.ARPACK_NCVSMALL,
-    'arpack_nevbe': ErrorCode.ARPACK_NEVBE,
-    'arpack_nevnpos': ErrorCode.ARPACK_NEVNPOS,
-    'arpack_nofact': ErrorCode.ARPACK_NOFACT,
-    'arpack_nonposi': ErrorCode.ARPACK_NONPOSI,
-    'arpack_noshift': ErrorCode.ARPACK_NOSHIFT,
-    'arpack_npos': ErrorCode.ARPACK_NPOS,
-    'arpack_prod': ErrorCode.ARPACK_PROD,
-    'arpack_reorder': ErrorCode.ARPACK_REORDER,
-    'arpack_shur': ErrorCode.ARPACK_SHUR,
-    'arpack_triderr': ErrorCode.ARPACK_TRIDERR,
-    'arpack_unknown': ErrorCode.ARPACK_UNKNOWN,
-    'arpack_whichinv': ErrorCode.ARPACK_WHICHINV,
-    'arpack_worklsmall': ErrorCode.ARPACK_WORKLSMALL,
-    'arpack_zerostart': ErrorCode.ARPACK_ZEROSTART,
-    'cputime': ErrorCode.CPUTIME,
     'diverged': ErrorCode.DIVERGED,
+    'earpack': ErrorCode.EARPACK,
     'eattrcombine': ErrorCode.EATTRCOMBINE,
-    'eattributes': ErrorCode.EATTRIBUTES,
-    'edivzero': ErrorCode.EDIVZERO,
-    'edrl': ErrorCode.EDRL,
     'efile': ErrorCode.EFILE,
-    'eglp': ErrorCode.EGLP,
     'einternal': ErrorCode.EINTERNAL,
     'einval': ErrorCode.EINVAL,
-    'einvevector': ErrorCode.EINVEVECTOR,
+    'einveid': ErrorCode.EINVEID,
     'einvmode': ErrorCode.EINVMODE,
     'einvvid': ErrorCode.EINVVID,
-    'elapack': ErrorCode.ELAPACK,
     'enegloop': ErrorCode.ENEGLOOP,
     'enomem': ErrorCode.ENOMEM,
     'enosol': ErrorCode.ENOSOL,
@@ -1807,16 +1806,7 @@ ErrorCode._string_map = {
     'eunderflow': ErrorCode.EUNDERFLOW,
     'exists': ErrorCode.EXISTS,
     'failure': ErrorCode.FAILURE,
-    'glp_ebound': ErrorCode.GLP_EBOUND,
-    'glp_efail': ErrorCode.GLP_EFAIL,
-    'glp_emipgap': ErrorCode.GLP_EMIPGAP,
-    'glp_enodfs': ErrorCode.GLP_ENODFS,
-    'glp_enopfs': ErrorCode.GLP_ENOPFS,
-    'glp_eroot': ErrorCode.GLP_EROOT,
-    'glp_estop': ErrorCode.GLP_ESTOP,
-    'glp_etmlim': ErrorCode.GLP_ETMLIM,
     'interrupted': ErrorCode.INTERRUPTED,
-    'nonsquare': ErrorCode.NONSQUARE,
     'parseerror': ErrorCode.PARSEERROR,
     'stop': ErrorCode.STOP,
     'success': ErrorCode.SUCCESS,
@@ -1958,6 +1948,86 @@ RootChoice._string_map = {
 }
 
 
+class ArpackError(IntEnum):
+    """Python counterpart of an ``igraph_arpack_error_t`` enum."""
+
+    NO_ERROR = 0
+    PROD = 15
+    NPOS = 16
+    NEVNPOS = 17
+    NCVSMALL = 18
+    NONPOSI = 19
+    WHICHINV = 20
+    BMATINV = 21
+    WORKLSMALL = 22
+    TRIDERR = 23
+    ZEROSTART = 24
+    MODEINV = 25
+    MODEBMAT = 26
+    ISHIFT = 27
+    NEVBE = 28
+    NOFACT = 29
+    FAILED = 30
+    HOWMNY = 31
+    HOWMNYS = 32
+    EVDIFF = 33
+    SHUR = 34
+    LAPACK = 35
+    UNKNOWN = 36
+    MAXIT = 39
+    NOSHIFT = 40
+    REORDER = 41
+
+    _string_map: ClassVar[dict[str, ArpackError]]
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, ArpackError):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return cls._string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to ArpackError") from None
+
+
+ArpackError._string_map = {
+    'bmatinv': ArpackError.BMATINV,
+    'evdiff': ArpackError.EVDIFF,
+    'failed': ArpackError.FAILED,
+    'howmny': ArpackError.HOWMNY,
+    'howmnys': ArpackError.HOWMNYS,
+    'ishift': ArpackError.ISHIFT,
+    'lapack': ArpackError.LAPACK,
+    'maxit': ArpackError.MAXIT,
+    'modebmat': ArpackError.MODEBMAT,
+    'modeinv': ArpackError.MODEINV,
+    'ncvsmall': ArpackError.NCVSMALL,
+    'nevbe': ArpackError.NEVBE,
+    'nevnpos': ArpackError.NEVNPOS,
+    'no_error': ArpackError.NO_ERROR,
+    'nofact': ArpackError.NOFACT,
+    'nonposi': ArpackError.NONPOSI,
+    'noshift': ArpackError.NOSHIFT,
+    'npos': ArpackError.NPOS,
+    'prod': ArpackError.PROD,
+    'reorder': ArpackError.REORDER,
+    'shur': ArpackError.SHUR,
+    'triderr': ArpackError.TRIDERR,
+    'unknown': ArpackError.UNKNOWN,
+    'whichinv': ArpackError.WHICHINV,
+    'worklsmall': ArpackError.WORKLSMALL,
+    'zerostart': ArpackError.ZEROSTART,
+}
+
+
 class BLISSSplittingHeuristics(IntEnum):
     """Python counterpart of an ``igraph_bliss_sh_t`` enum."""
 
@@ -2073,11 +2143,13 @@ LeadingEigenvectorCommunityHistory._string_map = {
 __all__ = (
     'AddWeights',
     'AdjacencyMode',
+    'ArpackError',
     'AttributeCombinationType',
     'AttributeElementType',
     'AttributeType',
     'BLISSSplittingHeuristics',
     'BarabasiAlgorithm',
+    'ChungLu',
     'CommunityComparison',
     'Connectedness',
     'DRLLayoutPreset',
@@ -2100,6 +2172,7 @@ __all__ = (
     'LazyAdjacencyListSimplify',
     'LeadingEigenvectorCommunityHistory',
     'Loops',
+    'LpaVariant',
     'MatrixStorage',
     'Multiple',
     'NeighborMode',
