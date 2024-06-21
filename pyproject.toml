@@ -7,7 +7,7 @@ packages = [{ include = "igraph_ctypes", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-numpy = "^1.23.3"
+numpy = "^2.0.0"
 pycapi = ">=0.82.1"
 
 [tool.poetry.group.dev.dependencies]
@@ -36,9 +36,8 @@ ignore_missing_imports = true
 addopts = "--cov-config=.coveragerc"
 
 [tool.ruff]
-ignore = ["F405"]
-line-length = 88
-select = ["B", "C", "E", "F", "W"]
+lint.ignore = ["F405"]
+lint.select = ["B", "C", "E", "F", "W"]
 
 [tool.ruff.per-file-ignores]
 "src/igraph_ctypes/_internal/enums.py" = ["E501"]
