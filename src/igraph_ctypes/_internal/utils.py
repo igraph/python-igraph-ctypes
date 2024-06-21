@@ -60,7 +60,7 @@ def protect(func: Callable[..., None]) -> Callable[..., int]:
 
 
 def protect_with(
-    handler: Callable[[int], int]
+    handler: Callable[[int], int],
 ) -> Callable[[Callable[..., None]], Callable[..., int]]:
     """Decorator factory that creates a decorator that takes a function that
     can potentially throw a Python exception, and turns it into another function

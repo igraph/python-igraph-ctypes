@@ -281,18 +281,17 @@ class AttributeValueList(Sequence[T | None]):
         raise RuntimeError("cannot delete items from a fixed-length list")
 
     @overload
-    def __getitem__(self, index: IntLike) -> T | None:
-        ...
+    def __getitem__(self, index: IntLike) -> T | None: ...
 
     @overload
     def __getitem__(
         self: C, index: slice | EllipsisType | Sequence[BoolLike | IntLike]
-    ) -> C:
-        ...
+    ) -> C: ...
 
     @overload
-    def __getitem__(self, index: NDArray[np.bool_] | NDArray[np.integer]) -> NDArray:
-        ...
+    def __getitem__(
+        self, index: NDArray[np.bool_] | NDArray[np.integer]
+    ) -> NDArray: ...
 
     def __getitem__(self, index: IndexLike):
         items = self._items
@@ -308,7 +307,9 @@ class AttributeValueList(Sequence[T | None]):
 
         elif isinstance(index, Sequence):
             return self.__class__(
-                self._items[index,], type=self._type, _wrap=True  # type: ignore
+                self._items[index,],
+                type=self._type,
+                _wrap=True,  # type: ignore
             )
 
         elif isinstance(index, np.ndarray):

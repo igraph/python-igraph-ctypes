@@ -1,14 +1,11 @@
 from ctypes import pointer
 from functools import partial
-from numpy.random import Generator, PCG64
+from numpy.random import Generator
 from typing import Callable, Optional
 
 from .lib import igraph_rng_set_default
 from .types import (
     igraph_rng_type_t,
-    np_type_of_igraph_integer_t,
-    np_type_of_igraph_real_t,
-    np_type_of_igraph_uint_t,
 )
 from .wrappers import _RNG
 

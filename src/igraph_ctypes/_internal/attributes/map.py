@@ -86,9 +86,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
 
         if isinstance(value, (bytes, str)):
             # strings and bytes are iterable but they are treated as if not
-            avl = AttributeValueList(
-                [value] * length, type=type, fixed_length=True
-            )  # type: ignore
+            avl = AttributeValueList([value] * length, type=type, fixed_length=True)  # type: ignore
         elif isinstance(value, Iterable):
             # iterables are mapped to an AttributeValueList. Note that this
             # also takes care of copying existing AttributeValueList instances
@@ -100,9 +98,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
         else:
             # all other values are assumed to be a common value for all
             # vertices or edges
-            avl = AttributeValueList(
-                [value] * length, type=type, fixed_length=True
-            )  # type: ignore
+            avl = AttributeValueList([value] * length, type=type, fixed_length=True)  # type: ignore
 
         assert avl.fixed_length
         assert not _check_length or len(avl) == length

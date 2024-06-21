@@ -56,7 +56,7 @@ def igraph_error_t_to_python_exception_class(code: int) -> Optional[Type[Excepti
 
 
 def python_exception_to_igraph_error_t(
-    exc: Optional[Union[Exception, Type[Exception]]]
+    exc: Optional[Union[Exception, Type[Exception]]],
 ) -> int:
     """Converts a Python exception class into an appropriate igraph error code.
 
