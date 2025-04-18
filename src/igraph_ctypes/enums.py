@@ -4,7 +4,6 @@
 # be used by end users of the library.
 #
 # The rest of this file is generated
-
 from ._internal.enums import (
     AddWeights,
     AdjacencyMode,
@@ -26,8 +25,8 @@ from ._internal.enums import (
     ErdosRenyiType,
     ErrorCode,
     FeedbackArcSetAlgorithm,
-    FileFormat,
     FloydWarshallAlgorithm,
+    FvsAlgorithm,
     GetAdjacency,
     GreedyColoringHeuristics,
     ImitateAlgorithm,
@@ -39,6 +38,7 @@ from ._internal.enums import (
     Loops,
     LpaVariant,
     MatrixStorage,
+    MstAlgorithm,
     Multiple,
     NeighborMode,
     Optimality,
@@ -88,8 +88,8 @@ __all__ = (
     "ErdosRenyiType",
     "ErrorCode",
     "FeedbackArcSetAlgorithm",
-    "FileFormat",
     "FloydWarshallAlgorithm",
+    "FvsAlgorithm",
     "GetAdjacency",
     "GreedyColoringHeuristics",
     "ImitateAlgorithm",
@@ -101,6 +101,7 @@ __all__ = (
     "Loops",
     "LpaVariant",
     "MatrixStorage",
+    "MstAlgorithm",
     "Multiple",
     "NeighborMode",
     "Optimality",

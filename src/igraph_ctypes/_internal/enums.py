@@ -480,6 +480,46 @@ LaplacianSpectralEmbeddingType._string_map = {
 }
 
 
+class BLISSSplittingHeuristics(IntEnum):
+    """Python counterpart of an ``igraph_bliss_sh_t`` enum."""
+
+    F = 0
+    FL = 1
+    FS = 2
+    FM = 3
+    FLM = 4
+    FSM = 5
+
+    _string_map: ClassVar[dict[str, BLISSSplittingHeuristics]]
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, BLISSSplittingHeuristics):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return cls._string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to BLISSSplittingHeuristics") from None
+
+
+BLISSSplittingHeuristics._string_map = {
+    'f': BLISSSplittingHeuristics.F,
+    'fl': BLISSSplittingHeuristics.FL,
+    'flm': BLISSSplittingHeuristics.FLM,
+    'fm': BLISSSplittingHeuristics.FM,
+    'fs': BLISSSplittingHeuristics.FS,
+    'fsm': BLISSSplittingHeuristics.FSM,
+}
+
+
 class Multiple(IntEnum):
     """Python counterpart of an ``igraph_multiple_t`` enum."""
 
@@ -992,44 +1032,6 @@ RandomTreeMethod._string_map = {
 }
 
 
-class FileFormat(IntEnum):
-    """Python counterpart of an ``igraph_fileformat_type_t`` enum."""
-
-    EDGELIST = 0
-    NCOL = 1
-    PAJEK = 2
-    LGL = 3
-    GRAPHML = 4
-
-    _string_map: ClassVar[dict[str, FileFormat]]
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, FileFormat):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return cls._string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to FileFormat") from None
-
-
-FileFormat._string_map = {
-    'edgelist': FileFormat.EDGELIST,
-    'graphml': FileFormat.GRAPHML,
-    'lgl': FileFormat.LGL,
-    'ncol': FileFormat.NCOL,
-    'pajek': FileFormat.PAJEK,
-}
-
-
 class Rewiring(IntEnum):
     """Python counterpart of an ``igraph_rewiring_t`` enum."""
 
@@ -1441,6 +1443,8 @@ class FeedbackArcSetAlgorithm(IntEnum):
 
     EXACT_IP = 0
     APPROX_EADES = 1
+    EXACT_IP_CG = 2
+    EXACT_IP_TI = 3
 
     _string_map: ClassVar[dict[str, FeedbackArcSetAlgorithm]]
 
@@ -1465,6 +1469,38 @@ class FeedbackArcSetAlgorithm(IntEnum):
 FeedbackArcSetAlgorithm._string_map = {
     'approx_eades': FeedbackArcSetAlgorithm.APPROX_EADES,
     'exact_ip': FeedbackArcSetAlgorithm.EXACT_IP,
+    'exact_ip_cg': FeedbackArcSetAlgorithm.EXACT_IP_CG,
+    'exact_ip_ti': FeedbackArcSetAlgorithm.EXACT_IP_TI,
+}
+
+
+class FvsAlgorithm(IntEnum):
+    """Python counterpart of an ``igraph_fvs_algorithm_t`` enum."""
+
+    IP = 0
+
+    _string_map: ClassVar[dict[str, FvsAlgorithm]]
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, FvsAlgorithm):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return cls._string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to FvsAlgorithm") from None
+
+
+FvsAlgorithm._string_map = {
+    'ip': FvsAlgorithm.IP,
 }
 
 
@@ -1644,7 +1680,7 @@ class ChungLu(IntEnum):
     """Python counterpart of an ``igraph_chung_lu_t`` enum."""
 
     ORIGINAL = 0
-    GRG = 1
+    MAXENT = 1
     NR = 2
 
     _string_map: ClassVar[dict[str, ChungLu]]
@@ -1668,7 +1704,7 @@ class ChungLu(IntEnum):
 
 
 ChungLu._string_map = {
-    'grg': ChungLu.GRG,
+    'maxent': ChungLu.MAXENT,
     'nr': ChungLu.NR,
     'original': ChungLu.ORIGINAL,
 }
@@ -1703,6 +1739,42 @@ class MatrixStorage(IntEnum):
 MatrixStorage._string_map = {
     'column_major': MatrixStorage.COLUMN_MAJOR,
     'row_major': MatrixStorage.ROW_MAJOR,
+}
+
+
+class MstAlgorithm(IntEnum):
+    """Python counterpart of an ``igraph_mst_algorithm_t`` enum."""
+
+    AUTOMATIC = 0
+    UNWEIGHTED = 1
+    PRIM = 2
+    KRUSKAL = 3
+
+    _string_map: ClassVar[dict[str, MstAlgorithm]]
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, MstAlgorithm):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return cls._string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to MstAlgorithm") from None
+
+
+MstAlgorithm._string_map = {
+    'automatic': MstAlgorithm.AUTOMATIC,
+    'kruskal': MstAlgorithm.KRUSKAL,
+    'prim': MstAlgorithm.PRIM,
+    'unweighted': MstAlgorithm.UNWEIGHTED,
 }
 
 
@@ -2028,46 +2100,6 @@ ArpackError._string_map = {
 }
 
 
-class BLISSSplittingHeuristics(IntEnum):
-    """Python counterpart of an ``igraph_bliss_sh_t`` enum."""
-
-    F = 0
-    FL = 1
-    FS = 2
-    FM = 3
-    FLM = 4
-    FSM = 5
-
-    _string_map: ClassVar[dict[str, BLISSSplittingHeuristics]]
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, BLISSSplittingHeuristics):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return cls._string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to BLISSSplittingHeuristics") from None
-
-
-BLISSSplittingHeuristics._string_map = {
-    'f': BLISSSplittingHeuristics.F,
-    'fl': BLISSSplittingHeuristics.FL,
-    'flm': BLISSSplittingHeuristics.FLM,
-    'fm': BLISSSplittingHeuristics.FM,
-    'fs': BLISSSplittingHeuristics.FS,
-    'fsm': BLISSSplittingHeuristics.FSM,
-}
-
-
 class LaplacianNormalization(IntEnum):
     """Python counterpart of an ``igraph_laplacian_normalization_t`` enum."""
 
@@ -2161,8 +2193,8 @@ __all__ = (
     'ErdosRenyiType',
     'ErrorCode',
     'FeedbackArcSetAlgorithm',
-    'FileFormat',
     'FloydWarshallAlgorithm',
+    'FvsAlgorithm',
     'GetAdjacency',
     'GreedyColoringHeuristics',
     'ImitateAlgorithm',
@@ -2174,6 +2206,7 @@ __all__ = (
     'Loops',
     'LpaVariant',
     'MatrixStorage',
+    'MstAlgorithm',
     'Multiple',
     'NeighborMode',
     'Optimality',

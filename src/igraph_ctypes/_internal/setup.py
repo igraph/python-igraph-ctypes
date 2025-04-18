@@ -1,7 +1,7 @@
 import sys
 
+from ctypes import pythonapi
 from dataclasses import dataclass
-from pycapi import PyErr_CheckSignals  # type: ignore
 from typing import Optional
 from warnings import warn
 
@@ -25,6 +25,12 @@ from .types import (
 )
 
 __all__ = ("setup_igraph_library", "_get_last_error_state")
+
+
+# Expose the PyErr_CheckSignals function from the Python C API
+PyErr_CheckSignals = pythonapi.PyErr_CheckSignals
+PyErr_CheckSignals.restype = int
+PyErr_CheckSignals.argtypes = []
 
 
 @dataclass

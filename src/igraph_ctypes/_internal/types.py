@@ -454,6 +454,9 @@ class igraph_rng_t(Structure):
     ]
 
 
+igraph_cycle_handler_t = CFUNCTYPE(
+    igraph_error_t, POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), c_void_p
+)
 igraph_error_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int, igraph_error_t)
 igraph_fatal_handler_t = CFUNCTYPE(None, c_char_p, c_char_p, c_int)
 igraph_interruption_handler_t = CFUNCTYPE(igraph_bool_t)

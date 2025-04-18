@@ -1,32 +1,35 @@
-[tool.poetry]
+[project]
 name = "igraph_ctypes"
-version = "0.0.0.post58.dev0+4ca9643"
+dynamic = ["version"]
 description = ""
-authors = ["Tamas Nepusz <ntamas@gmail.com>"]
-packages = [{ include = "igraph_ctypes", from = "src" }]
+authors = [{ name = "Tamas Nepusz", email = "ntamas@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=2.0.0"]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-numpy = "^2.0.0"
-pycapi = ">=0.82.1"
+[dependency-groups]
+dev = [
+  "richbench>=1.0.3",
+  "igraph>=0.10.6",
+  "pytest>=7.2.1",
+  "pytest-cov>=4.0.0",
+  "pytest-datadir >= 1.4.1",
+  "stimulus @ git+https://github.com/igraph/stimulus.git@0.21.7",
+]
+doc = ["mkdocs-material>=9.1.21", "mkdocstrings[python]>=0.22.0"]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.1"
-pytest-cov = "^4.0.0"
-richbench = "^1.0.3"
-igraph = "^0.10.6"
-stimulus = { git = "https://github.com/igraph/stimulus.git", tag = "0.21.0" }
-pytest-datadir = "^1.4.1"
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
 
-[tool.poetry.group.doc.dependencies]
-mkdocs-material = "^9.1.21"
-mkdocstrings = { version = "^0.22.0", extras = ["python"] }
+[tool.hatch.build.hooks.version]
+path = "src/igraph_ctypes/_version.py"
+template = '''__version__ = "{version}"
+'''
 
-[tool.poetry-dynamic-versioning]
-enable = true
+[tool.hatch.build.targets.sdist]
+include = ["src/igraph_ctypes"]
 
-[tool.poetry-dynamic-versioning.substitution]
-files = ["src/igraph_ctypes/_version.py"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/igraph_ctypes"]
 
 [[tool.mypy.overrides]]
 module = "igraph_ctypes._internal.wrappers"
@@ -48,12 +51,14 @@ lint.select = ["B", "C", "E", "F", "W"]
 legacy_tox_ini = """
 [tox]
 min_version = 4.0
-env_list = py311, py310, type
+env_list = py313, py312, py311, py310, type
 
 [gh-actions]
 python =
     3.10: py310
-    3.11: py311, type
+    3.11: py311
+    3.12: py312
+    3.13: py313, type
 
 [testenv]
 deps =
@@ -68,5 +73,5 @@ commands = mypy src
 """
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"

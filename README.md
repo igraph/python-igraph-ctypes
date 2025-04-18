@@ -21,19 +21,19 @@ things may break randomly, or they may not even work.
 
 1. Clone the repo.
 
-2. Install [`poetry`](https://python-poetry.org) if you don't have it yet.
+2. Install [`uv`](https://astral.sh/uv) if you don't have it yet.
 
-3. Run `poetry install` to prepare a virtualenv with all the required
+3. Run `uv sync` to prepare a virtualenv with all the required
    dependencies.
 
-4. Run `poetry run pytest` to run the unit tests, or `poetry run python` to run
+4. Run `uv run pytest` to run the unit tests, or `uv run python` to run
    a Python interpreter where you can `import igraph_ctypes`
 
 ## Benchmarking
 
 Benchmarks will be placed in `benchmarks` and they will compare the "old",
 official Python interface of igraph with this new implementation. To run the
-benchmarks, type `poetry run richbench benchmarks`.
+benchmarks, type `uv run richbench benchmarks`.
 
 ## Caveats
 

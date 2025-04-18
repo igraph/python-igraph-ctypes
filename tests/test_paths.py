@@ -14,7 +14,7 @@ def test_shortest_path():
 
     weights = [2] * g.ecount()
     expected_path = [0, 4, 5, 6, 7, 11]
-    for u, v in zip(expected_path, expected_path[1:]):
+    for u, v in zip(expected_path, expected_path[1:], strict=False):
         weights[g.get_edge_id(u, v)] = 1
 
     path = shortest_path(g, 0, 11, weights=weights)

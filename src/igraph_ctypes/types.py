@@ -4,7 +4,6 @@
 # be used by end users of the library.
 #
 # The rest of this file is generated
-
 from ._internal.types import (
     AttributeCombinationSpecification,
     AttributeCombinationSpecificationEntry,

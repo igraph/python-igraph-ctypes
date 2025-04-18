@@ -34,6 +34,7 @@ from .types import (
     igraph_adjlist_t,
     igraph_arpack_options_t,
     igraph_bliss_info_t,
+    igraph_cycle_handler_t,
     igraph_error_handler_t,
     igraph_fatal_handler_t,
     igraph_hrg_t,
