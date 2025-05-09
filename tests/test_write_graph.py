@@ -110,7 +110,10 @@ def test_write_graph_lgl(simple_graph, tmp_path, datadir):
     path_str = str(path)
 
     # Write to a file specified by its filename
-    with warns(IgraphWarning, match="Names attribute"):
+    with (
+        warns(IgraphWarning, match="Names attribute"),
+        warns(IgraphWarning, match="Weights attribute"),
+    ):
         write_graph_lgl(simple_graph, path_str)
     assert path.read_text() == expected
     path.unlink()
@@ -133,7 +136,10 @@ def test_write_graph_ncol(simple_graph, tmp_path, datadir):
     path_str = str(path)
 
     # Write to a file specified by its filename
-    with warns(IgraphWarning, match="Names attribute"):
+    with (
+        warns(IgraphWarning, match="Names attribute"),
+        warns(IgraphWarning, match="Weights attribute"),
+    ):
         write_graph_ncol(simple_graph, path_str)
     assert path.read_text() == expected
     path.unlink()
