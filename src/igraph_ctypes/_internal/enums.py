@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any, ClassVar
+from typing import Any
 
 
 class Loops(IntEnum):
@@ -23,8 +23,6 @@ class AttributeType(IntEnum):
     STRING = 3
     OBJECT = 127
 
-    _string_map: ClassVar[dict[str, AttributeType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -38,12 +36,12 @@ class AttributeType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _AttributeType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to AttributeType") from None
 
 
-AttributeType._string_map = {
+_AttributeType_string_map: dict[str, AttributeType] = {
     'boolean': AttributeType.BOOLEAN,
     'numeric': AttributeType.NUMERIC,
     'object': AttributeType.OBJECT,
@@ -59,8 +57,6 @@ class AttributeElementType(IntEnum):
     VERTEX = 1
     EDGE = 2
 
-    _string_map: ClassVar[dict[str, AttributeElementType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -74,12 +70,12 @@ class AttributeElementType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _AttributeElementType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to AttributeElementType") from None
 
 
-AttributeElementType._string_map = {
+_AttributeElementType_string_map: dict[str, AttributeElementType] = {
     'edge': AttributeElementType.EDGE,
     'graph': AttributeElementType.GRAPH,
     'vertex': AttributeElementType.VERTEX,
@@ -103,8 +99,6 @@ class AttributeCombinationType(IntEnum):
     MEDIAN = 11
     CONCAT = 12
 
-    _string_map: ClassVar[dict[str, AttributeCombinationType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -118,12 +112,12 @@ class AttributeCombinationType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _AttributeCombinationType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to AttributeCombinationType") from None
 
 
-AttributeCombinationType._string_map = {
+_AttributeCombinationType_string_map: dict[str, AttributeCombinationType] = {
     'concat': AttributeCombinationType.CONCAT,
     'default': AttributeCombinationType.DEFAULT,
     'first': AttributeCombinationType.FIRST,
@@ -147,8 +141,6 @@ class GreedyColoringHeuristics(IntEnum):
     DSATUR = 1
     NEIGHBORS = COLORED_NEIGHBORS
 
-    _string_map: ClassVar[dict[str, GreedyColoringHeuristics]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -162,12 +154,12 @@ class GreedyColoringHeuristics(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _GreedyColoringHeuristics_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to GreedyColoringHeuristics") from None
 
 
-GreedyColoringHeuristics._string_map = {
+_GreedyColoringHeuristics_string_map: dict[str, GreedyColoringHeuristics] = {
     'colored_neighbors': GreedyColoringHeuristics.COLORED_NEIGHBORS,
     'dsatur': GreedyColoringHeuristics.DSATUR,
     'neighbors': GreedyColoringHeuristics.COLORED_NEIGHBORS,
@@ -179,8 +171,6 @@ class PagerankAlgorithm(IntEnum):
 
     ARPACK = 1
     PRPACK = 2
-
-    _string_map: ClassVar[dict[str, PagerankAlgorithm]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -195,12 +185,12 @@ class PagerankAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _PagerankAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to PagerankAlgorithm") from None
 
 
-PagerankAlgorithm._string_map = {
+_PagerankAlgorithm_string_map: dict[str, PagerankAlgorithm] = {
     'arpack': PagerankAlgorithm.ARPACK,
     'prpack': PagerankAlgorithm.PRPACK,
 }
@@ -212,8 +202,6 @@ class FloydWarshallAlgorithm(IntEnum):
     AUTOMATIC = 0
     ORIGINAL = 1
     TREE = 2
-
-    _string_map: ClassVar[dict[str, FloydWarshallAlgorithm]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -228,12 +216,12 @@ class FloydWarshallAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _FloydWarshallAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to FloydWarshallAlgorithm") from None
 
 
-FloydWarshallAlgorithm._string_map = {
+_FloydWarshallAlgorithm_string_map: dict[str, FloydWarshallAlgorithm] = {
     'automatic': FloydWarshallAlgorithm.AUTOMATIC,
     'original': FloydWarshallAlgorithm.ORIGINAL,
     'tree': FloydWarshallAlgorithm.TREE,
@@ -252,8 +240,6 @@ class VertexSequenceType(IntEnum):
     RANGE = 6
     NONADJ = 7
 
-    _string_map: ClassVar[dict[str, VertexSequenceType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -267,12 +253,12 @@ class VertexSequenceType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _VertexSequenceType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to VertexSequenceType") from None
 
 
-VertexSequenceType._string_map = {
+_VertexSequenceType_string_map: dict[str, VertexSequenceType] = {
     'adj': VertexSequenceType.ADJ,
     'all': VertexSequenceType.ALL,
     'nonadj': VertexSequenceType.NONADJ,
@@ -291,8 +277,6 @@ class VertexIteratorType(IntEnum):
     VECTOR = 1
     VECTORPTR = 2
 
-    _string_map: ClassVar[dict[str, VertexIteratorType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -306,12 +290,12 @@ class VertexIteratorType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _VertexIteratorType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to VertexIteratorType") from None
 
 
-VertexIteratorType._string_map = {
+_VertexIteratorType_string_map: dict[str, VertexIteratorType] = {
     'range': VertexIteratorType.RANGE,
     'vector': VertexIteratorType.VECTOR,
     'vectorptr': VertexIteratorType.VECTORPTR,
@@ -334,8 +318,6 @@ class EdgeSequenceType(IntEnum):
     PATH = 10
     ALL_BETWEEN = 11
 
-    _string_map: ClassVar[dict[str, EdgeSequenceType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -349,12 +331,12 @@ class EdgeSequenceType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _EdgeSequenceType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to EdgeSequenceType") from None
 
 
-EdgeSequenceType._string_map = {
+_EdgeSequenceType_string_map: dict[str, EdgeSequenceType] = {
     'all': EdgeSequenceType.ALL,
     'all_between': EdgeSequenceType.ALL_BETWEEN,
     'allfrom': EdgeSequenceType.ALLFROM,
@@ -377,8 +359,6 @@ class EdgeIteratorType(IntEnum):
     VECTOR = 1
     VECTORPTR = 2
 
-    _string_map: ClassVar[dict[str, EdgeIteratorType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -392,12 +372,12 @@ class EdgeIteratorType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _EdgeIteratorType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to EdgeIteratorType") from None
 
 
-EdgeIteratorType._string_map = {
+_EdgeIteratorType_string_map: dict[str, EdgeIteratorType] = {
     'range': EdgeIteratorType.RANGE,
     'vector': EdgeIteratorType.VECTOR,
     'vectorptr': EdgeIteratorType.VECTORPTR,
@@ -414,8 +394,6 @@ class EigenAlgorithm(IntEnum):
     COMP_LAPACK = 4
     COMP_ARPACK = 5
 
-    _string_map: ClassVar[dict[str, EigenAlgorithm]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -429,12 +407,12 @@ class EigenAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _EigenAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to EigenAlgorithm") from None
 
 
-EigenAlgorithm._string_map = {
+_EigenAlgorithm_string_map: dict[str, EigenAlgorithm] = {
     'arpack': EigenAlgorithm.ARPACK,
     'auto': EigenAlgorithm.AUTO,
     'comp_arpack': EigenAlgorithm.COMP_ARPACK,
@@ -452,8 +430,6 @@ class LaplacianSpectralEmbeddingType(IntEnum):
     DAD = 2
     OAP = 3
 
-    _string_map: ClassVar[dict[str, LaplacianSpectralEmbeddingType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -467,12 +443,12 @@ class LaplacianSpectralEmbeddingType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _LaplacianSpectralEmbeddingType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to LaplacianSpectralEmbeddingType") from None
 
 
-LaplacianSpectralEmbeddingType._string_map = {
+_LaplacianSpectralEmbeddingType_string_map: dict[str, LaplacianSpectralEmbeddingType] = {
     'd_a': LaplacianSpectralEmbeddingType.D_A,
     'dad': LaplacianSpectralEmbeddingType.DAD,
     'i_dad': LaplacianSpectralEmbeddingType.I_DAD,
@@ -490,8 +466,6 @@ class BLISSSplittingHeuristics(IntEnum):
     FLM = 4
     FSM = 5
 
-    _string_map: ClassVar[dict[str, BLISSSplittingHeuristics]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -505,12 +479,12 @@ class BLISSSplittingHeuristics(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _BLISSSplittingHeuristics_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to BLISSSplittingHeuristics") from None
 
 
-BLISSSplittingHeuristics._string_map = {
+_BLISSSplittingHeuristics_string_map: dict[str, BLISSSplittingHeuristics] = {
     'f': BLISSSplittingHeuristics.F,
     'fl': BLISSSplittingHeuristics.FL,
     'flm': BLISSSplittingHeuristics.FLM,
@@ -526,8 +500,6 @@ class Multiple(IntEnum):
     NO_MULTIPLE = 0
     MULTIPLE = 1
 
-    _string_map: ClassVar[dict[str, Multiple]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -541,12 +513,12 @@ class Multiple(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _Multiple_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to Multiple") from None
 
 
-Multiple._string_map = {
+_Multiple_string_map: dict[str, Multiple] = {
     'multiple': Multiple.MULTIPLE,
     'no_multiple': Multiple.NO_MULTIPLE,
 }
@@ -557,8 +529,6 @@ class Order(IntEnum):
 
     ASCENDING = 0
     DESCENDING = 1
-
-    _string_map: ClassVar[dict[str, Order]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -573,12 +543,12 @@ class Order(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _Order_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to Order") from None
 
 
-Order._string_map = {
+_Order_string_map: dict[str, Order] = {
     'ascending': Order.ASCENDING,
     'descending': Order.DESCENDING,
 }
@@ -589,8 +559,6 @@ class Optimality(IntEnum):
 
     MINIMUM = 0
     MAXIMUM = 1
-
-    _string_map: ClassVar[dict[str, Optimality]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -605,12 +573,12 @@ class Optimality(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _Optimality_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to Optimality") from None
 
 
-Optimality._string_map = {
+_Optimality_string_map: dict[str, Optimality] = {
     'maximum': Optimality.MAXIMUM,
     'minimum': Optimality.MINIMUM,
 }
@@ -622,8 +590,6 @@ class NeighborMode(IntEnum):
     OUT = 1
     IN = 2
     ALL = 3
-
-    _string_map: ClassVar[dict[str, NeighborMode]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -638,12 +604,12 @@ class NeighborMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _NeighborMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to NeighborMode") from None
 
 
-NeighborMode._string_map = {
+_NeighborMode_string_map: dict[str, NeighborMode] = {
     'all': NeighborMode.ALL,
     'in': NeighborMode.IN,
     'out': NeighborMode.OUT,
@@ -655,8 +621,6 @@ class Connectedness(IntEnum):
 
     WEAK = 1
     STRONG = 2
-
-    _string_map: ClassVar[dict[str, Connectedness]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -671,12 +635,12 @@ class Connectedness(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _Connectedness_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to Connectedness") from None
 
 
-Connectedness._string_map = {
+_Connectedness_string_map: dict[str, Connectedness] = {
     'strong': Connectedness.STRONG,
     'weak': Connectedness.WEAK,
 }
@@ -687,8 +651,6 @@ class Reciprocity(IntEnum):
 
     DEFAULT = 0
     RATIO = 1
-
-    _string_map: ClassVar[dict[str, Reciprocity]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -703,12 +665,12 @@ class Reciprocity(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _Reciprocity_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to Reciprocity") from None
 
 
-Reciprocity._string_map = {
+_Reciprocity_string_map: dict[str, Reciprocity] = {
     'default': Reciprocity.DEFAULT,
     'ratio': Reciprocity.RATIO,
 }
@@ -725,8 +687,6 @@ class AdjacencyMode(IntEnum):
     PLUS = 5
     MAX = 6
 
-    _string_map: ClassVar[dict[str, AdjacencyMode]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -740,12 +700,12 @@ class AdjacencyMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _AdjacencyMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to AdjacencyMode") from None
 
 
-AdjacencyMode._string_map = {
+_AdjacencyMode_string_map: dict[str, AdjacencyMode] = {
     'directed': AdjacencyMode.DIRECTED,
     'lower': AdjacencyMode.LOWER,
     'max': AdjacencyMode.MAX,
@@ -764,8 +724,6 @@ class StarMode(IntEnum):
     UNDIRECTED = 2
     MUTUAL = 3
 
-    _string_map: ClassVar[dict[str, StarMode]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -779,12 +737,12 @@ class StarMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _StarMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to StarMode") from None
 
 
-StarMode._string_map = {
+_StarMode_string_map: dict[str, StarMode] = {
     'in': StarMode.IN,
     'mutual': StarMode.MUTUAL,
     'out': StarMode.OUT,
@@ -800,8 +758,6 @@ class WheelMode(IntEnum):
     UNDIRECTED = 2
     MUTUAL = 3
 
-    _string_map: ClassVar[dict[str, WheelMode]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -815,12 +771,12 @@ class WheelMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _WheelMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to WheelMode") from None
 
 
-WheelMode._string_map = {
+_WheelMode_string_map: dict[str, WheelMode] = {
     'in': WheelMode.IN,
     'mutual': WheelMode.MUTUAL,
     'out': WheelMode.OUT,
@@ -835,8 +791,6 @@ class TreeMode(IntEnum):
     IN = 1
     UNDIRECTED = 2
 
-    _string_map: ClassVar[dict[str, TreeMode]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -850,12 +804,12 @@ class TreeMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _TreeMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to TreeMode") from None
 
 
-TreeMode._string_map = {
+_TreeMode_string_map: dict[str, TreeMode] = {
     'in': TreeMode.IN,
     'out': TreeMode.OUT,
     'undirected': TreeMode.UNDIRECTED,
@@ -867,8 +821,6 @@ class ErdosRenyiType(IntEnum):
 
     GNP = 0
     GNM = 1
-
-    _string_map: ClassVar[dict[str, ErdosRenyiType]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -883,12 +835,12 @@ class ErdosRenyiType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ErdosRenyiType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ErdosRenyiType") from None
 
 
-ErdosRenyiType._string_map = {
+_ErdosRenyiType_string_map: dict[str, ErdosRenyiType] = {
     'gnm': ErdosRenyiType.GNM,
     'gnp': ErdosRenyiType.GNP,
 }
@@ -900,8 +852,6 @@ class GetAdjacency(IntEnum):
     UPPER = 0
     LOWER = 1
     BOTH = 2
-
-    _string_map: ClassVar[dict[str, GetAdjacency]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -916,12 +866,12 @@ class GetAdjacency(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _GetAdjacency_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to GetAdjacency") from None
 
 
-GetAdjacency._string_map = {
+_GetAdjacency_string_map: dict[str, GetAdjacency] = {
     'both': GetAdjacency.BOTH,
     'lower': GetAdjacency.LOWER,
     'upper': GetAdjacency.UPPER,
@@ -937,8 +887,6 @@ class DegreeSequenceMode(IntEnum):
     CONFIGURATION_SIMPLE = 3
     EDGE_SWITCHING_SIMPLE = 4
 
-    _string_map: ClassVar[dict[str, DegreeSequenceMode]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -952,12 +900,12 @@ class DegreeSequenceMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _DegreeSequenceMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to DegreeSequenceMode") from None
 
 
-DegreeSequenceMode._string_map = {
+_DegreeSequenceMode_string_map: dict[str, DegreeSequenceMode] = {
     'configuration': DegreeSequenceMode.CONFIGURATION,
     'configuration_simple': DegreeSequenceMode.CONFIGURATION_SIMPLE,
     'edge_switching_simple': DegreeSequenceMode.EDGE_SWITCHING_SIMPLE,
@@ -973,8 +921,6 @@ class RealizeDegseq(IntEnum):
     LARGEST = 1
     INDEX = 2
 
-    _string_map: ClassVar[dict[str, RealizeDegseq]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -988,12 +934,12 @@ class RealizeDegseq(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _RealizeDegseq_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to RealizeDegseq") from None
 
 
-RealizeDegseq._string_map = {
+_RealizeDegseq_string_map: dict[str, RealizeDegseq] = {
     'index': RealizeDegseq.INDEX,
     'largest': RealizeDegseq.LARGEST,
     'smallest': RealizeDegseq.SMALLEST,
@@ -1005,8 +951,6 @@ class RandomTreeMethod(IntEnum):
 
     PRUFER = 0
     LERW = 1
-
-    _string_map: ClassVar[dict[str, RandomTreeMethod]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1021,12 +965,12 @@ class RandomTreeMethod(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _RandomTreeMethod_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to RandomTreeMethod") from None
 
 
-RandomTreeMethod._string_map = {
+_RandomTreeMethod_string_map: dict[str, RandomTreeMethod] = {
     'lerw': RandomTreeMethod.LERW,
     'prufer': RandomTreeMethod.PRUFER,
 }
@@ -1037,8 +981,6 @@ class Rewiring(IntEnum):
 
     SIMPLE = 0
     SIMPLE_LOOPS = 1
-
-    _string_map: ClassVar[dict[str, Rewiring]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1053,12 +995,12 @@ class Rewiring(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _Rewiring_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to Rewiring") from None
 
 
-Rewiring._string_map = {
+_Rewiring_string_map: dict[str, Rewiring] = {
     'simple': Rewiring.SIMPLE,
     'simple_loops': Rewiring.SIMPLE_LOOPS,
 }
@@ -1070,8 +1012,6 @@ class EdgeOrder(IntEnum):
     ID = 0
     FROM = 1
     TO = 2
-
-    _string_map: ClassVar[dict[str, EdgeOrder]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1086,12 +1026,12 @@ class EdgeOrder(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _EdgeOrder_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to EdgeOrder") from None
 
 
-EdgeOrder._string_map = {
+_EdgeOrder_string_map: dict[str, EdgeOrder] = {
     'from': EdgeOrder.FROM,
     'id': EdgeOrder.ID,
     'to': EdgeOrder.TO,
@@ -1106,8 +1046,6 @@ class ToDirected(IntEnum):
     RANDOM = 2
     ACYCLIC = 3
 
-    _string_map: ClassVar[dict[str, ToDirected]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1121,12 +1059,12 @@ class ToDirected(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ToDirected_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ToDirected") from None
 
 
-ToDirected._string_map = {
+_ToDirected_string_map: dict[str, ToDirected] = {
     'acyclic': ToDirected.ACYCLIC,
     'arbitrary': ToDirected.ARBITRARY,
     'mutual': ToDirected.MUTUAL,
@@ -1141,8 +1079,6 @@ class ToUndirected(IntEnum):
     COLLAPSE = 1
     MUTUAL = 2
 
-    _string_map: ClassVar[dict[str, ToUndirected]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1156,12 +1092,12 @@ class ToUndirected(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ToUndirected_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ToUndirected") from None
 
 
-ToUndirected._string_map = {
+_ToUndirected_string_map: dict[str, ToUndirected] = {
     'collapse': ToUndirected.COLLAPSE,
     'each': ToUndirected.EACH,
     'mutual': ToUndirected.MUTUAL,
@@ -1176,8 +1112,6 @@ class VconnNei(IntEnum):
     IGNORE = 2
     NEGATIVE = 3
 
-    _string_map: ClassVar[dict[str, VconnNei]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1191,12 +1125,12 @@ class VconnNei(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _VconnNei_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to VconnNei") from None
 
 
-VconnNei._string_map = {
+_VconnNei_string_map: dict[str, VconnNei] = {
     'error': VconnNei.ERROR,
     'ignore': VconnNei.IGNORE,
     'negative': VconnNei.NEGATIVE,
@@ -1209,8 +1143,6 @@ class SpinglassUpdateMode(IntEnum):
 
     SIMPLE = 0
     CONFIG = 1
-
-    _string_map: ClassVar[dict[str, SpinglassUpdateMode]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1225,12 +1157,12 @@ class SpinglassUpdateMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _SpinglassUpdateMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to SpinglassUpdateMode") from None
 
 
-SpinglassUpdateMode._string_map = {
+_SpinglassUpdateMode_string_map: dict[str, SpinglassUpdateMode] = {
     'config': SpinglassUpdateMode.CONFIG,
     'simple': SpinglassUpdateMode.SIMPLE,
 }
@@ -1241,8 +1173,6 @@ class LazyAdjacencyListSimplify(IntEnum):
 
     DONT_SIMPLIFY = 0
     SIMPLIFY = 1
-
-    _string_map: ClassVar[dict[str, LazyAdjacencyListSimplify]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1257,12 +1187,12 @@ class LazyAdjacencyListSimplify(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _LazyAdjacencyListSimplify_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to LazyAdjacencyListSimplify") from None
 
 
-LazyAdjacencyListSimplify._string_map = {
+_LazyAdjacencyListSimplify_string_map: dict[str, LazyAdjacencyListSimplify] = {
     'dont_simplify': LazyAdjacencyListSimplify.DONT_SIMPLIFY,
     'simplify': LazyAdjacencyListSimplify.SIMPLIFY,
 }
@@ -1273,8 +1203,6 @@ class TransitivityMode(IntEnum):
 
     NAN = 0
     ZERO = 1
-
-    _string_map: ClassVar[dict[str, TransitivityMode]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1289,12 +1217,12 @@ class TransitivityMode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _TransitivityMode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to TransitivityMode") from None
 
 
-TransitivityMode._string_map = {
+_TransitivityMode_string_map: dict[str, TransitivityMode] = {
     'nan': TransitivityMode.NAN,
     'zero': TransitivityMode.ZERO,
 }
@@ -1305,8 +1233,6 @@ class SpinglassImplementation(IntEnum):
 
     ORIG = 0
     NEG = 1
-
-    _string_map: ClassVar[dict[str, SpinglassImplementation]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1321,12 +1247,12 @@ class SpinglassImplementation(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _SpinglassImplementation_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to SpinglassImplementation") from None
 
 
-SpinglassImplementation._string_map = {
+_SpinglassImplementation_string_map: dict[str, SpinglassImplementation] = {
     'neg': SpinglassImplementation.NEG,
     'orig': SpinglassImplementation.ORIG,
 }
@@ -1341,8 +1267,6 @@ class CommunityComparison(IntEnum):
     RAND = 3
     ADJUSTED_RAND = 4
 
-    _string_map: ClassVar[dict[str, CommunityComparison]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1356,12 +1280,12 @@ class CommunityComparison(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _CommunityComparison_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to CommunityComparison") from None
 
 
-CommunityComparison._string_map = {
+_CommunityComparison_string_map: dict[str, CommunityComparison] = {
     'adjusted_rand': CommunityComparison.ADJUSTED_RAND,
     'nmi': CommunityComparison.NMI,
     'rand': CommunityComparison.RAND,
@@ -1377,8 +1301,6 @@ class AddWeights(IntEnum):
     YES = 1
     IF_PRESENT = 2
 
-    _string_map: ClassVar[dict[str, AddWeights]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1392,12 +1314,12 @@ class AddWeights(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _AddWeights_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to AddWeights") from None
 
 
-AddWeights._string_map = {
+_AddWeights_string_map: dict[str, AddWeights] = {
     'if_present': AddWeights.IF_PRESENT,
     'no': AddWeights.NO,
     'yes': AddWeights.YES,
@@ -1410,8 +1332,6 @@ class BarabasiAlgorithm(IntEnum):
     BAG = 0
     PSUMTREE = 1
     PSUMTREE_MULTIPLE = 2
-
-    _string_map: ClassVar[dict[str, BarabasiAlgorithm]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1426,12 +1346,12 @@ class BarabasiAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _BarabasiAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to BarabasiAlgorithm") from None
 
 
-BarabasiAlgorithm._string_map = {
+_BarabasiAlgorithm_string_map: dict[str, BarabasiAlgorithm] = {
     'bag': BarabasiAlgorithm.BAG,
     'psumtree': BarabasiAlgorithm.PSUMTREE,
     'psumtree_multiple': BarabasiAlgorithm.PSUMTREE_MULTIPLE,
@@ -1446,8 +1366,6 @@ class FeedbackArcSetAlgorithm(IntEnum):
     EXACT_IP_CG = 2
     EXACT_IP_TI = 3
 
-    _string_map: ClassVar[dict[str, FeedbackArcSetAlgorithm]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1461,12 +1379,12 @@ class FeedbackArcSetAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _FeedbackArcSetAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to FeedbackArcSetAlgorithm") from None
 
 
-FeedbackArcSetAlgorithm._string_map = {
+_FeedbackArcSetAlgorithm_string_map: dict[str, FeedbackArcSetAlgorithm] = {
     'approx_eades': FeedbackArcSetAlgorithm.APPROX_EADES,
     'exact_ip': FeedbackArcSetAlgorithm.EXACT_IP,
     'exact_ip_cg': FeedbackArcSetAlgorithm.EXACT_IP_CG,
@@ -1478,8 +1396,6 @@ class FvsAlgorithm(IntEnum):
     """Python counterpart of an ``igraph_fvs_algorithm_t`` enum."""
 
     IP = 0
-
-    _string_map: ClassVar[dict[str, FvsAlgorithm]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1494,12 +1410,12 @@ class FvsAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _FvsAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to FvsAlgorithm") from None
 
 
-FvsAlgorithm._string_map = {
+_FvsAlgorithm_string_map: dict[str, FvsAlgorithm] = {
     'ip': FvsAlgorithm.IP,
 }
 
@@ -1510,8 +1426,6 @@ class SubgraphImplementation(IntEnum):
     AUTO = 0
     COPY_AND_DELETE = 1
     CREATE_FROM_SCRATCH = 2
-
-    _string_map: ClassVar[dict[str, SubgraphImplementation]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1526,12 +1440,12 @@ class SubgraphImplementation(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _SubgraphImplementation_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to SubgraphImplementation") from None
 
 
-SubgraphImplementation._string_map = {
+_SubgraphImplementation_string_map: dict[str, SubgraphImplementation] = {
     'auto': SubgraphImplementation.AUTO,
     'copy_and_delete': SubgraphImplementation.COPY_AND_DELETE,
     'create_from_scratch': SubgraphImplementation.CREATE_FROM_SCRATCH,
@@ -1544,8 +1458,6 @@ class ImitateAlgorithm(IntEnum):
     AUGMENTED = 0
     BLIND = 1
     CONTRACTED = 2
-
-    _string_map: ClassVar[dict[str, ImitateAlgorithm]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1560,12 +1472,12 @@ class ImitateAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ImitateAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ImitateAlgorithm") from None
 
 
-ImitateAlgorithm._string_map = {
+_ImitateAlgorithm_string_map: dict[str, ImitateAlgorithm] = {
     'augmented': ImitateAlgorithm.AUGMENTED,
     'blind': ImitateAlgorithm.BLIND,
     'contracted': ImitateAlgorithm.CONTRACTED,
@@ -1581,8 +1493,6 @@ class LayoutGrid(IntEnum):
     NO_GRID = NOGRID
     AUTO_GRID = AUTOGRID
 
-    _string_map: ClassVar[dict[str, LayoutGrid]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1596,12 +1506,12 @@ class LayoutGrid(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _LayoutGrid_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to LayoutGrid") from None
 
 
-LayoutGrid._string_map = {
+_LayoutGrid_string_map: dict[str, LayoutGrid] = {
     'auto_grid': LayoutGrid.AUTOGRID,
     'autogrid': LayoutGrid.AUTOGRID,
     'grid': LayoutGrid.GRID,
@@ -1616,8 +1526,6 @@ class RandomWalkStuck(IntEnum):
     ERROR = 0
     RETURN = 1
 
-    _string_map: ClassVar[dict[str, RandomWalkStuck]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1631,12 +1539,12 @@ class RandomWalkStuck(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _RandomWalkStuck_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to RandomWalkStuck") from None
 
 
-RandomWalkStuck._string_map = {
+_RandomWalkStuck_string_map: dict[str, RandomWalkStuck] = {
     'error': RandomWalkStuck.ERROR,
     'return': RandomWalkStuck.RETURN,
 }
@@ -1648,8 +1556,6 @@ class VoronoiTiebreaker(IntEnum):
     FIRST = 0
     LAST = 1
     RANDOM = 2
-
-    _string_map: ClassVar[dict[str, VoronoiTiebreaker]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1664,12 +1570,12 @@ class VoronoiTiebreaker(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _VoronoiTiebreaker_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to VoronoiTiebreaker") from None
 
 
-VoronoiTiebreaker._string_map = {
+_VoronoiTiebreaker_string_map: dict[str, VoronoiTiebreaker] = {
     'first': VoronoiTiebreaker.FIRST,
     'last': VoronoiTiebreaker.LAST,
     'random': VoronoiTiebreaker.RANDOM,
@@ -1682,8 +1588,6 @@ class ChungLu(IntEnum):
     ORIGINAL = 0
     MAXENT = 1
     NR = 2
-
-    _string_map: ClassVar[dict[str, ChungLu]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1698,12 +1602,12 @@ class ChungLu(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ChungLu_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ChungLu") from None
 
 
-ChungLu._string_map = {
+_ChungLu_string_map: dict[str, ChungLu] = {
     'maxent': ChungLu.MAXENT,
     'nr': ChungLu.NR,
     'original': ChungLu.ORIGINAL,
@@ -1715,8 +1619,6 @@ class MatrixStorage(IntEnum):
 
     ROW_MAJOR = 0
     COLUMN_MAJOR = 1
-
-    _string_map: ClassVar[dict[str, MatrixStorage]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1731,12 +1633,12 @@ class MatrixStorage(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _MatrixStorage_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to MatrixStorage") from None
 
 
-MatrixStorage._string_map = {
+_MatrixStorage_string_map: dict[str, MatrixStorage] = {
     'column_major': MatrixStorage.COLUMN_MAJOR,
     'row_major': MatrixStorage.ROW_MAJOR,
 }
@@ -1749,8 +1651,6 @@ class MstAlgorithm(IntEnum):
     UNWEIGHTED = 1
     PRIM = 2
     KRUSKAL = 3
-
-    _string_map: ClassVar[dict[str, MstAlgorithm]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1765,12 +1665,12 @@ class MstAlgorithm(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _MstAlgorithm_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to MstAlgorithm") from None
 
 
-MstAlgorithm._string_map = {
+_MstAlgorithm_string_map: dict[str, MstAlgorithm] = {
     'automatic': MstAlgorithm.AUTOMATIC,
     'kruskal': MstAlgorithm.KRUSKAL,
     'prim': MstAlgorithm.PRIM,
@@ -1785,8 +1685,6 @@ class LpaVariant(IntEnum):
     RETENTION = 1
     FAST = 2
 
-    _string_map: ClassVar[dict[str, LpaVariant]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1800,12 +1698,12 @@ class LpaVariant(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _LpaVariant_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to LpaVariant") from None
 
 
-LpaVariant._string_map = {
+_LpaVariant_string_map: dict[str, LpaVariant] = {
     'dominance': LpaVariant.DOMINANCE,
     'fast': LpaVariant.FAST,
     'retention': LpaVariant.RETENTION,
@@ -1839,8 +1737,6 @@ class ErrorCode(IntEnum):
     ERANGE = 61
     ENOSOL = 62
 
-    _string_map: ClassVar[dict[str, ErrorCode]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1854,12 +1750,12 @@ class ErrorCode(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ErrorCode_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ErrorCode") from None
 
 
-ErrorCode._string_map = {
+_ErrorCode_string_map: dict[str, ErrorCode] = {
     'diverged': ErrorCode.DIVERGED,
     'earpack': ErrorCode.EARPACK,
     'eattrcombine': ErrorCode.EATTRCOMBINE,
@@ -1892,8 +1788,6 @@ class SparseMatrixType(IntEnum):
     TRIPLET = 0
     CC = 1
 
-    _string_map: ClassVar[dict[str, SparseMatrixType]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1907,12 +1801,12 @@ class SparseMatrixType(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _SparseMatrixType_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to SparseMatrixType") from None
 
 
-SparseMatrixType._string_map = {
+_SparseMatrixType_string_map: dict[str, SparseMatrixType] = {
     'cc': SparseMatrixType.CC,
     'triplet': SparseMatrixType.TRIPLET,
 }
@@ -1923,8 +1817,6 @@ class SparseMatrixSolver(IntEnum):
 
     LU = 0
     QR = 1
-
-    _string_map: ClassVar[dict[str, SparseMatrixSolver]]
 
     @classmethod
     def from_(cls, value: Any):
@@ -1939,12 +1831,12 @@ class SparseMatrixSolver(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _SparseMatrixSolver_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to SparseMatrixSolver") from None
 
 
-SparseMatrixSolver._string_map = {
+_SparseMatrixSolver_string_map: dict[str, SparseMatrixSolver] = {
     'lu': SparseMatrixSolver.LU,
     'qr': SparseMatrixSolver.QR,
 }
@@ -1959,8 +1851,6 @@ class DRLLayoutPreset(IntEnum):
     REFINE = 3
     FINAL = 4
 
-    _string_map: ClassVar[dict[str, DRLLayoutPreset]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -1974,12 +1864,12 @@ class DRLLayoutPreset(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _DRLLayoutPreset_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to DRLLayoutPreset") from None
 
 
-DRLLayoutPreset._string_map = {
+_DRLLayoutPreset_string_map: dict[str, DRLLayoutPreset] = {
     'coarsen': DRLLayoutPreset.COARSEN,
     'coarsest': DRLLayoutPreset.COARSEST,
     'default': DRLLayoutPreset.DEFAULT,
@@ -1994,8 +1884,6 @@ class RootChoice(IntEnum):
     DEGREE = 0
     ECCENTRICITY = 1
 
-    _string_map: ClassVar[dict[str, RootChoice]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -2009,12 +1897,12 @@ class RootChoice(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _RootChoice_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to RootChoice") from None
 
 
-RootChoice._string_map = {
+_RootChoice_string_map: dict[str, RootChoice] = {
     'degree': RootChoice.DEGREE,
     'eccentricity': RootChoice.ECCENTRICITY,
 }
@@ -2050,8 +1938,6 @@ class ArpackError(IntEnum):
     NOSHIFT = 40
     REORDER = 41
 
-    _string_map: ClassVar[dict[str, ArpackError]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -2065,12 +1951,12 @@ class ArpackError(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _ArpackError_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to ArpackError") from None
 
 
-ArpackError._string_map = {
+_ArpackError_string_map: dict[str, ArpackError] = {
     'bmatinv': ArpackError.BMATINV,
     'evdiff': ArpackError.EVDIFF,
     'failed': ArpackError.FAILED,
@@ -2108,8 +1994,6 @@ class LaplacianNormalization(IntEnum):
     LEFT = 2
     RIGHT = 3
 
-    _string_map: ClassVar[dict[str, LaplacianNormalization]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -2123,12 +2007,12 @@ class LaplacianNormalization(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _LaplacianNormalization_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to LaplacianNormalization") from None
 
 
-LaplacianNormalization._string_map = {
+_LaplacianNormalization_string_map: dict[str, LaplacianNormalization] = {
     'left': LaplacianNormalization.LEFT,
     'right': LaplacianNormalization.RIGHT,
     'symmetric': LaplacianNormalization.SYMMETRIC,
@@ -2144,8 +2028,6 @@ class LeadingEigenvectorCommunityHistory(IntEnum):
     START_FULL = 3
     START_GIVEN = 4
 
-    _string_map: ClassVar[dict[str, LeadingEigenvectorCommunityHistory]]
-
     @classmethod
     def from_(cls, value: Any):
         """Converts an arbitrary Python object into this enum.
@@ -2159,12 +2041,12 @@ class LeadingEigenvectorCommunityHistory(IntEnum):
             return cls(value)
         else:
             try:
-                return cls._string_map[value]
+                return _LeadingEigenvectorCommunityHistory_string_map[value]
             except KeyError:
                 raise ValueError(f"{value!r} cannot be converted to LeadingEigenvectorCommunityHistory") from None
 
 
-LeadingEigenvectorCommunityHistory._string_map = {
+_LeadingEigenvectorCommunityHistory_string_map: dict[str, LeadingEigenvectorCommunityHistory] = {
     'failed': LeadingEigenvectorCommunityHistory.FAILED,
     'split': LeadingEigenvectorCommunityHistory.SPLIT,
     'start_full': LeadingEigenvectorCommunityHistory.START_FULL,

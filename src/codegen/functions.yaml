@@ -13,9 +13,6 @@ igraph_maximal_cliques_callback:
 igraph_community_leading_eigenvector:
   IGNORE: PythonCTypes
 
-igraph_subisomorphic_function_vf2:
-  IGNORE: PythonCTypes
-
 igraph_eigen_adjacency:
   IGNORE: PythonCTypes
 

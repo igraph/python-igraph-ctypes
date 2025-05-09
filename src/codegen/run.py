@@ -220,16 +220,14 @@ def generate_enums(  # noqa: C901
 
         for key, value_int_or_str in EXTRA_ENUM_MEMBERS.get(name, ()):
             if isinstance(value_int_or_str, str):
-                value_int = all_members[value_int_or_str.lower()]
+                value_str = all_members[value_int_or_str.lower()]
                 aliased_to = value_int_or_str
             else:
-                value_int = value_int_or_str
+                value_str = str(value_int_or_str)
                 aliased_to = key
-            fp.write(f"    {key} = {value_int}\n")
+            fp.write(f"    {key} = {value_str}\n")
             all_members[key.lower()] = aliased_to
 
-        fp.write("\n")
-        fp.write(f"    _string_map: ClassVar[dict[str, {name}]]\n")
         fp.write("\n")
         fp.write("    @classmethod\n")
         fp.write("    def from_(cls, value: Any):\n")
@@ -244,14 +242,14 @@ def generate_enums(  # noqa: C901
         fp.write("            return cls(value)\n")
         fp.write("        else:\n")
         fp.write("            try:\n")
-        fp.write("                return cls._string_map[value]\n")
+        fp.write(f"                return _{name}_string_map[value]\n")
         fp.write("            except KeyError:\n")
         fp.write(
             f'                raise ValueError(f"{{value!r}} cannot be '
             f'converted to {name}") from None\n'
         )
         fp.write("\n\n")
-        fp.write(f"{name}._string_map = {{\n")
+        fp.write(f"_{name}_string_map: dict[str, {name}] = {{\n")
         for key in sorted(all_members.keys()):
             fp.write(f"    {key!r}: {name}.{all_members[key]},\n")
         fp.write("}\n")

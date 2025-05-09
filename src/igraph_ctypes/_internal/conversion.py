@@ -151,8 +151,8 @@ __all__ = (
     "vertexlike_to_igraph_integer_t",
     "vertex_pairs_to_igraph_vector_int_t",
     "vertex_selector_to_igraph_vs_t",
-    "vertex_colors_to_igraph_vector_t",
-    "vertex_colors_to_igraph_vector_t_view",
+    "vertex_colors_to_igraph_vector_int_t",
+    "vertex_colors_to_igraph_vector_int_t_view",
     "vertex_qtys_to_igraph_vector_t",
     "vertex_qtys_to_igraph_vector_t_view",
     "vertex_weights_to_igraph_vector_t",
@@ -742,12 +742,14 @@ def vertex_selector_to_igraph_vs_t(
         return _VertexSelector.create_with(igraph_vs_1, index)
 
 
-def vertex_colors_to_igraph_vector_t(colors: Iterable[int], graph: Graph) -> _VectorInt:
+def vertex_colors_to_igraph_vector_int_t(
+    colors: Iterable[int], graph: Graph
+) -> _VectorInt:
     """Converts a Python iterable of integers to a vector of vertex colors."""
     return iterable_to_igraph_vector_int_t(colors)
 
 
-def vertex_colors_to_igraph_vector_t_view(
+def vertex_colors_to_igraph_vector_int_t_view(
     colors: Iterable[int], graph: Graph
 ) -> _VectorInt:
     """Converts a Python iterable of integers to a vector of vertex colors,

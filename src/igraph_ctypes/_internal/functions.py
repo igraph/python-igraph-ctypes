@@ -943,6 +943,25 @@ def erdos_renyi_game_gnm(n: int, m: int, directed: bool = False, loops: bool = F
     return graph
 
 
+def iea_game(n: int, m: int, directed: bool = False, loops: bool = False) -> Graph:
+    """Type-annotated wrapper for ``igraph_iea_game``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_n = n
+    c_m = m
+    c_directed = any_to_igraph_bool_t(directed)
+    c_loops = any_to_igraph_bool_t(loops)
+
+    # Call wrapped function
+    igraph_iea_game(c_graph, c_n, c_m, c_directed, c_loops)
+
+    # Prepare output arguments
+    graph = _create_graph_from_boxed(c_graph)
+
+    # Construct return value
+    return graph
+
+
 def degree_sequence_game(out_deg: Iterable[int], in_deg: Optional[Iterable[int]] = None, method: DegreeSequenceMode = DegreeSequenceMode.CONFIGURATION) -> Graph:
     """Type-annotated wrapper for ``igraph_degree_sequence_game``."""
     # Prepare input arguments
@@ -3563,6 +3582,28 @@ def bipartite_game_gnm(n1: int, n2: int, m: int, directed: bool = False, mode: N
 
     # Call wrapped function
     igraph_bipartite_game_gnm(c_graph, c_types, c_n1, c_n2, c_m, c_directed, c_mode, c_multiple)
+
+    # Prepare output arguments
+    graph = _create_graph_from_boxed(c_graph)
+    types = c_types.value
+
+    # Construct return value
+    return graph, types
+
+
+def bipartite_iea_game(n1: int, n2: int, m: int, directed: bool = False, mode: NeighborMode = NeighborMode.ALL) -> tuple[Graph, BoolArray]:
+    """Type-annotated wrapper for ``igraph_bipartite_iea_game``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_types = _VectorBool.create(0)
+    c_n1 = n1
+    c_n2 = n2
+    c_m = m
+    c_directed = any_to_igraph_bool_t(directed)
+    c_mode = c_int(mode)
+
+    # Call wrapped function
+    igraph_bipartite_iea_game(c_graph, c_types, c_n1, c_n2, c_m, c_directed, c_mode)
 
     # Prepare output arguments
     graph = _create_graph_from_boxed(c_graph)
@@ -6968,14 +7009,6 @@ def vertex_coloring_greedy(graph: Graph, heuristic: GreedyColoringHeuristics = G
     # Construct return value
     return colors
 
-# igraph_deterministic_optimal_imitation: no Python type known for type: ALL_VERTEX_QTY
-
-# igraph_moran_process: no Python type known for type: ALL_VERTEX_QTY
-
-# igraph_roulette_wheel_imitation: no Python type known for type: ALL_VERTEX_QTY
-
-# igraph_stochastic_imitation: no Python type known for type: ALL_VERTEX_QTY
-
 
 def convergence_degree(graph: Graph) -> tuple[RealArray, RealArray, RealArray]:
     """Type-annotated wrapper for ``igraph_convergence_degree``."""
@@ -7046,11 +7079,11 @@ def invalidate_cache(graph: Graph) -> None:
     igraph_invalidate_cache(c_graph)
 
 
-def vertex_path_from_edge_path(graph: Graph, start: VertexLike, edge_path: Iterable[EdgeLike], mode: NeighborMode = NeighborMode.OUT) -> IntArray:
+def vertex_path_from_edge_path(graph: Graph, edge_path: Iterable[EdgeLike], start: Optional[VertexLike] = None, mode: NeighborMode = NeighborMode.OUT) -> IntArray:
     """Type-annotated wrapper for ``igraph_vertex_path_from_edge_path``."""
     # Prepare input arguments
     c_graph = graph
-    c_start = vertexlike_to_igraph_integer_t(start)
+    c_start = vertexlike_to_igraph_integer_t(start) if start is not None else None
     c_edge_path = iterable_edge_indices_to_igraph_vector_int_t(edge_path)
     c_vertex_path = _VectorInt.create(0)
     c_mode = c_int(mode)
@@ -7084,9 +7117,3 @@ def version() -> tuple[str, int, int, int]:
 
     # Construct return value
     return version_string, major, minor, subminor
-
-
-def subisomorphic_function_vf2() -> None:
-    """Type-annotated wrapper for ``igraph_subisomorphic_function_vf2``."""
-    # Call wrapped function
-    igraph_subisomorphic_function_vf2()

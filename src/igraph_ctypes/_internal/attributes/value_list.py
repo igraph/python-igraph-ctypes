@@ -42,7 +42,7 @@ IndexLike = (
 )
 
 
-class AttributeValueList(Sequence[T | None]):
+class AttributeValueList(Sequence[T]):
     """List-like data structure that stores the values of a vertex or an edge
     attribute for every vertex and edge in the graph, while supporting
     NumPy-style fancy indexing operations.
@@ -281,7 +281,7 @@ class AttributeValueList(Sequence[T | None]):
         raise RuntimeError("cannot delete items from a fixed-length list")
 
     @overload
-    def __getitem__(self, index: IntLike) -> T | None: ...
+    def __getitem__(self, index: IntLike) -> T: ...
 
     @overload
     def __getitem__(
@@ -307,9 +307,9 @@ class AttributeValueList(Sequence[T | None]):
 
         elif isinstance(index, Sequence):
             return self.__class__(
-                self._items[index,],
+                self._items[index,],  # type: ignore
                 type=self._type,
-                _wrap=True,  # type: ignore
+                _wrap=True,
             )
 
         elif isinstance(index, np.ndarray):
@@ -317,7 +317,8 @@ class AttributeValueList(Sequence[T | None]):
 
         self._raise_invalid_index_error()
 
-    def __iter__(self) -> Iterable[T]:
+    def __iter__(self):
+        # No return value typing here to make mypy happy
         return iter(self._items)
 
     def __len__(self) -> int:
@@ -381,7 +382,7 @@ class AttributeValueList(Sequence[T | None]):
                 value = value.ravel()
             if isinstance(value, Iterator):
                 value = list(value)
-            self._items[index,] = value
+            self._items[index,] = value  # type: ignore
 
         else:
             self._raise_invalid_index_error()
@@ -398,6 +399,7 @@ class AttributeValueList(Sequence[T | None]):
             # We do not have enough space pre-allocated, find the nearest
             # power of two that will suffice
             new_length = 2 ** int(np.ceil(np.log2(target_length)))
+            default_value: Any
             if self._type is AttributeType.BOOLEAN:
                 default_value = False
             elif self._type is AttributeType.NUMERIC:

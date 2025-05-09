@@ -83,6 +83,7 @@ class AttributeMap(MutableMapping[str, AttributeValueList[T]]):
                 value for all vertices or edges.
         """
         length = self._common_length_of_values
+        avl: AttributeValueList[T]
 
         if isinstance(value, (bytes, str)):
             # strings and bytes are iterable but they are treated as if not

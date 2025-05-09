@@ -590,7 +590,6 @@ igraph_fas_algorithm_t = c_int
 igraph_floyd_warshall_algorithm_t = c_int
 igraph_fvs_algorithm_t = c_int
 igraph_get_adjacency_t = c_int
-igraph_imitate_algorithm_t = c_int
 igraph_laplacian_normalization_t = c_int
 igraph_laplacian_spectral_embedding_type_t = c_int
 igraph_layout_grid_t = c_int
@@ -598,7 +597,6 @@ igraph_loops_t = c_int
 igraph_lpa_variant_t = c_int
 igraph_mst_algorithm_t = c_int
 igraph_neimode_t = c_int
-igraph_optimal_t = c_int
 igraph_pagerank_algo_t = c_int
 igraph_random_tree_t = c_int
 igraph_random_walk_stuck_t = c_int
@@ -848,6 +846,10 @@ igraph_erdos_renyi_game_gnp.argtypes = [POINTER(igraph_t), igraph_integer_t, igr
 igraph_erdos_renyi_game_gnm = _lib.igraph_erdos_renyi_game_gnm
 igraph_erdos_renyi_game_gnm.restype = handle_igraph_error_t
 igraph_erdos_renyi_game_gnm.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_bool_t, igraph_bool_t]
+
+igraph_iea_game = _lib.igraph_iea_game
+igraph_iea_game.restype = handle_igraph_error_t
+igraph_iea_game.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_bool_t]
 
 igraph_degree_sequence_game = _lib.igraph_degree_sequence_game
 igraph_degree_sequence_game.restype = handle_igraph_error_t
@@ -1488,6 +1490,10 @@ igraph_bipartite_game_gnp.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_b
 igraph_bipartite_game_gnm = _lib.igraph_bipartite_game_gnm
 igraph_bipartite_game_gnm.restype = handle_igraph_error_t
 igraph_bipartite_game_gnm.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_neimode_t, igraph_bool_t]
+
+igraph_bipartite_iea_game = _lib.igraph_bipartite_iea_game
+igraph_bipartite_iea_game.restype = handle_igraph_error_t
+igraph_bipartite_iea_game.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_bool_t), igraph_integer_t, igraph_integer_t, igraph_integer_t, igraph_bool_t, igraph_neimode_t]
 
 igraph_get_laplacian = _lib.igraph_get_laplacian
 igraph_get_laplacian.restype = handle_igraph_error_t
@@ -2416,22 +2422,6 @@ igraph_tree_game.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_bool_t,
 igraph_vertex_coloring_greedy = _lib.igraph_vertex_coloring_greedy
 igraph_vertex_coloring_greedy.restype = handle_igraph_error_t
 igraph_vertex_coloring_greedy.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_coloring_greedy_t]
-
-igraph_deterministic_optimal_imitation = _lib.igraph_deterministic_optimal_imitation
-igraph_deterministic_optimal_imitation.restype = handle_igraph_error_t
-igraph_deterministic_optimal_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_optimal_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
-
-igraph_moran_process = _lib.igraph_moran_process
-igraph_moran_process.restype = handle_igraph_error_t
-igraph_moran_process.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
-
-igraph_roulette_wheel_imitation = _lib.igraph_roulette_wheel_imitation
-igraph_roulette_wheel_imitation.restype = handle_igraph_error_t
-igraph_roulette_wheel_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_bool_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
-
-igraph_stochastic_imitation = _lib.igraph_stochastic_imitation
-igraph_stochastic_imitation.restype = handle_igraph_error_t
-igraph_stochastic_imitation.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_imitate_algorithm_t, POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
 
 igraph_convergence_degree = _lib.igraph_convergence_degree
 igraph_convergence_degree.restype = handle_igraph_error_t

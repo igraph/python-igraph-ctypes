@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any, ClassVar
+from typing import Any
 
 
 class Loops(IntEnum):
