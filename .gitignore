@@ -8,6 +8,7 @@
 build/
 dist/
 htmlcov/
+src/igraph_ctypes/_version.py
 tmp/
 .venv/
 .vscode/
