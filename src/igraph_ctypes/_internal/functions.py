@@ -166,16 +166,18 @@ def ecount(graph: Graph) -> int:
     return c__result
 
 
-def neighbors(graph: Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
+def neighbors(graph: Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL, loops: Loops = Loops.TWICE, multiple: bool = True) -> IntArray:
     """Type-annotated wrapper for ``igraph_neighbors``."""
     # Prepare input arguments
     c_graph = graph
     c_neis = _VectorInt.create(0)
     c_vid = vertexlike_to_igraph_integer_t(vid)
     c_mode = c_int(mode)
+    c_loops = c_int(loops)
+    c_multiple = any_to_igraph_bool_t(multiple)
 
     # Call wrapped function
-    igraph_neighbors(c_graph, c_neis, c_vid, c_mode)
+    igraph_neighbors(c_graph, c_neis, c_vid, c_mode, c_loops, c_multiple)
 
     # Prepare output arguments
     neis = igraph_vector_int_t_to_numpy_array(c_neis)
@@ -234,15 +236,16 @@ def edge(graph: Graph, eid: int) -> tuple[int, int]:
     return from_, to
 
 
-def edges(graph: Graph, eids: EdgeSelector) -> IntArray:
+def edges(graph: Graph, eids: EdgeSelector, bycol: bool = False) -> IntArray:
     """Type-annotated wrapper for ``igraph_edges``."""
     # Prepare input arguments
     c_graph = graph
     c_eids = edge_selector_to_igraph_es_t(eids, graph)
     c_edges = _VectorInt.create(0)
+    c_bycol = any_to_igraph_bool_t(bycol)
 
     # Call wrapped function
-    igraph_edges(c_graph, c_eids.unwrap(), c_edges)
+    igraph_edges(c_graph, c_eids.unwrap(), c_edges, c_bycol)
 
     # Prepare output arguments
     edges = igraph_vector_int_t_to_numpy_array(c_edges)
@@ -309,16 +312,17 @@ def get_all_eids_between(graph: Graph, from_: VertexLike, to: VertexLike, direct
     return eids
 
 
-def incident(graph: Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
+def incident(graph: Graph, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL, loops: Loops = Loops.TWICE) -> IntArray:
     """Type-annotated wrapper for ``igraph_incident``."""
     # Prepare input arguments
     c_graph = graph
     c_eids = _VectorInt.create(0)
     c_vid = vertexlike_to_igraph_integer_t(vid)
     c_mode = c_int(mode)
+    c_loops = c_int(loops)
 
     # Call wrapped function
-    igraph_incident(c_graph, c_eids, c_vid, c_mode)
+    igraph_incident(c_graph, c_eids, c_vid, c_mode, c_loops)
 
     # Prepare output arguments
     eids = igraph_vector_int_t_to_numpy_array(c_eids)
@@ -759,8 +763,8 @@ def famous(name: str) -> Graph:
     return graph
 
 
-def lcf_vector(n: int, shifts: Iterable[int], repeats: int = 1) -> Graph:
-    """Type-annotated wrapper for ``igraph_lcf_vector``."""
+def lcf(n: int, shifts: Iterable[int], repeats: int = 1) -> Graph:
+    """Type-annotated wrapper for ``igraph_lcf``."""
     # Prepare input arguments
     c_graph = _Graph()
     c_n = n
@@ -768,7 +772,7 @@ def lcf_vector(n: int, shifts: Iterable[int], repeats: int = 1) -> Graph:
     c_repeats = repeats
 
     # Call wrapped function
-    igraph_lcf_vector(c_graph, c_n, c_shifts, c_repeats)
+    igraph_lcf(c_graph, c_n, c_shifts, c_repeats)
 
     # Prepare output arguments
     graph = _create_graph_from_boxed(c_graph)
@@ -1530,34 +1534,8 @@ def are_adjacent(graph: Graph, v1: VertexLike, v2: VertexLike) -> bool:
     return res
 
 
-def diameter(graph: Graph, directed: bool = True, unconnected: bool = True) -> tuple[float, int, int, IntArray, IntArray]:
+def diameter(graph: Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, unconnected: bool = True) -> tuple[float, int, int, IntArray, IntArray]:
     """Type-annotated wrapper for ``igraph_diameter``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = igraph_real_t()
-    c_from = igraph_integer_t()
-    c_to = igraph_integer_t()
-    c_vertex_path = _VectorInt.create(0)
-    c_edge_path = _VectorInt.create(0)
-    c_directed = any_to_igraph_bool_t(directed)
-    c_unconnected = any_to_igraph_bool_t(unconnected)
-
-    # Call wrapped function
-    igraph_diameter(c_graph, c_res, c_from, c_to, c_vertex_path, c_edge_path, c_directed, c_unconnected)
-
-    # Prepare output arguments
-    res = c_res.value
-    from_ = c_from.value
-    to = c_to.value
-    vertex_path = igraph_vector_int_t_to_numpy_array(c_vertex_path)
-    edge_path = igraph_vector_int_t_to_numpy_array(c_edge_path)
-
-    # Construct return value
-    return res, from_, to, vertex_path, edge_path
-
-
-def diameter_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, unconnected: bool = True) -> tuple[float, int, int, IntArray, IntArray]:
-    """Type-annotated wrapper for ``igraph_diameter_dijkstra``."""
     # Prepare input arguments
     c_graph = graph
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
@@ -1570,7 +1548,7 @@ def diameter_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, d
     c_unconnected = any_to_igraph_bool_t(unconnected)
 
     # Call wrapped function
-    igraph_diameter_dijkstra(c_graph, c_weights, c_res, c_from, c_to, c_vertex_path, c_edge_path, c_directed, c_unconnected)
+    igraph_diameter(c_graph, c_weights, c_res, c_from, c_to, c_vertex_path, c_edge_path, c_directed, c_unconnected)
 
     # Prepare output arguments
     res = c_res.value
@@ -2219,38 +2197,18 @@ def reverse_edges(graph: Graph, eids: EdgeSelector = "all") -> None:
     igraph_reverse_edges(c_graph, c_eids.unwrap())
 
 
-def average_path_length(graph: Graph, directed: bool = True, unconn: bool = True) -> tuple[float, float]:
+def average_path_length(graph: Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, unconn: bool = True) -> tuple[float, float]:
     """Type-annotated wrapper for ``igraph_average_path_length``."""
     # Prepare input arguments
     c_graph = graph
-    c_res = igraph_real_t()
-    c_unconn_pairs = igraph_real_t()
-    c_directed = any_to_igraph_bool_t(directed)
-    c_unconn = any_to_igraph_bool_t(unconn)
-
-    # Call wrapped function
-    igraph_average_path_length(c_graph, c_res, c_unconn_pairs, c_directed, c_unconn)
-
-    # Prepare output arguments
-    res = c_res.value
-    unconn_pairs = c_unconn_pairs.value
-
-    # Construct return value
-    return res, unconn_pairs
-
-
-def average_path_length_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, directed: bool = True, unconn: bool = True) -> tuple[float, float]:
-    """Type-annotated wrapper for ``igraph_average_path_length_dijkstra``."""
-    # Prepare input arguments
-    c_graph = graph
-    c_res = igraph_real_t()
-    c_unconn_pairs = igraph_real_t()
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+    c_res = igraph_real_t()
+    c_unconn_pairs = igraph_real_t()
     c_directed = any_to_igraph_bool_t(directed)
     c_unconn = any_to_igraph_bool_t(unconn)
 
     # Call wrapped function
-    igraph_average_path_length_dijkstra(c_graph, c_res, c_unconn_pairs, c_weights, c_directed, c_unconn)
+    igraph_average_path_length(c_graph, c_weights, c_res, c_unconn_pairs, c_directed, c_unconn)
 
     # Prepare output arguments
     res = c_res.value
@@ -3152,36 +3110,17 @@ def contract_vertices(graph: Graph, mapping: Iterable[int], vertex_attr_comb: Op
 
 # igraph_eccentricity: no Python type known for type: VERTEX_QTY
 
-# igraph_eccentricity_dijkstra: no Python type known for type: VERTEX_QTY
 
-
-def graph_center(graph: Graph, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
+def graph_center(graph: Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
     """Type-annotated wrapper for ``igraph_graph_center``."""
     # Prepare input arguments
     c_graph = graph
-    c_res = _VectorInt.create(0)
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_graph_center(c_graph, c_res, c_mode)
-
-    # Prepare output arguments
-    res = igraph_vector_int_t_to_numpy_array(c_res)
-
-    # Construct return value
-    return res
-
-
-def graph_center_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.ALL) -> IntArray:
-    """Type-annotated wrapper for ``igraph_graph_center_dijkstra``."""
-    # Prepare input arguments
-    c_graph = graph
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_res = _VectorInt.create(0)
     c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_graph_center_dijkstra(c_graph, c_weights, c_res, c_mode)
+    igraph_graph_center(c_graph, c_weights, c_res, c_mode)
 
     # Prepare output arguments
     res = igraph_vector_int_t_to_numpy_array(c_res)
@@ -3190,33 +3129,16 @@ def graph_center_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = Non
     return res
 
 
-def radius(graph: Graph, mode: NeighborMode = NeighborMode.ALL) -> float:
+def radius(graph: Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.ALL) -> float:
     """Type-annotated wrapper for ``igraph_radius``."""
     # Prepare input arguments
     c_graph = graph
-    c_radius = igraph_real_t()
-    c_mode = c_int(mode)
-
-    # Call wrapped function
-    igraph_radius(c_graph, c_radius, c_mode)
-
-    # Prepare output arguments
-    radius = c_radius.value
-
-    # Construct return value
-    return radius
-
-
-def radius_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, mode: NeighborMode = NeighborMode.ALL) -> float:
-    """Type-annotated wrapper for ``igraph_radius_dijkstra``."""
-    # Prepare input arguments
-    c_graph = graph
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_radius = igraph_real_t()
     c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_radius_dijkstra(c_graph, c_weights, c_radius, c_mode)
+    igraph_radius(c_graph, c_weights, c_radius, c_mode)
 
     # Prepare output arguments
     radius = c_radius.value
@@ -3225,33 +3147,10 @@ def radius_dijkstra(graph: Graph, weights: Optional[Iterable[float]] = None, mod
     return radius
 
 
-def pseudo_diameter(graph: Graph, start_vid: VertexLike, directed: bool = True, unconnected: bool = True) -> tuple[float, int, int]:
+def pseudo_diameter(graph: Graph, start_vid: VertexLike, weights: Optional[Iterable[float]] = None, directed: bool = True, unconnected: bool = True) -> tuple[float, int, int]:
     """Type-annotated wrapper for ``igraph_pseudo_diameter``."""
     # Prepare input arguments
     c_graph = graph
-    c_diameter = igraph_real_t()
-    c_start_vid = vertexlike_to_igraph_integer_t(start_vid)
-    c_from = igraph_integer_t()
-    c_to = igraph_integer_t()
-    c_directed = any_to_igraph_bool_t(directed)
-    c_unconnected = any_to_igraph_bool_t(unconnected)
-
-    # Call wrapped function
-    igraph_pseudo_diameter(c_graph, c_diameter, c_start_vid, c_from, c_to, c_directed, c_unconnected)
-
-    # Prepare output arguments
-    diameter = c_diameter.value
-    from_ = c_from.value
-    to = c_to.value
-
-    # Construct return value
-    return diameter, from_, to
-
-
-def pseudo_diameter_dijkstra(graph: Graph, start_vid: VertexLike, weights: Optional[Iterable[float]] = None, directed: bool = True, unconnected: bool = True) -> tuple[float, int, int]:
-    """Type-annotated wrapper for ``igraph_pseudo_diameter_dijkstra``."""
-    # Prepare input arguments
-    c_graph = graph
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
     c_diameter = igraph_real_t()
     c_start_vid = vertexlike_to_igraph_integer_t(start_vid)
@@ -3261,7 +3160,7 @@ def pseudo_diameter_dijkstra(graph: Graph, start_vid: VertexLike, weights: Optio
     c_unconnected = any_to_igraph_bool_t(unconnected)
 
     # Call wrapped function
-    igraph_pseudo_diameter_dijkstra(c_graph, c_weights, c_diameter, c_start_vid, c_from, c_to, c_directed, c_unconnected)
+    igraph_pseudo_diameter(c_graph, c_weights, c_diameter, c_start_vid, c_from, c_to, c_directed, c_unconnected)
 
     # Prepare output arguments
     diameter = c_diameter.value
@@ -3301,12 +3200,12 @@ def global_efficiency(graph: Graph, weights: Optional[Iterable[float]] = None, d
     """Type-annotated wrapper for ``igraph_global_efficiency``."""
     # Prepare input arguments
     c_graph = graph
-    c_res = igraph_real_t()
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+    c_res = igraph_real_t()
     c_directed = any_to_igraph_bool_t(directed)
 
     # Call wrapped function
-    igraph_global_efficiency(c_graph, c_res, c_weights, c_directed)
+    igraph_global_efficiency(c_graph, c_weights, c_res, c_directed)
 
     # Prepare output arguments
     res = c_res.value
@@ -3321,13 +3220,13 @@ def average_local_efficiency(graph: Graph, weights: Optional[Iterable[float]] = 
     """Type-annotated wrapper for ``igraph_average_local_efficiency``."""
     # Prepare input arguments
     c_graph = graph
-    c_res = igraph_real_t()
     c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+    c_res = igraph_real_t()
     c_directed = any_to_igraph_bool_t(directed)
     c_mode = c_int(mode)
 
     # Call wrapped function
-    igraph_average_local_efficiency(c_graph, c_res, c_weights, c_directed, c_mode)
+    igraph_average_local_efficiency(c_graph, c_weights, c_res, c_directed, c_mode)
 
     # Prepare output arguments
     res = c_res.value
@@ -5450,11 +5349,11 @@ def motifs_randesu(graph: Graph, size: int = 3, cut_prob: Optional[Iterable[floa
     return hist
 
 
-def motifs_randesu_estimate(graph: Graph, sample_size: int, size: int = 3, cut_prob: Optional[Iterable[float]] = None, sample: Optional[Iterable[int]] = None) -> int:
+def motifs_randesu_estimate(graph: Graph, sample_size: int, size: int = 3, cut_prob: Optional[Iterable[float]] = None, sample: Optional[Iterable[int]] = None) -> float:
     """Type-annotated wrapper for ``igraph_motifs_randesu_estimate``."""
     # Prepare input arguments
     c_graph = graph
-    c_est = igraph_integer_t()
+    c_est = igraph_real_t()
     c_size = size
     c_cut_prob = iterable_to_igraph_vector_t_view(cut_prob) if cut_prob is not None else None
     c_sample_size = sample_size
@@ -5470,11 +5369,11 @@ def motifs_randesu_estimate(graph: Graph, sample_size: int, size: int = 3, cut_p
     return est
 
 
-def motifs_randesu_no(graph: Graph, size: int = 3, cut_prob: Optional[Iterable[float]] = None) -> int:
+def motifs_randesu_no(graph: Graph, size: int = 3, cut_prob: Optional[Iterable[float]] = None) -> float:
     """Type-annotated wrapper for ``igraph_motifs_randesu_no``."""
     # Prepare input arguments
     c_graph = graph
-    c_no = igraph_integer_t()
+    c_no = igraph_real_t()
     c_size = size
     c_cut_prob = iterable_to_igraph_vector_t_view(cut_prob) if cut_prob is not None else None
 
@@ -5879,6 +5778,8 @@ def induced_subgraph_map(graph: Graph, vids: VertexSelector, impl: SubgraphImple
 
     # Construct return value
     return res, map, invmap
+
+# igraph_product: no Python type known for type: GRAPH_PRODUCT_TYPE
 
 
 def gomory_hu_tree(graph: Graph, capacity: Optional[Iterable[float]] = None) -> tuple[Graph, RealArray]:

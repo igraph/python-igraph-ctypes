@@ -598,6 +598,7 @@ igraph_lpa_variant_t = c_int
 igraph_mst_algorithm_t = c_int
 igraph_neimode_t = c_int
 igraph_pagerank_algo_t = c_int
+igraph_product_t = c_int
 igraph_random_tree_t = c_int
 igraph_random_walk_stuck_t = c_int
 igraph_realize_degseq_t = c_int
@@ -661,7 +662,7 @@ igraph_ecount.argtypes = [POINTER(igraph_t)]
 
 igraph_neighbors = _lib.igraph_neighbors
 igraph_neighbors.restype = handle_igraph_error_t
-igraph_neighbors.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_neimode_t]
+igraph_neighbors.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_neimode_t, igraph_loops_t, igraph_bool_t]
 
 igraph_is_directed = _lib.igraph_is_directed
 igraph_is_directed.restype = igraph_bool_t
@@ -677,7 +678,7 @@ igraph_edge.argtypes = [POINTER(igraph_t), igraph_integer_t, POINTER(igraph_inte
 
 igraph_edges = _lib.igraph_edges
 igraph_edges.restype = handle_igraph_error_t
-igraph_edges.argtypes = [POINTER(igraph_t), igraph_es_t, POINTER(igraph_vector_int_t)]
+igraph_edges.argtypes = [POINTER(igraph_t), igraph_es_t, POINTER(igraph_vector_int_t), igraph_bool_t]
 
 igraph_get_eid = _lib.igraph_get_eid
 igraph_get_eid.restype = handle_igraph_error_t
@@ -693,7 +694,7 @@ igraph_get_all_eids_between.argtypes = [POINTER(igraph_t), POINTER(igraph_vector
 
 igraph_incident = _lib.igraph_incident
 igraph_incident.restype = handle_igraph_error_t
-igraph_incident.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_neimode_t]
+igraph_incident.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_integer_t, igraph_neimode_t, igraph_loops_t]
 
 igraph_is_same_graph = _lib.igraph_is_same_graph
 igraph_is_same_graph.restype = handle_igraph_error_t
@@ -795,9 +796,9 @@ igraph_famous = _lib.igraph_famous
 igraph_famous.restype = handle_igraph_error_t
 igraph_famous.argtypes = [POINTER(igraph_t), c_char_p]
 
-igraph_lcf_vector = _lib.igraph_lcf_vector
-igraph_lcf_vector.restype = handle_igraph_error_t
-igraph_lcf_vector.argtypes = [POINTER(igraph_t), igraph_integer_t, POINTER(igraph_vector_int_t), igraph_integer_t]
+igraph_lcf = _lib.igraph_lcf
+igraph_lcf.restype = handle_igraph_error_t
+igraph_lcf.argtypes = [POINTER(igraph_t), igraph_integer_t, POINTER(igraph_vector_int_t), igraph_integer_t]
 
 igraph_adjlist = _lib.igraph_adjlist
 igraph_adjlist.restype = handle_igraph_error_t
@@ -981,11 +982,7 @@ igraph_are_adjacent.argtypes = [POINTER(igraph_t), igraph_integer_t, igraph_inte
 
 igraph_diameter = _lib.igraph_diameter
 igraph_diameter.restype = handle_igraph_error_t
-igraph_diameter.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_integer_t), POINTER(igraph_integer_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bool_t, igraph_bool_t]
-
-igraph_diameter_dijkstra = _lib.igraph_diameter_dijkstra
-igraph_diameter_dijkstra.restype = handle_igraph_error_t
-igraph_diameter_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), POINTER(igraph_integer_t), POINTER(igraph_integer_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bool_t, igraph_bool_t]
+igraph_diameter.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), POINTER(igraph_integer_t), POINTER(igraph_integer_t), POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t), igraph_bool_t, igraph_bool_t]
 
 igraph_closeness = _lib.igraph_closeness
 igraph_closeness.restype = handle_igraph_error_t
@@ -1153,11 +1150,7 @@ igraph_reverse_edges.argtypes = [POINTER(igraph_t), igraph_es_t]
 
 igraph_average_path_length = _lib.igraph_average_path_length
 igraph_average_path_length.restype = handle_igraph_error_t
-igraph_average_path_length.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_real_t), igraph_bool_t, igraph_bool_t]
-
-igraph_average_path_length_dijkstra = _lib.igraph_average_path_length_dijkstra
-igraph_average_path_length_dijkstra.restype = handle_igraph_error_t
-igraph_average_path_length_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_real_t), POINTER(igraph_vector_t), igraph_bool_t, igraph_bool_t]
+igraph_average_path_length.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), POINTER(igraph_real_t), igraph_bool_t, igraph_bool_t]
 
 igraph_path_length_hist = _lib.igraph_path_length_hist
 igraph_path_length_hist.restype = handle_igraph_error_t
@@ -1385,35 +1378,19 @@ igraph_contract_vertices.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_in
 
 igraph_eccentricity = _lib.igraph_eccentricity
 igraph_eccentricity.restype = handle_igraph_error_t
-igraph_eccentricity.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), igraph_vs_t, igraph_neimode_t]
-
-igraph_eccentricity_dijkstra = _lib.igraph_eccentricity_dijkstra
-igraph_eccentricity_dijkstra.restype = handle_igraph_error_t
-igraph_eccentricity_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_vs_t, igraph_neimode_t]
+igraph_eccentricity.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_vs_t, igraph_neimode_t]
 
 igraph_graph_center = _lib.igraph_graph_center
 igraph_graph_center.restype = handle_igraph_error_t
-igraph_graph_center.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
-
-igraph_graph_center_dijkstra = _lib.igraph_graph_center_dijkstra
-igraph_graph_center_dijkstra.restype = handle_igraph_error_t
-igraph_graph_center_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
+igraph_graph_center.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_int_t), igraph_neimode_t]
 
 igraph_radius = _lib.igraph_radius
 igraph_radius.restype = handle_igraph_error_t
-igraph_radius.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_neimode_t]
-
-igraph_radius_dijkstra = _lib.igraph_radius_dijkstra
-igraph_radius_dijkstra.restype = handle_igraph_error_t
-igraph_radius_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_neimode_t]
+igraph_radius.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_neimode_t]
 
 igraph_pseudo_diameter = _lib.igraph_pseudo_diameter
 igraph_pseudo_diameter.restype = handle_igraph_error_t
-igraph_pseudo_diameter.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_integer_t, POINTER(igraph_integer_t), POINTER(igraph_integer_t), igraph_bool_t, igraph_bool_t]
-
-igraph_pseudo_diameter_dijkstra = _lib.igraph_pseudo_diameter_dijkstra
-igraph_pseudo_diameter_dijkstra.restype = handle_igraph_error_t
-igraph_pseudo_diameter_dijkstra.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_integer_t, POINTER(igraph_integer_t), POINTER(igraph_integer_t), igraph_bool_t, igraph_bool_t]
+igraph_pseudo_diameter.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_integer_t, POINTER(igraph_integer_t), POINTER(igraph_integer_t), igraph_bool_t, igraph_bool_t]
 
 igraph_diversity = _lib.igraph_diversity
 igraph_diversity.restype = handle_igraph_error_t
@@ -1425,15 +1402,15 @@ igraph_random_walk.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POIN
 
 igraph_global_efficiency = _lib.igraph_global_efficiency
 igraph_global_efficiency.restype = handle_igraph_error_t
-igraph_global_efficiency.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_t), igraph_bool_t]
+igraph_global_efficiency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t]
 
 igraph_local_efficiency = _lib.igraph_local_efficiency
 igraph_local_efficiency.restype = handle_igraph_error_t
-igraph_local_efficiency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), igraph_vs_t, POINTER(igraph_vector_t), igraph_bool_t, igraph_neimode_t]
+igraph_local_efficiency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_vector_t), igraph_vs_t, igraph_bool_t, igraph_neimode_t]
 
 igraph_average_local_efficiency = _lib.igraph_average_local_efficiency
 igraph_average_local_efficiency.restype = handle_igraph_error_t
-igraph_average_local_efficiency.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), POINTER(igraph_vector_t), igraph_bool_t, igraph_neimode_t]
+igraph_average_local_efficiency.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), POINTER(igraph_real_t), igraph_bool_t, igraph_neimode_t]
 
 igraph_transitive_closure = _lib.igraph_transitive_closure
 igraph_transitive_closure.restype = handle_igraph_error_t
@@ -1989,11 +1966,11 @@ igraph_motifs_randesu.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_t), i
 
 igraph_motifs_randesu_estimate = _lib.igraph_motifs_randesu_estimate
 igraph_motifs_randesu_estimate.restype = handle_igraph_error_t
-igraph_motifs_randesu_estimate.argtypes = [POINTER(igraph_t), POINTER(igraph_integer_t), igraph_integer_t, POINTER(igraph_vector_t), igraph_integer_t, POINTER(igraph_vector_int_t)]
+igraph_motifs_randesu_estimate.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_integer_t, POINTER(igraph_vector_t), igraph_integer_t, POINTER(igraph_vector_int_t)]
 
 igraph_motifs_randesu_no = _lib.igraph_motifs_randesu_no
 igraph_motifs_randesu_no.restype = handle_igraph_error_t
-igraph_motifs_randesu_no.argtypes = [POINTER(igraph_t), POINTER(igraph_integer_t), igraph_integer_t, POINTER(igraph_vector_t)]
+igraph_motifs_randesu_no.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t), igraph_integer_t, POINTER(igraph_vector_t)]
 
 igraph_dyad_census = _lib.igraph_dyad_census
 igraph_dyad_census.restype = handle_igraph_error_t
@@ -2090,6 +2067,10 @@ igraph_compose.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_
 igraph_induced_subgraph_map = _lib.igraph_induced_subgraph_map
 igraph_induced_subgraph_map.restype = handle_igraph_error_t
 igraph_induced_subgraph_map.argtypes = [POINTER(igraph_t), POINTER(igraph_t), igraph_vs_t, igraph_subgraph_implementation_t, POINTER(igraph_vector_int_t), POINTER(igraph_vector_int_t)]
+
+igraph_product = _lib.igraph_product
+igraph_product.restype = handle_igraph_error_t
+igraph_product.argtypes = [POINTER(igraph_t), POINTER(igraph_t), POINTER(igraph_t), igraph_product_t]
 
 igraph_gomory_hu_tree = _lib.igraph_gomory_hu_tree
 igraph_gomory_hu_tree.restype = handle_igraph_error_t

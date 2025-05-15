@@ -494,36 +494,6 @@ _BLISSSplittingHeuristics_string_map: dict[str, BLISSSplittingHeuristics] = {
 }
 
 
-class Multiple(IntEnum):
-    """Python counterpart of an ``igraph_multiple_t`` enum."""
-
-    NO_MULTIPLE = 0
-    MULTIPLE = 1
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, Multiple):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return _Multiple_string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to Multiple") from None
-
-
-_Multiple_string_map: dict[str, Multiple] = {
-    'multiple': Multiple.MULTIPLE,
-    'no_multiple': Multiple.NO_MULTIPLE,
-}
-
-
 class Order(IntEnum):
     """Python counterpart of an ``igraph_order_t`` enum."""
 
@@ -1678,6 +1648,36 @@ _MstAlgorithm_string_map: dict[str, MstAlgorithm] = {
 }
 
 
+class Product(IntEnum):
+    """Python counterpart of an ``igraph_product_t`` enum."""
+
+    CARTESIAN = 0
+    TENSOR = 1
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, Product):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return _Product_string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to Product") from None
+
+
+_Product_string_map: dict[str, Product] = {
+    'cartesian': Product.CARTESIAN,
+    'tensor': Product.TENSOR,
+}
+
+
 class LpaVariant(IntEnum):
     """Python counterpart of an ``igraph_lpa_variant_t`` enum."""
 
@@ -2089,11 +2089,11 @@ __all__ = (
     'LpaVariant',
     'MatrixStorage',
     'MstAlgorithm',
-    'Multiple',
     'NeighborMode',
     'Optimality',
     'Order',
     'PagerankAlgorithm',
+    'Product',
     'RandomTreeMethod',
     'RandomWalkStuck',
     'RealizeDegseq',
