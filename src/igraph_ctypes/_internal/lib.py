@@ -44,6 +44,7 @@ from .types import (
     igraph_isocompat_t,
     igraph_isohandler_t,
     igraph_plfit_result_t,
+    igraph_rewiring_stats_t,
     igraph_rng_t,
     igraph_rng_type_t,
     igraph_warning_handler_t,
@@ -1131,7 +1132,7 @@ igraph_personalized_pagerank_vs.argtypes = [POINTER(igraph_t), POINTER(igraph_ve
 
 igraph_rewire = _lib.igraph_rewire
 igraph_rewire.restype = handle_igraph_error_t
-igraph_rewire.argtypes = [POINTER(igraph_t), igraph_int_t, igraph_edge_type_sw_t, POINTER(igraph_t)]
+igraph_rewire.argtypes = [POINTER(igraph_t), igraph_int_t, igraph_edge_type_sw_t, POINTER(igraph_rewiring_stats_t)]
 
 igraph_induced_subgraph = _lib.igraph_induced_subgraph
 igraph_induced_subgraph.restype = handle_igraph_error_t

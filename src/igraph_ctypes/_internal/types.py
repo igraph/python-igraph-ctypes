@@ -399,6 +399,17 @@ class igraph_plfit_result_t(Structure):
     ]
 
 
+class igraph_rewiring_stats_t(Structure):
+    """ctypes representation of an ``igraph_rewiring_stats_t`` object"""
+
+    _fields_ = [
+        ("successful_swaps", igraph_int_t),
+        ("_unused1", igraph_int_t),
+        ("_unused2", igraph_int_t),
+        ("_unused3", igraph_int_t),
+    ]
+
+
 igraph_rng_state_t = c_void_p
 
 

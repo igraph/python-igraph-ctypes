@@ -44,6 +44,7 @@ from .types import (
     igraph_isocompat_t,
     igraph_isohandler_t,
     igraph_plfit_result_t,
+    igraph_rewiring_stats_t,
     igraph_rng_t,
     igraph_rng_type_t,
     igraph_warning_handler_t,
