@@ -1,0 +1,3 @@
+[tasks.codegen]
+description = "Update generated code"
+run = "uv run python3 -m codegen.run"
