@@ -1,3 +1,7 @@
 [tasks.codegen]
 description = "Update generated code"
 run = "uv run python3 -m codegen.run"
+
+[tasks.test]
+description = "Run unit tests"
+run = "uv run pytest"
