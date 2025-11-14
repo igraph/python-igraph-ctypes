@@ -5,3 +5,7 @@ run = "uv run python3 -m codegen.run"
 [tasks.test]
 description = "Run unit tests"
 run = "uv run pytest"
+
+[tasks.test]
+description = "Run benchmarks"
+run = "uv run richbench benchmarks"
