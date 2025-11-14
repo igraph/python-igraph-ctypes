@@ -13,7 +13,7 @@ dev = [
   "pytest>=7.2.1",
   "pytest-cov>=4.0.0",
   "pytest-datadir >= 1.4.1",
-  "stimulus @ git+https://github.com/igraph/stimulus.git@0.21.7",
+  "stimulus @ git+https://github.com/igraph/stimulus.git@0.23.1",
 ]
 doc = ["mkdocs-material>=9.1.21", "mkdocstrings[python]>=0.22.0"]
 
