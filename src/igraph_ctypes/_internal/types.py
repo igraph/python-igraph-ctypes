@@ -39,7 +39,7 @@ def vector_fields(base_type):
 
 igraph_bool_t = c_bool
 igraph_error_t = c_int
-igraph_integer_t = (
+igraph_int_t = (
     c_int64  # TODO(ntamas): this depends on whether igraph is 32-bit or 64-bit
 )
 igraph_real_t = c_double
@@ -49,7 +49,7 @@ igraph_uint_t = (
 
 # TODO(ntamas): these depend on whether igraph is 32-bit or 64-bit
 np_type_of_igraph_bool_t = np.bool_
-np_type_of_igraph_integer_t = np.int64
+np_type_of_igraph_int_t = np.int64
 np_type_of_igraph_real_t = np.float64
 np_type_of_igraph_uint_t = np.uint64
 
@@ -90,7 +90,7 @@ class igraph_vector_complex_t(Structure):
 class igraph_vector_int_t(Structure):
     """ctypes representation of ``igraph_vector_int_t``"""
 
-    _fields_ = vector_fields(igraph_integer_t)
+    _fields_ = vector_fields(igraph_int_t)
 
 
 class igraph_vector_list_t(Structure):
@@ -162,20 +162,20 @@ class igraph_sparsemat_t(Structure):
 class igraph_adjlist_t(Structure):
     """ctypes representation of ``igraph_adjlist_t``"""
 
-    _fields_ = [("length", igraph_integer_t), ("adjs", POINTER(igraph_vector_int_t))]
+    _fields_ = [("length", igraph_int_t), ("adjs", POINTER(igraph_vector_int_t))]
 
 
 class igraph_inclist_t(Structure):
     """ctypes representation of ``igraph_adjlist_t``"""
 
-    _fields_ = [("length", igraph_integer_t), ("incs", POINTER(igraph_vector_int_t))]
+    _fields_ = [("length", igraph_int_t), ("incs", POINTER(igraph_vector_int_t))]
 
 
 class igraph_t(Structure):
     """ctypes representation of ``igraph_t``"""
 
     _fields_ = [
-        ("n", igraph_integer_t),
+        ("n", igraph_int_t),
         ("directed", igraph_bool_t),
         ("from_", igraph_vector_int_t),
         ("to", igraph_vector_int_t),
@@ -198,14 +198,14 @@ class _igraph_vs_es_index_mode_t(Structure):
     """ctypes representation of a pair of an index and a neighborhood mode,
     typically used in the .data.adj field in an ``igraph_vs_t``"""
 
-    _fields_ = [("vid", igraph_integer_t), ("mode", c_int)]
+    _fields_ = [("vid", igraph_int_t), ("mode", c_int)]
 
 
 class _igraph_vs_es_index_pair_t(Structure):
     """ctypes representation of an index pair, typically used in the
     .data.range field in an ``igraph_vs_t`` or ``igraph_es_t``"""
 
-    _fields_ = [("from", igraph_integer_t), ("to", igraph_integer_t)]
+    _fields_ = [("from", igraph_int_t), ("to", igraph_int_t)]
 
 
 class _igraph_vs_es_index_pair_and_directedness_t(Structure):
@@ -213,8 +213,8 @@ class _igraph_vs_es_index_pair_and_directedness_t(Structure):
     typically used in the .data.path field in an ``igraph_es_t``"""
 
     _fields_ = [
-        ("from", igraph_integer_t),
-        ("to", igraph_integer_t),
+        ("from", igraph_int_t),
+        ("to", igraph_int_t),
         ("directed", igraph_bool_t),
     ]
 
@@ -230,7 +230,7 @@ class _igraph_vs_t_data(CUnion):
     """ctypes representation of the .data field in an ``igraph_vs_t``"""
 
     _fields_ = [
-        ("vid", igraph_integer_t),
+        ("vid", igraph_int_t),
         ("vecptr", POINTER(igraph_vector_int_t)),
         ("adj", _igraph_vs_es_index_mode_t),
         ("range", _igraph_vs_es_index_pair_t),
@@ -247,8 +247,8 @@ class _igraph_es_t_data(CUnion):
     """ctypes representation of the .data field in an ``igraph_es_t``"""
 
     _fields_ = [
-        ("vid", igraph_integer_t),
-        ("eid", igraph_integer_t),
+        ("vid", igraph_int_t),
+        ("eid", igraph_int_t),
         ("vecptr", POINTER(igraph_vector_int_t)),
         ("incident", _igraph_vs_es_index_mode_t),
         ("range", _igraph_vs_es_index_pair_t),
@@ -347,27 +347,27 @@ class igraph_layout_drl_options_t(Structure):
 
     _fields_ = [
         ("edge_cut", igraph_real_t),
-        ("init_iterations", igraph_integer_t),
+        ("init_iterations", igraph_int_t),
         ("init_temperature", igraph_real_t),
         ("init_attraction", igraph_real_t),
         ("init_damping_mult", igraph_real_t),
-        ("liquid_iterations", igraph_integer_t),
+        ("liquid_iterations", igraph_int_t),
         ("liquid_temperature", igraph_real_t),
         ("liquid_attraction", igraph_real_t),
         ("liquid_damping_mult", igraph_real_t),
-        ("expansion_iterations", igraph_integer_t),
+        ("expansion_iterations", igraph_int_t),
         ("expansion_temperature", igraph_real_t),
         ("expansion_attraction", igraph_real_t),
         ("expansion_damping_mult", igraph_real_t),
-        ("cooldown_iterations", igraph_integer_t),
+        ("cooldown_iterations", igraph_int_t),
         ("cooldown_temperature", igraph_real_t),
         ("cooldown_attraction", igraph_real_t),
         ("cooldown_damping_mult", igraph_real_t),
-        ("crunch_iterations", igraph_integer_t),
+        ("crunch_iterations", igraph_int_t),
         ("crunch_temperature", igraph_real_t),
         ("crunch_attraction", igraph_real_t),
         ("crunch_damping_mult", igraph_real_t),
-        ("simmer_iterations", igraph_integer_t),
+        ("simmer_iterations", igraph_int_t),
         ("simmer_temperature", igraph_real_t),
         ("simmer_attraction", igraph_real_t),
         ("simmer_damping_mult", igraph_real_t),
@@ -378,11 +378,11 @@ class igraph_maxflow_stats_t(Structure):
     """ctypes representation of an ``igraph_maxflow_stats_t`` object"""
 
     _fields_ = [
-        ("nopush", igraph_integer_t),
-        ("norelabel", igraph_integer_t),
-        ("nogap", igraph_integer_t),
-        ("nogapnodes", igraph_integer_t),
-        ("nobfs", igraph_integer_t),
+        ("nopush", igraph_int_t),
+        ("norelabel", igraph_int_t),
+        ("nogap", igraph_int_t),
+        ("nogapnodes", igraph_int_t),
+        ("nobfs", igraph_int_t),
     ]
 
 
@@ -411,13 +411,13 @@ class igraph_rng_type_t(Structure):
         "seed": CFUNCTYPE(igraph_error_t, igraph_rng_state_t, igraph_uint_t),
         "get": CFUNCTYPE(igraph_uint_t, igraph_rng_state_t),
         "get_int": CFUNCTYPE(
-            igraph_integer_t, igraph_rng_state_t, igraph_integer_t, igraph_integer_t
+            igraph_int_t, igraph_rng_state_t, igraph_int_t, igraph_int_t
         ),
         "get_real": CFUNCTYPE(igraph_real_t, igraph_rng_state_t),
         "get_norm": CFUNCTYPE(igraph_real_t, igraph_rng_state_t),
         "get_geom": CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t),
         "get_binom": CFUNCTYPE(
-            igraph_real_t, igraph_rng_state_t, igraph_integer_t, igraph_real_t
+            igraph_real_t, igraph_rng_state_t, igraph_int_t, igraph_real_t
         ),
         "get_exp": CFUNCTYPE(igraph_real_t, igraph_rng_state_t, igraph_real_t),
         "get_gamma": CFUNCTYPE(
@@ -464,8 +464,8 @@ igraph_isocompat_t = CFUNCTYPE(
     igraph_bool_t,
     POINTER(igraph_t),
     POINTER(igraph_t),
-    igraph_integer_t,
-    igraph_integer_t,
+    igraph_int_t,
+    igraph_int_t,
     c_void_p,
 )
 igraph_isohandler_t = CFUNCTYPE(
@@ -503,7 +503,7 @@ class igraph_attribute_table_t(Structure):
             igraph_bool_t,
         ),
         "add_vertices": CFUNCTYPE(
-            igraph_error_t, p_igraph_t, igraph_integer_t, p_attribute_record_list_t
+            igraph_error_t, p_igraph_t, igraph_int_t, p_attribute_record_list_t
         ),
         "permute_vertices": CFUNCTYPE(
             igraph_error_t, p_igraph_t, p_igraph_t, p_vector_int_t
@@ -602,7 +602,7 @@ class igraph_attribute_table_t(Structure):
 BoolArray = npt.NDArray[np_type_of_igraph_bool_t]
 """Type alias for NumPy arrays containing igraph booleans"""
 
-IntArray = npt.NDArray[np_type_of_igraph_integer_t]
+IntArray = npt.NDArray[np_type_of_igraph_int_t]
 """Type alias for NumPy arrays containing igraph integers"""
 
 RealArray = npt.NDArray[np_type_of_igraph_real_t]

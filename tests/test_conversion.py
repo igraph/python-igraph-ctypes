@@ -6,7 +6,7 @@ from igraph_ctypes.constructors import create_empty_graph
 from igraph_ctypes.enums import EdgeSequenceType, VertexSequenceType
 from igraph_ctypes._internal.conversion import (
     any_to_igraph_bool_t,
-    edgelike_to_igraph_integer_t,
+    edgelike_to_igraph_int_t,
     edge_selector_to_igraph_es_t,
     igraph_matrix_t_to_numpy_array,
     igraph_matrix_int_t_to_numpy_array,
@@ -28,10 +28,10 @@ from igraph_ctypes._internal.conversion import (
     iterable_to_igraph_vector_t,
     sequence_to_igraph_matrix_t,
     sequence_to_igraph_matrix_int_t,
-    vertexlike_to_igraph_integer_t,
+    vertexlike_to_igraph_int_t,
     vertex_selector_to_igraph_vs_t,
 )
-from igraph_ctypes._internal.types import igraph_bool_t, igraph_integer_t
+from igraph_ctypes._internal.types import igraph_bool_t, igraph_int_t
 from igraph_ctypes._internal.wrappers import (
     _Matrix,
     _MatrixInt,
@@ -53,26 +53,26 @@ def test_any_to_igraph_bool_t(test_input):
 @pytest.mark.parametrize(
     "test_input,expected_output", [(1, 1), (-6, None), (8.5, None)]
 )
-def test_edgelike_to_igraph_integer_t(test_input, expected_output):
+def test_edgelike_to_igraph_int_t(test_input, expected_output):
     if expected_output is None:
         with pytest.raises(ValueError):
-            converted = edgelike_to_igraph_integer_t(test_input)
+            converted = edgelike_to_igraph_int_t(test_input)
     else:
-        converted = edgelike_to_igraph_integer_t(test_input)
-        assert isinstance(converted, igraph_integer_t)
+        converted = edgelike_to_igraph_int_t(test_input)
+        assert isinstance(converted, igraph_int_t)
         assert converted.value == expected_output
 
 
 @pytest.mark.parametrize(
     "test_input,expected_output", [(1, 1), (-6, None), (8.5, None)]
 )
-def test_vertexlike_to_igraph_integer_t(test_input, expected_output):
+def test_vertexlike_to_igraph_int_t(test_input, expected_output):
     if expected_output is None:
         with pytest.raises(ValueError):
-            converted = vertexlike_to_igraph_integer_t(test_input)
+            converted = vertexlike_to_igraph_int_t(test_input)
     else:
-        converted = vertexlike_to_igraph_integer_t(test_input)
-        assert isinstance(converted, igraph_integer_t)
+        converted = vertexlike_to_igraph_int_t(test_input)
+        assert isinstance(converted, igraph_int_t)
         assert converted.value == expected_output
 
 

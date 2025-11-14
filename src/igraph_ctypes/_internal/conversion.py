@@ -66,10 +66,10 @@ from .lib import (
 )
 from .types import (
     igraph_bool_t,
-    igraph_integer_t,
+    igraph_int_t,
     igraph_real_t,
     np_type_of_igraph_bool_t,
-    np_type_of_igraph_integer_t,
+    np_type_of_igraph_int_t,
     np_type_of_igraph_real_t,
     AttributeCombinationSpecification,
     AttributeCombinationSpecificationEntry,
@@ -107,7 +107,7 @@ __all__ = (
     "any_to_file_ptr",
     "any_to_igraph_bool_t",
     "bytes_to_str",
-    "edgelike_to_igraph_integer_t",
+    "edgelike_to_igraph_int_t",
     "edge_capacities_to_igraph_vector_t",
     "edge_capacities_to_igraph_vector_t_view",
     "edge_colors_to_igraph_vector_t",
@@ -148,13 +148,13 @@ __all__ = (
     "sequence_to_igraph_matrix_int_t_view",
     "sequence_to_igraph_matrix_t",
     "sequence_to_igraph_matrix_t_view",
-    "vertexlike_to_igraph_integer_t",
+    "vertexlike_to_igraph_int_t",
     "vertex_pairs_to_igraph_vector_int_t",
     "vertex_selector_to_igraph_vs_t",
     "vertex_colors_to_igraph_vector_int_t",
     "vertex_colors_to_igraph_vector_int_t_view",
-    "vertex_qtys_to_igraph_vector_t",
-    "vertex_qtys_to_igraph_vector_t_view",
+    "vertex_qty_to_igraph_vector_t",
+    "vertex_qty_to_igraph_vector_t_view",
     "vertex_weights_to_igraph_vector_t",
     "vertex_weights_to_igraph_vector_t_view",
 )
@@ -228,10 +228,10 @@ def any_to_igraph_bool_t(obj: Any) -> igraph_bool_t:
     return igraph_bool_t(bool(obj))
 
 
-def edgelike_to_igraph_integer_t(edge: EdgeLike) -> igraph_integer_t:
+def edgelike_to_igraph_int_t(edge: EdgeLike) -> igraph_int_t:
     """Converts an edge-like object to an igraph integer."""
     if isinstance(edge, int) and edge >= 0:
-        return igraph_integer_t(edge)
+        return igraph_int_t(edge)
     else:
         raise ValueError(f"{edge!r} cannot be converted to an igraph edge index")
 
@@ -251,7 +251,7 @@ def edge_selector_to_igraph_es_t(selector: EdgeSelector, graph: Graph) -> _EdgeS
         indices = iterable_edge_indices_to_igraph_vector_int_t(selector)  # type: ignore
         return _EdgeSelector.create_with(igraph_es_vector_copy, indices)
     else:
-        index = edgelike_to_igraph_integer_t(selector)  # type: ignore
+        index = edgelike_to_igraph_int_t(selector)  # type: ignore
         return _EdgeSelector.create_with(igraph_es_1, index)
 
 
@@ -312,7 +312,7 @@ def iterable_edge_indices_to_igraph_vector_int_t(
 
     result = _VectorInt.create(0)
     for index in indices:
-        igraph_vector_int_push_back(result, edgelike_to_igraph_integer_t(index))
+        igraph_vector_int_push_back(result, edgelike_to_igraph_int_t(index))
     return result
 
 
@@ -399,7 +399,7 @@ def iterable_vertex_indices_to_igraph_vector_int_t(
 
     result: _VectorInt = _VectorInt.create(0)
     for index in indices:
-        igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(index))
+        igraph_vector_int_push_back(result, vertexlike_to_igraph_int_t(index))
     return result
 
 
@@ -502,7 +502,7 @@ def sequence_to_igraph_matrix_int_t(items: MatrixIntLike) -> _MatrixInt:
     else:
         _ensure_matrix(items)
         return numpy_array_to_igraph_matrix_int_t(
-            np.array(items, dtype=np_type_of_igraph_integer_t)
+            np.array(items, dtype=np_type_of_igraph_int_t)
         )
 
 
@@ -589,10 +589,10 @@ def numpy_array_to_igraph_matrix_t(arr: np.ndarray) -> _Matrix:
 
 def numpy_array_to_igraph_matrix_int_t(arr: np.ndarray) -> _MatrixInt:
     """Converts a two-dimensional NumPy array to an igraph matrix of integers."""
-    arr = _force_into_2d_numpy_array(arr, np_type_of_igraph_integer_t)
+    arr = _force_into_2d_numpy_array(arr, np_type_of_igraph_int_t)
     return _MatrixInt.create_with(
         igraph_matrix_int_init_array,
-        arr.ctypes.data_as(POINTER(igraph_integer_t)),
+        arr.ctypes.data_as(POINTER(igraph_int_t)),
         arr.shape[0],
         arr.shape[1],
         MatrixStorage.COLUMN_MAJOR,
@@ -637,10 +637,10 @@ def numpy_array_to_igraph_vector_int_t(
     arr: np.ndarray, flatten: bool = False
 ) -> _VectorInt:
     """Converts a one-dimensional NumPy array to an igraph vector of integers."""
-    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_integer_t, flatten=flatten)
+    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_int_t, flatten=flatten)
     return _VectorInt.create_with(
         igraph_vector_int_init_array,
-        arr.ctypes.data_as(POINTER(igraph_integer_t)),
+        arr.ctypes.data_as(POINTER(igraph_int_t)),
         arr.shape[0],
     )
 
@@ -654,11 +654,11 @@ def numpy_array_to_igraph_vector_int_t_view(
     into the appropriate layout and data type first and then a view will be
     provided into the copy.
     """
-    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_integer_t, flatten=flatten)
+    arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_int_t, flatten=flatten)
 
     result = _VectorInt()
     igraph_vector_int_view(
-        result, arr.ctypes.data_as(POINTER(igraph_integer_t)), arr.shape[0]
+        result, arr.ctypes.data_as(POINTER(igraph_int_t)), arr.shape[0]
     )
 
     # Destructor must not be called so we never mark result as initialized;
@@ -697,10 +697,10 @@ def numpy_array_to_igraph_vector_t_view(
     return result
 
 
-def vertexlike_to_igraph_integer_t(vertex: VertexLike) -> igraph_integer_t:
+def vertexlike_to_igraph_int_t(vertex: VertexLike) -> igraph_int_t:
     """Converts a vertex-like object to an igraph integer."""
     if isinstance(vertex, int) and vertex >= 0:
-        return igraph_integer_t(vertex)
+        return igraph_int_t(vertex)
     else:
         raise ValueError(f"{vertex!r} cannot be converted to an igraph vertex index")
 
@@ -714,8 +714,8 @@ def vertex_pairs_to_igraph_vector_int_t(pairs: Iterable[VertexPair]) -> _VectorI
 
     result: _VectorInt = _VectorInt.create(0)
     for u, v in pairs:
-        igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(u))
-        igraph_vector_int_push_back(result, vertexlike_to_igraph_integer_t(v))
+        igraph_vector_int_push_back(result, vertexlike_to_igraph_int_t(u))
+        igraph_vector_int_push_back(result, vertexlike_to_igraph_int_t(v))
     return result
 
 
@@ -738,7 +738,7 @@ def vertex_selector_to_igraph_vs_t(
         )
         return _VertexSelector.create_with(igraph_vs_vector_copy, indices)
     else:
-        index = vertexlike_to_igraph_integer_t(selector)  # type: ignore
+        index = vertexlike_to_igraph_int_t(selector)  # type: ignore
         return _VertexSelector.create_with(igraph_vs_1, index)
 
 
@@ -758,14 +758,14 @@ def vertex_colors_to_igraph_vector_int_t_view(
     return iterable_to_igraph_vector_int_t_view(colors)
 
 
-def vertex_qtys_to_igraph_vector_t(weights: Iterable[float], graph: Graph) -> _Vector:
+def vertex_qty_to_igraph_vector_t(weights: Iterable[float], graph: Graph) -> _Vector:
     """Converts a Python iterable of floating-point numbers to a vector of
     vertex-related quantities.
     """
     return iterable_to_igraph_vector_t(weights)
 
 
-def vertex_qtys_to_igraph_vector_t_view(
+def vertex_qty_to_igraph_vector_t_view(
     weights: Optional[Iterable[float]], graph: Graph
 ) -> Optional[_Vector]:
     """Converts a Python iterable of floating-point numbers to a vector of
@@ -830,7 +830,7 @@ def igraph_matrix_t_to_numpy_array(matrix: _Matrix) -> RealArray:
 
 def igraph_matrix_int_t_to_numpy_array(matrix: _MatrixInt) -> IntArray:
     shape = igraph_matrix_int_nrow(matrix), igraph_matrix_int_ncol(matrix)
-    result = np.zeros(shape, dtype=np_type_of_igraph_integer_t)
+    result = np.zeros(shape, dtype=np_type_of_igraph_int_t)
     if result.size > 0:
         memmove(result.ctypes.data, matrix.unwrap().data.stor_begin, result.nbytes)
     return result
@@ -872,7 +872,7 @@ def igraph_vector_bool_t_to_numpy_array_view(vector: _VectorBool) -> BoolArray:
 
 def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> IntArray:
     n = igraph_vector_int_size(vector)
-    result = np.zeros(n, dtype=np_type_of_igraph_integer_t)
+    result = np.zeros(n, dtype=np_type_of_igraph_int_t)
     if n > 0:
         memmove(result.ctypes.data, igraph_vector_int_get_ptr(vector, 0), result.nbytes)
     return result
@@ -881,9 +881,9 @@ def igraph_vector_int_t_to_numpy_array(vector: _VectorInt) -> IntArray:
 def igraph_vector_int_t_to_numpy_array_view(vector: _VectorInt) -> IntArray:
     n = igraph_vector_int_size(vector)
     addr = addressof(igraph_vector_int_get_ptr(vector, 0).contents)
-    buf_type = igraph_integer_t * n
+    buf_type = igraph_int_t * n
     buf = buf_type.from_address(addr)
-    return np.frombuffer(buf, dtype=np_type_of_igraph_integer_t)
+    return np.frombuffer(buf, dtype=np_type_of_igraph_int_t)
 
 
 def igraph_vector_list_t_to_list_of_numpy_array(

@@ -13,7 +13,7 @@ from typing import (
     cast,
 )
 
-from .types import igraph_integer_t
+from .types import igraph_int_t
 
 
 C = TypeVar("C", bound="Boxed")
@@ -29,7 +29,7 @@ class BoxedConfig(TypedDict):
     constructor: Optional[Callable[..., None]]
     destructor: Optional[Callable[..., None]]
     getitem: Optional[Callable]
-    len: Optional[Callable[..., Union[int, igraph_integer_t]]]
+    len: Optional[Callable[..., Union[int, igraph_int_t]]]
 
 
 def _fake_constructor(*args, **kwds) -> NoReturn:

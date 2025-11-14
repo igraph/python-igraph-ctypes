@@ -422,6 +422,56 @@ _EigenAlgorithm_string_map: dict[str, EigenAlgorithm] = {
 }
 
 
+class EigenWhichPosition(IntEnum):
+    """Python counterpart of an ``igraph_eigen_which_position_t`` enum."""
+
+    LM = 0
+    SM = 1
+    LA = 2
+    SA = 3
+    BE = 4
+    LR = 5
+    SR = 6
+    LI = 7
+    SI = 8
+    ALL = 9
+    INTERVAL = 10
+    SELECT = 11
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, EigenWhichPosition):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return _EigenWhichPosition_string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to EigenWhichPosition") from None
+
+
+_EigenWhichPosition_string_map: dict[str, EigenWhichPosition] = {
+    'all': EigenWhichPosition.ALL,
+    'be': EigenWhichPosition.BE,
+    'interval': EigenWhichPosition.INTERVAL,
+    'la': EigenWhichPosition.LA,
+    'li': EigenWhichPosition.LI,
+    'lm': EigenWhichPosition.LM,
+    'lr': EigenWhichPosition.LR,
+    'sa': EigenWhichPosition.SA,
+    'select': EigenWhichPosition.SELECT,
+    'si': EigenWhichPosition.SI,
+    'sm': EigenWhichPosition.SM,
+    'sr': EigenWhichPosition.SR,
+}
+
+
 class LaplacianSpectralEmbeddingType(IntEnum):
     """Python counterpart of an ``igraph_laplacian_spectral_embedding_type_t`` enum."""
 
@@ -521,36 +571,6 @@ class Order(IntEnum):
 _Order_string_map: dict[str, Order] = {
     'ascending': Order.ASCENDING,
     'descending': Order.DESCENDING,
-}
-
-
-class Optimality(IntEnum):
-    """Python counterpart of an ``igraph_optimal_t`` enum."""
-
-    MINIMUM = 0
-    MAXIMUM = 1
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, Optimality):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return _Optimality_string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to Optimality") from None
-
-
-_Optimality_string_map: dict[str, Optimality] = {
-    'maximum': Optimality.MAXIMUM,
-    'minimum': Optimality.MINIMUM,
 }
 
 
@@ -786,36 +806,6 @@ _TreeMode_string_map: dict[str, TreeMode] = {
 }
 
 
-class ErdosRenyiType(IntEnum):
-    """Python counterpart of an ``igraph_erdos_renyi_t`` enum."""
-
-    GNP = 0
-    GNM = 1
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, ErdosRenyiType):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return _ErdosRenyiType_string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to ErdosRenyiType") from None
-
-
-_ErdosRenyiType_string_map: dict[str, ErdosRenyiType] = {
-    'gnm': ErdosRenyiType.GNM,
-    'gnp': ErdosRenyiType.GNP,
-}
-
-
 class GetAdjacency(IntEnum):
     """Python counterpart of an ``igraph_get_adjacency_t`` enum."""
 
@@ -943,36 +933,6 @@ class RandomTreeMethod(IntEnum):
 _RandomTreeMethod_string_map: dict[str, RandomTreeMethod] = {
     'lerw': RandomTreeMethod.LERW,
     'prufer': RandomTreeMethod.PRUFER,
-}
-
-
-class Rewiring(IntEnum):
-    """Python counterpart of an ``igraph_rewiring_t`` enum."""
-
-    SIMPLE = 0
-    SIMPLE_LOOPS = 1
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, Rewiring):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return _Rewiring_string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to Rewiring") from None
-
-
-_Rewiring_string_map: dict[str, Rewiring] = {
-    'simple': Rewiring.SIMPLE,
-    'simple_loops': Rewiring.SIMPLE_LOOPS,
 }
 
 
@@ -1135,36 +1095,6 @@ class SpinglassUpdateMode(IntEnum):
 _SpinglassUpdateMode_string_map: dict[str, SpinglassUpdateMode] = {
     'config': SpinglassUpdateMode.CONFIG,
     'simple': SpinglassUpdateMode.SIMPLE,
-}
-
-
-class LazyAdjacencyListSimplify(IntEnum):
-    """Python counterpart of an ``igraph_lazy_adlist_simplify_t`` enum."""
-
-    DONT_SIMPLIFY = 0
-    SIMPLIFY = 1
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, LazyAdjacencyListSimplify):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return _LazyAdjacencyListSimplify_string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to LazyAdjacencyListSimplify") from None
-
-
-_LazyAdjacencyListSimplify_string_map: dict[str, LazyAdjacencyListSimplify] = {
-    'dont_simplify': LazyAdjacencyListSimplify.DONT_SIMPLIFY,
-    'simplify': LazyAdjacencyListSimplify.SIMPLIFY,
 }
 
 
@@ -1422,38 +1352,6 @@ _SubgraphImplementation_string_map: dict[str, SubgraphImplementation] = {
 }
 
 
-class ImitateAlgorithm(IntEnum):
-    """Python counterpart of an ``igraph_imitate_algorithm_t`` enum."""
-
-    AUGMENTED = 0
-    BLIND = 1
-    CONTRACTED = 2
-
-    @classmethod
-    def from_(cls, value: Any):
-        """Converts an arbitrary Python object into this enum.
-
-        Raises:
-            ValueError: if the object cannot be converted
-        """
-        if isinstance(value, ImitateAlgorithm):
-            return value
-        elif isinstance(value, int):
-            return cls(value)
-        else:
-            try:
-                return _ImitateAlgorithm_string_map[value]
-            except KeyError:
-                raise ValueError(f"{value!r} cannot be converted to ImitateAlgorithm") from None
-
-
-_ImitateAlgorithm_string_map: dict[str, ImitateAlgorithm] = {
-    'augmented': ImitateAlgorithm.AUGMENTED,
-    'blind': ImitateAlgorithm.BLIND,
-    'contracted': ImitateAlgorithm.CONTRACTED,
-}
-
-
 class LayoutGrid(IntEnum):
     """Python counterpart of an ``igraph_layout_grid_t`` enum."""
 
@@ -1652,7 +1550,10 @@ class Product(IntEnum):
     """Python counterpart of an ``igraph_product_t`` enum."""
 
     CARTESIAN = 0
-    TENSOR = 1
+    LEXICOGRAPHIC = 1
+    STRONG = 2
+    TENSOR = 3
+    MODULAR = 4
 
     @classmethod
     def from_(cls, value: Any):
@@ -1674,6 +1575,9 @@ class Product(IntEnum):
 
 _Product_string_map: dict[str, Product] = {
     'cartesian': Product.CARTESIAN,
+    'lexicographic': Product.LEXICOGRAPHIC,
+    'modular': Product.MODULAR,
+    'strong': Product.STRONG,
     'tensor': Product.TENSOR,
 }
 
@@ -1727,7 +1631,7 @@ class ErrorCode(IntEnum):
     INTERRUPTED = 13
     DIVERGED = 14
     EARPACK = 15
-    ENEGLOOP = 37
+    ENEGCYCLE = 37
     EINTERNAL = 38
     EATTRCOMBINE = 52
     EOVERFLOW = 55
@@ -1765,7 +1669,7 @@ _ErrorCode_string_map: dict[str, ErrorCode] = {
     'einveid': ErrorCode.EINVEID,
     'einvmode': ErrorCode.EINVMODE,
     'einvvid': ErrorCode.EINVVID,
-    'enegloop': ErrorCode.ENEGLOOP,
+    'enegcycle': ErrorCode.ENEGCYCLE,
     'enomem': ErrorCode.ENOMEM,
     'enosol': ErrorCode.ENOSOL,
     'eoverflow': ErrorCode.EOVERFLOW,
@@ -1905,6 +1809,36 @@ class RootChoice(IntEnum):
 _RootChoice_string_map: dict[str, RootChoice] = {
     'degree': RootChoice.DEGREE,
     'eccentricity': RootChoice.ECCENTRICITY,
+}
+
+
+class Metric(IntEnum):
+    """Python counterpart of an ``igraph_metric_t`` enum."""
+
+    EUCLIDEAN = 0
+    MANHATTAN = 1
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, Metric):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return _Metric_string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to Metric") from None
+
+
+_Metric_string_map: dict[str, Metric] = {
+    'euclidean': Metric.EUCLIDEAN,
+    'manhattan': Metric.MANHATTAN,
 }
 
 
@@ -2054,6 +1988,38 @@ _LeadingEigenvectorCommunityHistory_string_map: dict[str, LeadingEigenvectorComm
 }
 
 
+class LeidenObjective(IntEnum):
+    """Python counterpart of an ``igraph_leiden_objective_t`` enum."""
+
+    MODULARITY = 0
+    CPM = 1
+    ER = 2
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, LeidenObjective):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return _LeidenObjective_string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to LeidenObjective") from None
+
+
+_LeidenObjective_string_map: dict[str, LeidenObjective] = {
+    'cpm': LeidenObjective.CPM,
+    'er': LeidenObjective.ER,
+    'modularity': LeidenObjective.MODULARITY,
+}
+
+
 __all__ = (
     'AddWeights',
     'AdjacencyMode',
@@ -2072,25 +2038,24 @@ __all__ = (
     'EdgeOrder',
     'EdgeSequenceType',
     'EigenAlgorithm',
-    'ErdosRenyiType',
+    'EigenWhichPosition',
     'ErrorCode',
     'FeedbackArcSetAlgorithm',
     'FloydWarshallAlgorithm',
     'FvsAlgorithm',
     'GetAdjacency',
     'GreedyColoringHeuristics',
-    'ImitateAlgorithm',
     'LaplacianNormalization',
     'LaplacianSpectralEmbeddingType',
     'LayoutGrid',
-    'LazyAdjacencyListSimplify',
     'LeadingEigenvectorCommunityHistory',
+    'LeidenObjective',
     'Loops',
     'LpaVariant',
     'MatrixStorage',
+    'Metric',
     'MstAlgorithm',
     'NeighborMode',
-    'Optimality',
     'Order',
     'PagerankAlgorithm',
     'Product',
@@ -2098,7 +2063,6 @@ __all__ = (
     'RandomWalkStuck',
     'RealizeDegseq',
     'Reciprocity',
-    'Rewiring',
     'RootChoice',
     'SparseMatrixSolver',
     'SparseMatrixType',

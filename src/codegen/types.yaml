@@ -13,12 +13,16 @@ BOOLEAN:
 INTEGER:
   PY_TYPE: int
   INCONV:
-    OUT: "%C% = igraph_integer_t()"
+    OUT: "%C% = igraph_int_t()"
+  DEFAULT:
+    UNLIMITED: "-1" # value of IGRAPH_UNLIMITED
 
 REAL:
   PY_TYPE: float
   INCONV:
     OUT: "%C% = igraph_real_t()"
+  DEFAULT:
+    UNLIMITED: "-1" # value of IGRAPH_UNLIMITED
 
 INT:
   PY_TYPE: int
@@ -110,8 +114,8 @@ VERTEX:
   PY_TYPE: VertexLike
   PY_RETURN_TYPE: int
   INCONV:
-    IN: "%C% = vertexlike_to_igraph_integer_t(%I%)"
-    OUT: "%C% = igraph_integer_t(0)"
+    IN: "%C% = vertexlike_to_igraph_int_t(%I%)"
+    OUT: "%C% = igraph_int_t(0)"
 
 VERTEX_COLORS:
   PY_TYPE: Iterable[int]
@@ -152,12 +156,12 @@ VERTEX_SELECTOR:
     ALL: '"all"'
   CALL: "%C%.unwrap()"
 
-VERTEX_QTYS:
+VERTEX_QTY:
   PY_TYPE: Iterable[float]
   PY_RETURN_TYPE: RealArray
   INCONV:
-    IN: "%C% = vertex_qtys_to_igraph_vector_t_view(%I%, %I1%)"
-    INOUT: "%C% = vertex_qtys_to_igraph_vector_t(%I%, %I1%)"
+    IN: "%C% = vertex_qty_to_igraph_vector_t_view(%I%, %I1%)"
+    INOUT: "%C% = vertex_qty_to_igraph_vector_t(%I%, %I1%)"
     OUT: "%C% = _Vector.create(0)"
   OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
@@ -174,8 +178,8 @@ EDGE:
   PY_TYPE: EdgeLike
   PY_RETURN_TYPE: int
   INCONV:
-    IN: "%C% = edgelike_to_igraph_integer_t(%I%)"
-    OUT: "%C% = igraph_integer_t(0)"
+    IN: "%C% = edgelike_to_igraph_int_t(%I%)"
+    OUT: "%C% = igraph_int_t(0)"
 
 EDGE_COLORS:
   PY_TYPE: Iterable[int]
@@ -312,11 +316,6 @@ EIGENALGO:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
-ERDOS_RENYI_TYPE:
-  PY_TYPE: ErdosRenyiType
-  INCONV:
-    IN: "%C% = c_int(%I%)"
-
 FAS_ALGORITHM:
   PY_TYPE: FeedbackArcSetAlgorithm
   INCONV:
@@ -329,11 +328,6 @@ FWALGORITHM:
 
 GREEDY_COLORING_HEURISTIC:
   PY_TYPE: GreedyColoringHeuristics
-  INCONV:
-    IN: "%C% = c_int(%I%)"
-
-IMITATE_ALGORITHM:
-  PY_TYPE: ImitateAlgorithm
   INCONV:
     IN: "%C% = c_int(%I%)"
 
@@ -352,11 +346,6 @@ NEIMODE:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
-OPTIMALITY:
-  PY_TYPE: Optimality
-  INCONV:
-    IN: "%C% = c_int(%I%)"
-
 PAGERANKALGO:
   PY_TYPE: PagerankAlgorithm
   INCONV:
@@ -372,10 +361,8 @@ RECIP:
   INCONV:
     IN: "%C% = c_int(%I%)"
 
-REWIRING_MODE:
-  PY_TYPE: Rewiring
-  INCONV:
-    IN: "%C% = c_int(%I%)"
+REWIRING_STATS:
+  PY_TYPE: ~
 
 ROOTCHOICE:
   PY_TYPE: RootChoice
