@@ -1,6 +1,6 @@
 """Functions related to shortest or widest paths in a graph."""
 
-from typing import Iterable, Optional
+from typing import Iterable, Literal, Optional
 
 from .enums import Connectedness, NeighborMode
 from .graph import Graph
@@ -34,7 +34,7 @@ def shortest_path(
     target: VertexLike,
     mode: NeighborMode = NeighborMode.OUT,
     weights: Optional[Iterable[float]] = None,
-    method: str = "dijkstra",
+    method: Literal["auto", "dijkstra", "bellman_ford"] = "dijkstra",
 ) -> IntArray:
     """Finds a single shortest path between two vertices in a graph.
 
@@ -46,15 +46,15 @@ def shortest_path(
         weights: list of weights for each edge in the graph, or ``None`` to treat
             the edges as unweighted
         method: the method to use for finding shortest paths when the graph is
-            weighted. May be one of `"dijkstra"` (Dijkstra's algorithm) or
-            `"bellman-ford"` (Bellman-Ford algorithm).
+            weighted. May be one of `"auto"` (pick the best method), `"dijkstra"`
+            (Dijkstra's algorithm) or `"bellman_ford"` (Bellman-Ford algorithm).
 
     Returns:
         the IDs of the vertices along the shortest path
     """
     # TODO(ntamas): handle epath?
-    if weights is None:
-        vpath, _ = get_shortest_path(graph, source, target, mode)
+    if method == "auto":
+        vpath, _ = get_shortest_path(graph, source, target, weights, mode)
     elif method == "dijkstra":
         vpath, _ = get_shortest_path_dijkstra(graph, source, target, weights, mode)
     elif method in ("bellman-ford", "bellman_ford"):
