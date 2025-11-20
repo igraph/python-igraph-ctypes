@@ -110,8 +110,8 @@ __all__ = (
     "edgelike_to_igraph_int_t",
     "edge_capacities_to_igraph_vector_t",
     "edge_capacities_to_igraph_vector_t_view",
-    "edge_colors_to_igraph_vector_t",
-    "edge_colors_to_igraph_vector_t_view",
+    "edge_colors_to_igraph_vector_int_t",
+    "edge_colors_to_igraph_vector_int_t_view",
     "edge_lengths_to_igraph_vector_t",
     "edge_lengths_to_igraph_vector_t_view",
     "edge_selector_to_igraph_es_t",
@@ -287,12 +287,14 @@ edge_capacities_to_igraph_vector_t = edge_weights_to_igraph_vector_t
 edge_capacities_to_igraph_vector_t_view = edge_weights_to_igraph_vector_t_view
 
 
-def edge_colors_to_igraph_vector_t(colors: Iterable[int], graph: Graph) -> _VectorInt:
+def edge_colors_to_igraph_vector_int_t(
+    colors: Iterable[int], graph: Graph
+) -> _VectorInt:
     """Converts a Python iterable of integers to a vector of edge colors."""
     return iterable_to_igraph_vector_int_t(colors)
 
 
-def edge_colors_to_igraph_vector_t_view(
+def edge_colors_to_igraph_vector_int_t_view(
     colors: Iterable[int], graph: Graph
 ) -> _VectorInt:
     """Converts a Python iterable of integers to a vector of edge colors,
