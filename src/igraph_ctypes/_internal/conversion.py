@@ -621,14 +621,12 @@ def numpy_array_to_igraph_vector_bool_t_view(
     provided into the copy.
     """
     arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_bool_t, flatten=flatten)
+    arr_ptr = arr.ctypes.data_as(POINTER(igraph_bool_t))
 
-    result = _VectorBool()
-    igraph_vector_bool_view(
-        result, arr.ctypes.data_as(POINTER(igraph_bool_t)), arr.shape[0]
-    )
+    result = _VectorBool(igraph_vector_bool_view(arr_ptr, arr.shape[0]))
 
     # Destructor must not be called so we never mark result as initialized;
-    # this is intentional
+    result.release()
 
     return result
 
@@ -655,14 +653,12 @@ def numpy_array_to_igraph_vector_int_t_view(
     provided into the copy.
     """
     arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_int_t, flatten=flatten)
+    arr_ptr = arr.ctypes.data_as(POINTER(igraph_int_t))
 
-    result = _VectorInt()
-    igraph_vector_int_view(
-        result, arr.ctypes.data_as(POINTER(igraph_int_t)), arr.shape[0]
-    )
+    result = _VectorInt(igraph_vector_int_view(arr_ptr, arr.shape[0]))
 
-    # Destructor must not be called so we never mark result as initialized;
-    # this is intentional
+    # Destructor must not be called so we need to call .release()
+    result.release()
 
     return result
 
@@ -687,12 +683,12 @@ def numpy_array_to_igraph_vector_t_view(
     provided into the copy.
     """
     arr = _force_into_1d_numpy_array(arr, np_type_of_igraph_real_t, flatten=flatten)
+    arr_ptr = arr.ctypes.data_as(POINTER(igraph_real_t))
 
-    result = _Vector()
-    igraph_vector_view(result, arr.ctypes.data_as(POINTER(igraph_real_t)), arr.shape[0])
+    result = _Vector(igraph_vector_view(arr_ptr, arr.shape[0]))
 
-    # Destructor must not be called so we never mark result as initialized;
-    # this is intentional
+    # Destructor must not be called so we need to call .release()
+    result.release()
 
     return result
 
