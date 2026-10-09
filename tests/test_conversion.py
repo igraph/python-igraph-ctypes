@@ -31,6 +31,13 @@ from igraph_ctypes._internal.conversion import (
     vertexlike_to_igraph_int_t,
     vertex_selector_to_igraph_vs_t,
 )
+from igraph_ctypes._internal.functions import (
+    convex_hull_2d,
+    create,
+    get_adjacency,
+    layout_grid,
+    ring,
+)
 from igraph_ctypes._internal.types import igraph_bool_t, igraph_int_t
 from igraph_ctypes._internal.wrappers import (
     _Matrix,
@@ -231,6 +238,51 @@ def test_real_matrix_roundtrip():
 
     restored_array = igraph_matrix_t_to_numpy_array(converted)
     assert (restored_array == expected_array).all()
+
+
+def _igraph_matrix_element(matrix: _Matrix | _MatrixInt, row: int, col: int):
+    # igraph matrices are stored in column-major order
+    data = matrix.unwrap()
+    return data.data.stor_begin[col * data.nrow + row]
+
+
+@pytest.mark.parametrize(
+    "converter", [sequence_to_igraph_matrix_t, sequence_to_igraph_matrix_int_t]
+)
+@pytest.mark.parametrize("from_numpy", [False, True])
+def test_matrix_storage_order(converter, from_numpy):
+    input = [[0, 1, 2], [10, 11, 12]]
+    converted = converter(array(input) if from_numpy else input)
+
+    assert converted.unwrap().nrow == 2
+    assert converted.unwrap().ncol == 3
+    for i, row in enumerate(input):
+        for j, value in enumerate(row):
+            assert _igraph_matrix_element(converted, i, j) == value
+
+
+def test_matrix_from_fortran_ordered_numpy_array():
+    input = array([[0.5, 1.5, 2.5], [10.5, 11.5, 12.5]], order="F")
+    converted = sequence_to_igraph_matrix_t(input)
+    assert _igraph_matrix_element(converted, 1, 0) == 10.5
+    assert _igraph_matrix_element(converted, 0, 2) == 2.5
+    assert (igraph_matrix_t_to_numpy_array(converted) == input).all()
+
+
+def test_matrix_results_of_igraph_functions():
+    # directed path 0 -> 1 -> 2; the adjacency matrix is not symmetric
+    g = create([0, 1, 1, 2], 3, True)
+    assert get_adjacency(g).tolist() == [[0, 1, 0], [0, 0, 1], [0, 0, 0]]
+
+    # non-square result, filled row by row by igraph
+    g = ring(4, False, False, True)
+    assert layout_grid(g, 2).tolist() == [[0, 0], [1, 0], [0, 1], [1, 1]]
+
+    # non-square input and output
+    points = [[0, 0], [1, 0], [0, 1], [0.2, 0.2]]
+    indices, coords = convex_hull_2d(points)
+    assert sorted(indices.tolist()) == [0, 1, 2]
+    assert sorted(coords.tolist()) == [[0, 0], [0, 1], [1, 0]]
 
 
 def test_int_vector_list_roundtrip():
