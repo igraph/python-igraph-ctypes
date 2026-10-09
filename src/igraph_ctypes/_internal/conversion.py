@@ -552,7 +552,7 @@ def _ensure_matrix(items: Sequence[Sequence[Any]]) -> None:
     nrow = len(items)
     if nrow:
         ncol = len(items[0])
-        if not any(len(row) == ncol for row in items):
+        if not all(len(row) == ncol for row in items):
             raise ValueError("rows of a matrix must have the same length")
 
 
