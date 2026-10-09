@@ -29,6 +29,19 @@ things may break randomly, or they may not even work.
 4. Run `uv run pytest` to run the unit tests, or `uv run python` to run
    a Python interpreter where you can `import igraph_ctypes`
 
+## Development
+
+During development, you need to have the shared library of igraph's C core
+(`libigraph.4.so` on Linux, `libigraph.4.dylib` on macOS) available in your
+`LD_LIBRARY_PATH` (Linux) or `DYLD_LIBRARY_PATH` (macOS).
+
+Large chunks of the code in the library are generated from the interface specification
+file in igraph (`functions.yaml`). Stimulus is the name of the component responsible for
+the code generation and it is in a separate project, referred from this project as a
+dev dependency. To regenerate the code, run `uv run python3 -m codegen.run`, which uses
+Stimulus to parse the interface specification file from igraph and generate the Python
+code.
+
 ## Benchmarking
 
 Benchmarks will be placed in `benchmarks` and they will compare the "old",
