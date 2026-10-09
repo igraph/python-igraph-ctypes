@@ -87,7 +87,7 @@ MATRIX:
   INCONV:
     IN: "%C% = sequence_to_igraph_matrix_t_view(%I%)"
     INOUT: "%C% = sequence_to_igraph_matrix_t(%I%)"
-    OUT: "%C% = _Matrix.create(0)"
+    OUT: "%C% = _Matrix.create(0, 0)"
   OUTCONV: "%I% = igraph_matrix_t_to_numpy_array(%C%)"
 
 MATRIX_INT:
@@ -96,7 +96,7 @@ MATRIX_INT:
   INCONV:
     IN: "%C% = sequence_to_igraph_matrix_int_t_view(%I%)"
     INOUT: "%C% = sequence_to_igraph_matrix_int_t(%I%)"
-    OUT: "%C% = _MatrixInt.create(0)"
+    OUT: "%C% = _MatrixInt.create(0, 0)"
   OUTCONV: "%I% = igraph_matrix_int_t_to_numpy_array(%C%)"
 
 # Graph, vertex and edge related classes
