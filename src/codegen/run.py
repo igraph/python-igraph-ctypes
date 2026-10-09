@@ -171,7 +171,14 @@ def generate_enums(  # noqa: C901
 
         entries = [entry.strip() for entry in spec.split(",")]
         entries = [entry for entry in entries if entry]
-        plen = longest_common_prefix_length(entries)
+        if len(entries) == 1:
+            # No common prefix to infer from a single entry; strip the longest
+            # prefix derived from the name of the enum type instead
+            words = orig_name.upper().split("_")[:-1]
+            prefixes = ("_".join(words[:i]) + "_" for i in range(len(words), 1, -1))
+            plen = next((len(p) for p in prefixes if entries[0].startswith(p)), 0)
+        else:
+            plen = longest_common_prefix_length(entries)
         entries = [entry[plen:] for entry in entries]
 
         remapped_name = ENUM_NAME_REMAPPING.get(name, name)
