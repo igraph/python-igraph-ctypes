@@ -289,7 +289,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=4.0.0" },
     { name = "pytest-datadir", specifier = ">=1.4.1" },
     { name = "richbench", specifier = ">=1.0.3" },
-    { name = "stimulus", git = "https://github.com/igraph/stimulus.git?rev=0.23.1" },
+    { name = "stimulus", git = "https://github.com/igraph/stimulus.git?rev=0.23.2" },
 ]
 doc = [
     { name = "mkdocs-material", specifier = ">=9.1.21" },
@@ -874,8 +874,8 @@ wheels = [
 
 [[package]]
 name = "stimulus"
-version = "0.23.1"
-source = { git = "https://github.com/igraph/stimulus.git?rev=0.23.1#00e0f2719ee089aad7eff95c3465b4c219e244d9" }
+version = "0.23.2"
+source = { git = "https://github.com/igraph/stimulus.git?rev=0.23.2#83d278e47602efb299e31640d75c1dac430dfd6a" }
 dependencies = [
     { name = "deepmerge" },
     { name = "jinja2" },
