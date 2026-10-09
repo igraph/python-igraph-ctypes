@@ -569,12 +569,13 @@ def _force_into_1d_numpy_array(arr: np.ndarray, np_type, flatten: bool) -> np.nd
 
 
 def _force_into_2d_numpy_array(arr: np.ndarray, np_type) -> np.ndarray:
-    """Ensures that the given NumPy array is two-dimensional and matches the
-    given NumPy type, avoiding copies during the conversion if possible.
+    """Ensures that the given NumPy array is two-dimensional, matches the
+    given NumPy type and is stored in column-major (Fortran) order like igraph
+    matrices, avoiding copies during the conversion if possible.
     """
     if len(arr.shape) != 2:
         raise TypeError("NumPy array must be two-dimensional")
-    return arr.astype(np_type, order="C", casting="safe", copy=False)
+    return arr.astype(np_type, order="F", casting="safe", copy=False)
 
 
 def numpy_array_to_igraph_matrix_t(arr: np.ndarray) -> _Matrix:
@@ -820,7 +821,7 @@ def igraph_vector_int_t_to_list(vector: _VectorInt) -> list[int]:
 
 def igraph_matrix_t_to_numpy_array(matrix: _Matrix) -> RealArray:
     shape = igraph_matrix_nrow(matrix), igraph_matrix_ncol(matrix)
-    result = np.zeros(shape, dtype=np_type_of_igraph_real_t)
+    result = np.zeros(shape, dtype=np_type_of_igraph_real_t, order="F")
     if result.size > 0:
         memmove(result.ctypes.data, matrix.unwrap().data.stor_begin, result.nbytes)
     return result
@@ -828,7 +829,7 @@ def igraph_matrix_t_to_numpy_array(matrix: _Matrix) -> RealArray:
 
 def igraph_matrix_int_t_to_numpy_array(matrix: _MatrixInt) -> IntArray:
     shape = igraph_matrix_int_nrow(matrix), igraph_matrix_int_ncol(matrix)
-    result = np.zeros(shape, dtype=np_type_of_igraph_int_t)
+    result = np.zeros(shape, dtype=np_type_of_igraph_int_t, order="F")
     if result.size > 0:
         memmove(result.ctypes.data, matrix.unwrap().data.stor_begin, result.nbytes)
     return result
