@@ -16,7 +16,7 @@ from ._internal.functions import (
 __all__ = ("components", "shortest_path")
 
 
-def components(graph: Graph, mode: Connectedness = Connectedness.WEAK) -> IntArray:
+def components(graph: Graph, mode: Connectedness = "weak") -> IntArray:
     """Finds the weakly or strongly connected components of a graph.
 
     Args:
@@ -32,7 +32,7 @@ def shortest_path(
     graph: Graph,
     source: VertexLike,
     target: VertexLike,
-    mode: NeighborMode = NeighborMode.OUT,
+    mode: NeighborMode = "out",
     weights: Optional[Iterable[float]] = None,
     method: Literal["auto", "dijkstra", "bellman_ford"] = "dijkstra",
 ) -> IntArray:

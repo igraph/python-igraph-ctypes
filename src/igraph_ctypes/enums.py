@@ -1,12 +1,13 @@
 # fmt: off
 #
-# This module simply re-exports types from ._internal.enums that are meant to
+# This module simply re-exports types from ._internal.literals that are meant to
 # be used by end users of the library.
 #
 # The rest of this file is generated
-from ._internal.enums import (
+from ._internal.literals import (
     AddWeights,
     AdjacencyMode,
+    AllowedEdgeTypes,
     ArpackError,
     AttributeCombinationType,
     AttributeElementType,
@@ -63,11 +64,13 @@ from ._internal.enums import (
     VertexSequenceType,
     VoronoiTiebreaker,
     WheelMode,
+    WriteGMLOptions,
 )
 
 __all__ = (
     "AddWeights",
     "AdjacencyMode",
+    "AllowedEdgeTypes",
     "ArpackError",
     "AttributeCombinationType",
     "AttributeElementType",
@@ -124,4 +127,5 @@ __all__ = (
     "VertexSequenceType",
     "VoronoiTiebreaker",
     "WheelMode",
+    "WriteGMLOptions",
 )

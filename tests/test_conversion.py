@@ -3,7 +3,7 @@ import pytest
 from numpy import array
 
 from igraph_ctypes.constructors import create_empty_graph
-from igraph_ctypes.enums import EdgeSequenceType, VertexSequenceType
+from igraph_ctypes._internal.enums import EdgeSequenceType, VertexSequenceType
 from igraph_ctypes._internal.conversion import (
     any_to_igraph_bool_t,
     edgelike_to_igraph_int_t,

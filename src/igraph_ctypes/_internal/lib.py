@@ -732,6 +732,10 @@ igraph_hypercube = _lib.igraph_hypercube
 igraph_hypercube.restype = handle_igraph_error_t
 igraph_hypercube.argtypes = [POINTER(igraph_t), igraph_int_t, igraph_bool_t]
 
+igraph_hamming = _lib.igraph_hamming
+igraph_hamming.restype = handle_igraph_error_t
+igraph_hamming.argtypes = [POINTER(igraph_t), igraph_int_t, igraph_int_t, igraph_bool_t]
+
 igraph_square_lattice = _lib.igraph_square_lattice
 igraph_square_lattice.restype = handle_igraph_error_t
 igraph_square_lattice.argtypes = [POINTER(igraph_t), POINTER(igraph_vector_int_t), igraph_int_t, igraph_bool_t, igraph_bool_t, POINTER(igraph_vector_bool_t)]
@@ -2007,6 +2011,10 @@ igraph_count_adjacent_triangles.argtypes = [POINTER(igraph_t), POINTER(igraph_ve
 igraph_count_triangles = _lib.igraph_count_triangles
 igraph_count_triangles.restype = handle_igraph_error_t
 igraph_count_triangles.argtypes = [POINTER(igraph_t), POINTER(igraph_real_t)]
+
+igraph_is_triangle_free = _lib.igraph_is_triangle_free
+igraph_is_triangle_free.restype = handle_igraph_error_t
+igraph_is_triangle_free.argtypes = [POINTER(igraph_t), POINTER(igraph_bool_t)]
 
 igraph_local_scan_0 = _lib.igraph_local_scan_0
 igraph_local_scan_0.restype = handle_igraph_error_t

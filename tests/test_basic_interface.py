@@ -1,7 +1,6 @@
 from numpy import array
 from pytest import raises
 
-from igraph_ctypes._internal.enums import NeighborMode
 from igraph_ctypes.constructors import create_empty_graph
 from igraph_ctypes.errors import IgraphError
 from igraph_ctypes.graph import Graph
@@ -155,8 +154,8 @@ def test_neighbors_directed():
     g = create_ring(n, directed=True)
     for i in range(n):
         assert sorted(g.neighbors(i)) == sorted(((i - 1) % n, (i + 1) % n))
-        assert g.neighbors(i, mode=NeighborMode.OUT) == [(i + 1) % n]
-        assert g.neighbors(i, mode=NeighborMode.IN) == [(i - 1) % n]
+        assert g.neighbors(i, mode="out") == [(i + 1) % n]
+        assert g.neighbors(i, mode="in") == [(i - 1) % n]
 
 
 def test_incident_undirected():
@@ -171,16 +170,16 @@ def test_incident_directed():
     g = create_ring(n, directed=True)
     for i in range(n):
         assert sorted(g.incident(i)) == sorted((i, (i - 1) % n))
-        assert g.incident(i, mode=NeighborMode.OUT) == [i]
-        assert g.incident(i, mode=NeighborMode.IN) == [(i - 1) % n]
+        assert g.incident(i, mode="out") == [i]
+        assert g.incident(i, mode="in") == [(i - 1) % n]
 
     g = create_mutual_ring(n)
     for i in range(n):
         assert sorted(g.incident(i)) == sorted((i, (i - 1) % n, i + 5, (i - 1) % n + 5))
-        assert sorted(g.incident(i, mode=NeighborMode.OUT).tolist()) == sorted(
+        assert sorted(g.incident(i, mode="out").tolist()) == sorted(
             [i, (i - 1) % n + 5]
         )
-        assert sorted(g.incident(i, mode=NeighborMode.IN).tolist()) == sorted(
+        assert sorted(g.incident(i, mode="in").tolist()) == sorted(
             [
                 i + 5,
                 (i - 1) % n,

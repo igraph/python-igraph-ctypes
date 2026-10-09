@@ -1,4 +1,4 @@
-from igraph_ctypes.enums import AttributeType
+from igraph_ctypes._internal.enums import AttributeType
 from igraph_ctypes._internal.attributes.value_list import (
     AttributeValueList,
     _slice_length,

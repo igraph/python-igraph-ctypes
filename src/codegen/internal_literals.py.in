@@ -1,0 +1,15 @@
+"""String literal types that the public API uses in place of the enums of the
+C core of igraph.
+
+Each type alias in this module lists the strings that are accepted for the
+corresponding enum. The conversion to the C enum happens in the ``from_()``
+class methods of the enums in ``._internal.enums``, which also accept the
+enum members and integers.
+"""
+
+from __future__ import annotations
+
+from typing import Iterable, Literal, TypeAlias
+
+# fmt: off
+# The rest of this file is generated

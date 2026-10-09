@@ -1,3 +1,4 @@
+from enum import IntFlag
 from fnmatch import fnmatch
 from os.path import expanduser
 from pathlib import Path
@@ -11,13 +12,22 @@ from typing import (
 )
 
 import ast
+import importlib.util
 import re
 import subprocess
 import sys
+import yaml
 
 
 IGRAPH_C_CORE_SOURCE_FOLDER = Path.home() / "dev" / "igraph" / "igraph"
 SOURCE_FOLDER = Path(sys.modules[__name__].__file__ or "").parent.parent.absolute()
+
+BOOLEAN_ENUM_MEMBERS: dict[str, tuple[str, str]] = {
+    "AddWeights": ("YES", "NO"),
+}
+"""Enums that also accept ``True`` and ``False``, mapped to the names of the
+enum members that they correspond to.
+"""
 
 
 def create_glob_matcher(globs: Union[str, Iterable[str]]) -> Callable[[str], bool]:
@@ -62,8 +72,9 @@ def reexport(
     *,
     template: Path = SOURCE_FOLDER / "codegen" / "reexport.py.in",
 ) -> None:
-    """Generates a Python module that re-exports all top-level functions and
-    classes matching the given glob or globs from another module.
+    """Generates a Python module that re-exports all top-level functions,
+    classes and annotated type aliases matching the given glob or globs from
+    another module.
 
     Args:
         input: the module whose content is to be re-exported
@@ -76,11 +87,14 @@ def reexport(
         node = ast.parse(fp.read(), str(input))
 
     matcher = create_glob_matcher(g for g in match if "*" in g or "?" in g)
-    matched_symbols = [
-        n.name
+    top_level_names = [
+        n.target.id
+        if isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name)
+        else getattr(n, "name", None)
         for n in node.body
-        if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and matcher(n.name)
+        if isinstance(n, (ast.FunctionDef, ast.ClassDef, ast.AnnAssign))
     ]
+    matched_symbols = [n for n in top_level_names if n and matcher(n)]
     matched_symbols.extend(g for g in match if "*" not in g and "?" not in g)
     matched_symbols.sort()
 
@@ -109,6 +123,7 @@ def generate_enums(  # noqa: C901
     so the formatting of the input file matters.
     """
 
+    HANDWRITTEN_FLAGS = ("AllowedEdgeTypes", "WriteGMLOptions")
     IGNORED_ENUMS = {
         "igraph_cached_property_t",
         "igraph_lapack_dsyev_which_t",
@@ -245,6 +260,12 @@ def generate_enums(  # noqa: C901
         fp.write('        """\n')
         fp.write(f"        if isinstance(value, {name}):\n")
         fp.write("            return value\n")
+        if name in BOOLEAN_ENUM_MEMBERS:
+            true_member, false_member = BOOLEAN_ENUM_MEMBERS[name]
+            fp.write("        elif value is True:\n")
+            fp.write(f"            return cls.{true_member}\n")
+            fp.write("        elif value is False:\n")
+            fp.write(f"            return cls.{false_member}\n")
         fp.write("        elif isinstance(value, int):\n")
         fp.write("            return cls(value)\n")
         fp.write("        else:\n")
@@ -294,7 +315,7 @@ def generate_enums(  # noqa: C901
         with template.open("r") as infp:
             outfp.write(infp.read())
 
-        exports = []
+        exports = list(HANDWRITTEN_FLAGS)
         for path in headers:
             with path.open("r") as infp:
                 exports.extend(process_file(outfp, infp))
@@ -305,10 +326,174 @@ def generate_enums(  # noqa: C901
         outfp.write(")\n")
 
 
+def _load_module_from_path(path: Path, name: str):
+    """Loads a standalone Python module from the given path without importing
+    the package that contains it.
+    """
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _enum_strings(module, enum_class) -> list[str]:
+    """Returns the strings accepted by the ``from_()`` class method of the given
+    enum class, i.e. the keys of its string map, in the order of definition of
+    the corresponding enum members.
+    """
+    string_map = getattr(module, f"_{enum_class.__name__}_string_map")
+    order = {name.lower(): index for index, name in enumerate(enum_class.__members__)}
+    return sorted(string_map, key=lambda key: order.get(key, len(order)))
+
+
+def generate_enum_literals(module, template: Path, output: Path) -> None:
+    """Generates the string literal type aliases corresponding to the enums in
+    the given (generated) enum module.
+
+    Args:
+        module: the loaded enum module
+        template: template of the module containing the string literal types
+        output: path to the module containing the string literal types
+    """
+    with output.open("w") as outfp:
+        with template.open("r") as infp:
+            outfp.write(infp.read())
+
+        for name in module.__all__:
+            enum_class = getattr(module, name)
+            strings = ", ".join(f'"{s}"' for s in _enum_strings(module, enum_class))
+            literal = f"Literal[{strings}]"
+            if issubclass(enum_class, IntFlag):
+                kind = "a combination of flags of"
+                literal = f"{literal} | Iterable[{literal}]"
+            else:
+                kind = "a value of"
+            extra = ""
+            if name in BOOLEAN_ENUM_MEMBERS:
+                literal = f"{literal} | bool"
+                true_member, false_member = BOOLEAN_ENUM_MEMBERS[name]
+                extra = (
+                    f" ``True`` and ``False`` are equivalent to "
+                    f'``"{true_member.lower()}"`` and ``"{false_member.lower()}"``.'
+                )
+            outfp.write(f"{name}: TypeAlias = {literal}\n")
+            outfp.write(
+                f'"""String literals accepted where {kind} the ``{name}`` '
+                f'enum is expected.{extra}"""\n\n'
+            )
+
+        outfp.write("\n__all__ = (\n")
+        for name in module.__all__:
+            outfp.write(f"    {name!r},\n")
+        outfp.write(")\n")
+
+
+def generate_enum_types(module, output: Path, abstract_types: Path) -> None:
+    """Generates the abstract type definitions for Stimulus that convert the
+    string literals of the enums in the given (generated) enum module to the
+    C enums.
+
+    Args:
+        module: the loaded enum module
+        output: path to the type definition file that the abstract type
+            definitions should be written into
+        abstract_types: path to the type definition file of the C core where
+            the abstract enum types are declared
+    """
+    enum_classes = {}
+    for name in module.__all__:
+        enum_class = getattr(module, name)
+        match = re.search(r"``(igraph_\w+_t)``", enum_class.__doc__ or "")
+        if match:
+            enum_classes[match.group(1)] = enum_class
+
+    with abstract_types.open() as fp:
+        abstract_type_specs = yaml.safe_load(fp)
+
+    type_specs = {}
+    for abstract_type, spec in sorted(abstract_type_specs.items()):
+        flags = str(spec.get("FLAGS", "")).upper()
+        enum_class = enum_classes.get(spec.get("CTYPE"))
+        if ("ENUM" not in flags and "BITS" not in flags) or enum_class is None:
+            continue
+
+        name = enum_class.__name__
+        type_spec = {
+            "PY_TYPE": name,
+            "INCONV": {
+                "IN": f"%C% = c_int(_enums.{name}.from_(%I%))",
+                "OUT": "%C% = c_int()",
+            },
+            "DEFAULT": {},
+        }
+        if "ENUM" in flags:
+            type_spec["OUTCONV"] = {
+                "OUT": f"%I% = cast({name}, _enums.{name}(%C%.value).name.lower())"
+            }
+
+        # Abstract default values in functions.yaml are the names of the enum
+        # members, or sometimes their string representations in quotes
+        for string in _enum_strings(module, enum_class):
+            type_spec["DEFAULT"][string.upper()] = f'"{string}"'
+            type_spec["DEFAULT"][f'"{string}"'] = f'"{string}"'
+
+        type_specs[abstract_type] = type_spec
+
+    with output.open("w") as fp:
+        fp.write(
+            "# Abstract types for the enums of the C core of igraph.\n"
+            "#\n"
+            "# This file is generated by codegen/run.py; do not edit by hand.\n"
+            "# Override the entries in types.yaml instead.\n\n"
+        )
+        yaml.safe_dump(type_specs, fp, sort_keys=False, width=1000)
+
+
+def check_enum_defaults(functions: Path, enum_names: Iterable[str]) -> None:
+    """Checks that the generated typed wrapper functions do not refer to enum
+    defaults that Stimulus could not map to a string literal.
+
+    Raises:
+        RuntimeError: if an unmapped enum default was found
+    """
+    # Enum names qualified with a module name are references to the enum
+    # classes in conversions and not default values
+    pattern = re.compile(rf"(?<![\w.])(?:{'|'.join(enum_names)})\.[A-Za-z_]\w*")
+    unmapped = sorted(set(pattern.findall(functions.read_text())))
+    if unmapped:
+        raise RuntimeError(
+            "Unmapped enum default values in generated code: " + ", ".join(unmapped)
+        )
+
+
 def main():
     """Executes the code generation steps that are needed to make the source
     code of the Python extension complete.
     """
+    generate_enums(
+        SOURCE_FOLDER / "codegen" / "internal_enums.py.in",
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "enums.py",
+        (IGRAPH_C_CORE_SOURCE_FOLDER / "include").glob("*.h"),
+    )
+
+    # Stimulus needs the abstract types of the enums so the enum module is
+    # generated and loaded first
+    enum_module = _load_module_from_path(
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "enums.py",
+        "_igraph_ctypes_codegen_enums",
+    )
+    generate_enum_literals(
+        enum_module,
+        SOURCE_FOLDER / "codegen" / "internal_literals.py.in",
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "literals.py",
+    )
+    generate_enum_types(
+        enum_module,
+        SOURCE_FOLDER / "codegen" / "types_enums.yaml",
+        IGRAPH_C_CORE_SOURCE_FOLDER / "interfaces" / "types.yaml",
+    )
+
     common_args = [
         sys.executable,
         "-m",
@@ -317,6 +502,8 @@ def main():
         str(IGRAPH_C_CORE_SOURCE_FOLDER / "interfaces" / "functions.yaml"),
         "-t",
         str(IGRAPH_C_CORE_SOURCE_FOLDER / "interfaces" / "types.yaml"),
+        "-t",
+        str(SOURCE_FOLDER / "codegen" / "types_enums.yaml"),
         "-f",
         str(SOURCE_FOLDER / "codegen" / "functions.yaml"),
         "-t",
@@ -353,16 +540,15 @@ def main():
     ]
     subprocess.run(args, check=True)
 
-    generate_enums(
-        SOURCE_FOLDER / "codegen" / "internal_enums.py.in",
-        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "enums.py",
-        (IGRAPH_C_CORE_SOURCE_FOLDER / "include").glob("*.h"),
+    check_enum_defaults(
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "functions.py",
+        enum_module.__all__,
     )
 
     reexport(
-        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "enums.py",
+        SOURCE_FOLDER / "igraph_ctypes" / "_internal" / "literals.py",
         SOURCE_FOLDER / "igraph_ctypes" / "enums.py",
-        "._internal.enums",
+        "._internal.literals",
     )
 
     reexport(

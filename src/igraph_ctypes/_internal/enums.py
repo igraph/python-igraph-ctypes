@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import IntEnum
+from enum import IntEnum, IntFlag
 from typing import Any
 
 
@@ -10,6 +10,100 @@ class Loops(IntEnum):
     IGNORE = 0
     TWICE = 1
     ONCE = 2
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts an arbitrary Python object into this enum.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        if isinstance(value, Loops):
+            return value
+        elif isinstance(value, int):
+            return cls(value)
+        else:
+            try:
+                return _Loops_string_map[value]
+            except KeyError:
+                raise ValueError(f"{value!r} cannot be converted to Loops") from None
+
+
+_Loops_string_map: dict[str, Loops] = {
+    "ignore": Loops.IGNORE,
+    "once": Loops.ONCE,
+    "twice": Loops.TWICE,
+}
+
+
+def _flags_from(cls, string_map, value: Any):
+    """Converts a flag, an integer, a string or an iterable of flags, integers
+    or strings into a combination of flags of the given type.
+    """
+    if isinstance(value, cls):
+        return value
+    elif isinstance(value, int):
+        return cls(value)
+    elif isinstance(value, str):
+        try:
+            return string_map[value]
+        except KeyError:
+            raise ValueError(
+                f"{value!r} cannot be converted to {cls.__name__}"
+            ) from None
+    else:
+        result = cls(0)
+        for item in value:
+            result |= _flags_from(cls, string_map, item)
+        return result
+
+
+class AllowedEdgeTypes(IntFlag):
+    """Python counterpart of the ``igraph_edge_type_sw_t`` bit flags."""
+
+    SIMPLE = 0
+    LOOPS = 1
+    MULTI = 6
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts a flag, an integer, a string or an iterable of flags,
+        integers or strings into a combination of these flags.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        return _flags_from(cls, _AllowedEdgeTypes_string_map, value)
+
+
+_AllowedEdgeTypes_string_map: dict[str, AllowedEdgeTypes] = {
+    "simple": AllowedEdgeTypes.SIMPLE,
+    "loops": AllowedEdgeTypes.LOOPS,
+    "multi": AllowedEdgeTypes.MULTI,
+}
+
+
+class WriteGMLOptions(IntFlag):
+    """Python counterpart of the ``igraph_write_gml_sw_t`` bit flags."""
+
+    DEFAULT = 0
+    ENCODE_ONLY_QUOT = 1
+
+    @classmethod
+    def from_(cls, value: Any):
+        """Converts a flag, an integer, a string or an iterable of flags,
+        integers or strings into a combination of these flags.
+
+        Raises:
+            ValueError: if the object cannot be converted
+        """
+        return _flags_from(cls, _WriteGMLOptions_string_map, value)
+
+
+_WriteGMLOptions_string_map: dict[str, WriteGMLOptions] = {
+    "default": WriteGMLOptions.DEFAULT,
+    "encode_only_quot": WriteGMLOptions.ENCODE_ONLY_QUOT,
+}
 
 
 # fmt: off
@@ -1210,6 +1304,10 @@ class AddWeights(IntEnum):
         """
         if isinstance(value, AddWeights):
             return value
+        elif value is True:
+            return cls.YES
+        elif value is False:
+            return cls.NO
         elif isinstance(value, int):
             return cls(value)
         else:
@@ -1295,7 +1393,7 @@ _FeedbackArcSetAlgorithm_string_map: dict[str, FeedbackArcSetAlgorithm] = {
 class FvsAlgorithm(IntEnum):
     """Python counterpart of an ``igraph_fvs_algorithm_t`` enum."""
 
-    IP = 0
+    EXACT_IP = 0
 
     @classmethod
     def from_(cls, value: Any):
@@ -1316,7 +1414,7 @@ class FvsAlgorithm(IntEnum):
 
 
 _FvsAlgorithm_string_map: dict[str, FvsAlgorithm] = {
-    'ip': FvsAlgorithm.IP,
+    'exact_ip': FvsAlgorithm.EXACT_IP,
 }
 
 
@@ -2023,6 +2121,7 @@ _LeidenObjective_string_map: dict[str, LeidenObjective] = {
 __all__ = (
     'AddWeights',
     'AdjacencyMode',
+    'AllowedEdgeTypes',
     'ArpackError',
     'AttributeCombinationType',
     'AttributeElementType',
@@ -2079,4 +2178,5 @@ __all__ = (
     'VertexSequenceType',
     'VoronoiTiebreaker',
     'WheelMode',
+    'WriteGMLOptions',
 )

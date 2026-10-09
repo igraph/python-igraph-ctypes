@@ -35,6 +35,10 @@ packages = ["src/igraph_ctypes"]
 module = "igraph_ctypes._internal.wrappers"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "yaml"
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 addopts = "--cov-config=.coveragerc"
 
@@ -46,6 +50,7 @@ lint.select = ["B", "C", "E", "F", "W"]
 "src/igraph_ctypes/_internal/enums.py" = ["E501"]
 "src/igraph_ctypes/_internal/functions.py" = ["E501", "E741"]
 "src/igraph_ctypes/_internal/lib.py" = ["E501"]
+"src/igraph_ctypes/_internal/literals.py" = ["E501"]
 
 [tool.tox]
 legacy_tox_ini = """

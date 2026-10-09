@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import MutableMapping
-from typing import Any, Iterable, Literal, Optional, TypeVar
+from typing import Any, Iterable, Optional, TypeVar
 
 from .enums import NeighborMode, ToDirected, ToUndirected
 from .types import (
@@ -69,9 +69,7 @@ class Graph:
         add_vertices(self, n)
         return self
 
-    def convert_to_directed(
-        self: C, mode: Literal["arbitrary", "mutual", "random", "acyclic"] = "mutual"
-    ) -> C:
+    def convert_to_directed(self: C, mode: ToDirected = "mutual") -> C:
         """Converts the graph in-place to a directed graph if it is undirected.
 
         Args:
@@ -85,12 +83,12 @@ class Graph:
         Returns:
             the graph itself
         """
-        to_directed(self, ToDirected.from_(mode))
+        to_directed(self, mode)
         return self
 
     def convert_to_undirected(
         self: C,
-        mode: Literal["collapse", "each", "mutual"] = "collapse",
+        mode: ToUndirected = "collapse",
         edge_attr_comb: Optional[AttributeCombinationSpecification] = None,
     ) -> C:
         """Converts the graph in-place to an undirected graph if it is directed.
@@ -110,7 +108,7 @@ class Graph:
         Returns:
             the graph itself
         """
-        to_undirected(self, ToUndirected.from_(mode), edge_attr_comb)
+        to_undirected(self, mode, edge_attr_comb)
         return self
 
     def copy(self) -> Graph:
@@ -154,18 +152,14 @@ class Graph:
         """
         return get_eid(self, from_, to, directed, error)
 
-    def incident(
-        self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
-    ) -> IntArray:
+    def incident(self, vid: VertexLike, mode: NeighborMode = "all") -> IntArray:
         return incident(self, vid, mode)
 
     def is_directed(self) -> bool:
         """Returns whether the graph is directed."""
         return is_directed(self)
 
-    def neighbors(
-        self, vid: VertexLike, mode: NeighborMode = NeighborMode.ALL
-    ) -> IntArray:
+    def neighbors(self, vid: VertexLike, mode: NeighborMode = "all") -> IntArray:
         """Returns the list of neighbors of a vertex."""
         return neighbors(self, vid, mode)
 
