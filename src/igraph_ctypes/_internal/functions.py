@@ -18,18 +18,24 @@ from .types import (
     MatrixLike,
     MatrixIntLike,
     RealArray,
+    SIRSimulation,
     VertexLike,
     VertexPair,
     VertexSelector,
 )
 from .wrappers import (
     _Graph,
+    _GraphList,
     _Matrix,
     _MatrixInt,
+    _MatrixList,
+    _SIRList,
+    _StrVector,
     _Vector,
     _VectorBool,
     _VectorInt,
     _VectorIntList,
+    _VectorList,  # noqa: F401 (used by outputs of type VECTOR_LIST)
     _create_graph_from_boxed,
 )
 
@@ -1557,7 +1563,25 @@ def hsbm_game(n: int, m: int, rho: Iterable[float], C: MatrixLike, p: float) -> 
     # Construct return value
     return graph
 
-# igraph_hsbm_list_game: no Python type known for type: VECTOR_LIST
+
+def hsbm_list_game(n: int, mlist: Iterable[int], rholist: Iterable[Iterable[float]], Clist: Iterable[MatrixLike], p: float) -> Graph:
+    """Type-annotated wrapper for ``igraph_hsbm_list_game``."""
+    # Prepare input arguments
+    c_graph = _Graph()
+    c_n = n
+    c_mlist = iterable_to_igraph_vector_int_t_view(mlist)
+    c_rholist = iterable_of_iterable_to_igraph_vector_list_t(rholist)
+    c_Clist = iterable_of_matrices_to_igraph_matrix_list_t(Clist)
+    c_p = p
+
+    # Call wrapped function
+    igraph_hsbm_list_game(c_graph, c_n, c_mlist, c_rholist, c_Clist, c_p)
+
+    # Prepare output arguments
+    graph = _create_graph_from_boxed(c_graph)
+
+    # Construct return value
+    return graph
 
 
 def dot_product_game(vecs: MatrixLike, directed: bool = False) -> Graph:
@@ -2690,7 +2714,25 @@ def neighborhood(graph: Graph, vids: VertexSelector, order: int, mode: NeighborM
     # Construct return value
     return res
 
-# igraph_neighborhood_graphs: no Python type known for type: GRAPH_LIST
+
+def neighborhood_graphs(graph: Graph, vids: VertexSelector, order: int, mode: NeighborMode = "all", mindist: int = 0) -> list[Graph]:
+    """Type-annotated wrapper for ``igraph_neighborhood_graphs``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _GraphList.create(0)
+    c_vids = vertex_selector_to_igraph_vs_t(vids, graph)
+    c_order = order
+    c_mode = c_int(_enums.NeighborMode.from_(mode))
+    c_mindist = mindist
+
+    # Call wrapped function
+    igraph_neighborhood_graphs(c_graph, c_res, c_vids.unwrap(), c_order, c_mode, c_mindist)
+
+    # Prepare output arguments
+    res = igraph_graph_list_t_to_list_of_graphs(c_res)
+
+    # Construct return value
+    return res
 
 
 def topological_sorting(graph: Graph, mode: NeighborMode = "out") -> IntArray:
@@ -2938,9 +2980,9 @@ def add_edge(graph: Graph, from_: int, to: int) -> None:
     # Call wrapped function
     igraph_add_edge(c_graph, c_from, c_to)
 
-# igraph_eigenvector_centrality: no Python type known for type: ALL_VERTEX_QTY
+# igraph_eigenvector_centrality: no Python type known for type: ARPACK_OPTIONS
 
-# igraph_hub_and_authority_scores: no Python type known for type: ALL_VERTEX_QTY
+# igraph_hub_and_authority_scores: no Python type known for type: ARPACK_OPTIONS
 
 
 def unfold_tree(graph: Graph, roots: Iterable[int], mode: NeighborMode = "all") -> tuple[Graph, IntArray]:
@@ -3956,7 +3998,24 @@ def is_connected(graph: Graph, mode: Connectedness = "weak") -> bool:
     # Construct return value
     return res
 
-# igraph_decompose: no Python type known for type: GRAPH_LIST
+
+def decompose(graph: Graph, mode: Connectedness = "weak", maxcompno: int = -1, minelements: int = 1) -> list[Graph]:
+    """Type-annotated wrapper for ``igraph_decompose``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_components = _GraphList.create(0)
+    c_mode = c_int(_enums.Connectedness.from_(mode))
+    c_maxcompno = maxcompno
+    c_minelements = minelements
+
+    # Call wrapped function
+    igraph_decompose(c_graph, c_components, c_mode, c_maxcompno, c_minelements)
+
+    # Prepare output arguments
+    components = igraph_graph_list_t_to_list_of_graphs(c_components)
+
+    # Construct return value
+    return components
 
 
 def articulation_points(graph: Graph) -> IntArray:
@@ -4620,9 +4679,45 @@ def layout_graphopt(graph: Graph, res: MatrixLike, niter: int = 500, node_charge
 
 # igraph_layout_drl_3d: no Python type known for type: DRL_OPTIONS
 
-# igraph_layout_merge_dla: no Python type known for type: GRAPH_PTR_LIST
 
-# igraph_layout_sugiyama: no Python type known for type: MATRIX_LIST
+def layout_merge_dla(graphs: Iterable[Graph], coords: Iterable[MatrixLike]) -> RealArray:
+    """Type-annotated wrapper for ``igraph_layout_merge_dla``."""
+    # Prepare input arguments
+    c_graphs = iterable_of_graphs_to_igraph_vector_ptr_t(graphs)
+    c_coords = iterable_of_matrices_to_igraph_matrix_list_t(coords)
+    c_res = _Matrix.create(0, 0)
+
+    # Call wrapped function
+    igraph_layout_merge_dla(c_graphs, c_coords, c_res)
+
+    # Prepare output arguments
+    res = igraph_matrix_t_to_numpy_array(c_res)
+
+    # Construct return value
+    return res
+
+
+def layout_sugiyama(graph: Graph, layers: Optional[Iterable[int]] = None, hgap: float = 1, vgap: float = 1, maxiter: int = 100, weights: Optional[Iterable[float]] = None) -> tuple[RealArray, list[RealArray]]:
+    """Type-annotated wrapper for ``igraph_layout_sugiyama``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_res = _Matrix.create(0, 0)
+    c_routing = _MatrixList.create(0)
+    c_layers = iterable_to_igraph_vector_int_t_view(layers) if layers is not None else None
+    c_hgap = hgap
+    c_vgap = vgap
+    c_maxiter = maxiter
+    c_weights = edge_weights_to_igraph_vector_t_view(weights, graph) if weights is not None else None
+
+    # Call wrapped function
+    igraph_layout_sugiyama(c_graph, c_res, c_routing, c_layers, c_hgap, c_vgap, c_maxiter, c_weights)
+
+    # Prepare output arguments
+    res = igraph_matrix_t_to_numpy_array(c_res)
+    routing = igraph_matrix_list_t_to_list_of_numpy_array(c_routing)
+
+    # Construct return value
+    return res, routing
 
 
 def layout_mds(graph: Graph, dist: Optional[MatrixLike] = None, dim: int = 2) -> RealArray:
@@ -5546,7 +5641,31 @@ def read_graph_edgelist(instream: FileLike, n: int = 0, directed: bool = True) -
     # Help the type checker to figure out that we never get here
     assert False, "unreachable"  # noqa: B011
 
-# igraph_read_graph_ncol: no Python type known for type: VECTOR_STR
+
+def read_graph_ncol(instream: FileLike, predefnames: Optional[Iterable[str]] = None, names: bool = True, weights: AddWeights = "yes", directed: bool = True) -> Graph:
+    """Type-annotated wrapper for ``igraph_read_graph_ncol``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+        c_predefnames = iterable_of_strings_to_igraph_strvector_t(predefnames) if predefnames is not None else None
+        c_names = any_to_igraph_bool_t(names)
+        c_weights = c_int(_enums.AddWeights.from_(weights))
+        c_directed = any_to_igraph_bool_t(directed)
+
+        # Call wrapped function
+        igraph_read_graph_ncol(c_graph, c_instream, c_predefnames, c_names, c_weights, c_directed)
+
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
+
+        # Construct return value
+        return graph
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 
 def read_graph_lgl(instream: FileLike, names: bool = True, weights: AddWeights = "yes", directed: bool = True) -> Graph:
@@ -5618,7 +5737,38 @@ def read_graph_graphml(instream: FileLike, index: int = 0) -> Graph:
     # Help the type checker to figure out that we never get here
     assert False, "unreachable"  # noqa: B011
 
-# igraph_read_graph_dimacs_flow: no Python type known for type: VECTOR_STR
+
+def read_graph_dimacs_flow(instream: FileLike, directed: bool = True) -> tuple[Graph, list[str], IntArray, int, int, RealArray]:
+    """Type-annotated wrapper for ``igraph_read_graph_dimacs_flow``."""
+    # Create exit stack for graceful cleanup
+    with ExitStack() as py__stack:
+
+        # Prepare input arguments
+        c_graph = _Graph()
+        c_instream = py__stack.enter_context(any_to_file_ptr(instream, "r"))
+        c_problem = _StrVector.create(0)
+        c_label = _VectorInt.create(0)
+        c_source = igraph_int_t()
+        c_target = igraph_int_t()
+        c_capacity = _Vector.create(0)
+        c_directed = any_to_igraph_bool_t(directed)
+
+        # Call wrapped function
+        igraph_read_graph_dimacs_flow(c_graph, c_instream, c_problem, c_label, c_source, c_target, c_capacity, c_directed)
+
+        # Prepare output arguments
+        graph = _create_graph_from_boxed(c_graph)
+        problem = igraph_strvector_t_to_list(c_problem)
+        label = igraph_vector_int_t_to_numpy_array(c_label)
+        source = c_source.value
+        target = c_target.value
+        capacity = igraph_vector_t_to_numpy_array(c_capacity)
+
+        # Construct return value
+        return graph, problem, label, source, target, capacity
+
+    # Help the type checker to figure out that we never get here
+    assert False, "unreachable"  # noqa: B011
 
 
 def read_graph_graphdb(instream: FileLike, directed: bool = False) -> Graph:
@@ -6213,7 +6363,21 @@ def disjoint_union(left: Graph, right: Graph) -> Graph:
     # Construct return value
     return res
 
-# igraph_disjoint_union_many: no Python type known for type: GRAPH_PTR_LIST
+
+def disjoint_union_many(graphs: Iterable[Graph]) -> Graph:
+    """Type-annotated wrapper for ``igraph_disjoint_union_many``."""
+    # Prepare input arguments
+    c_res = _Graph()
+    c_graphs = iterable_of_graphs_to_igraph_vector_ptr_t(graphs)
+
+    # Call wrapped function
+    igraph_disjoint_union_many(c_res, c_graphs)
+
+    # Prepare output arguments
+    res = _create_graph_from_boxed(c_res)
+
+    # Construct return value
+    return res
 
 
 def join(left: Graph, right: Graph) -> Graph:
@@ -6253,7 +6417,23 @@ def union(left: Graph, right: Graph) -> tuple[Graph, IntArray, IntArray]:
     # Construct return value
     return res, edge_map_left, edge_map_right
 
-# igraph_union_many: no Python type known for type: GRAPH_PTR_LIST
+
+def union_many(graphs: Iterable[Graph]) -> tuple[Graph, list[IntArray]]:
+    """Type-annotated wrapper for ``igraph_union_many``."""
+    # Prepare input arguments
+    c_res = _Graph()
+    c_graphs = iterable_of_graphs_to_igraph_vector_ptr_t(graphs)
+    c_edgemaps = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_union_many(c_res, c_graphs, c_edgemaps)
+
+    # Prepare output arguments
+    res = _create_graph_from_boxed(c_res)
+    edgemaps = igraph_vector_int_list_t_to_list_of_numpy_array(c_edgemaps)
+
+    # Construct return value
+    return res, edgemaps
 
 
 def intersection(left: Graph, right: Graph) -> tuple[Graph, IntArray, IntArray]:
@@ -6276,7 +6456,23 @@ def intersection(left: Graph, right: Graph) -> tuple[Graph, IntArray, IntArray]:
     # Construct return value
     return res, edge_map_left, edge_map_right
 
-# igraph_intersection_many: no Python type known for type: GRAPH_PTR_LIST
+
+def intersection_many(graphs: Iterable[Graph]) -> tuple[Graph, list[IntArray]]:
+    """Type-annotated wrapper for ``igraph_intersection_many``."""
+    # Prepare input arguments
+    c_res = _Graph()
+    c_graphs = iterable_of_graphs_to_igraph_vector_ptr_t(graphs)
+    c_edgemaps = _VectorIntList.create(0)
+
+    # Call wrapped function
+    igraph_intersection_many(c_res, c_graphs, c_edgemaps)
+
+    # Prepare output arguments
+    res = _create_graph_from_boxed(c_res)
+    edgemaps = igraph_vector_int_list_t_to_list_of_numpy_array(c_edgemaps)
+
+    # Construct return value
+    return res, edgemaps
 
 
 def difference(orig: Graph, sub: Graph) -> Graph:
@@ -6990,7 +7186,7 @@ def isoclass_create(size: int, number: int, directed: bool = True) -> Graph:
 
 # igraph_count_isomorphisms_vf2: no Python type known for type: ISOCOMPAT_FUNC
 
-# igraph_get_isomorphisms_vf2: no Python type known for type: VECTOR_INT_LIST
+# igraph_get_isomorphisms_vf2: no Python type known for type: ISOCOMPAT_FUNC
 
 
 def subisomorphic(graph1: Graph, graph2: Graph) -> bool:
@@ -7015,7 +7211,7 @@ def subisomorphic(graph1: Graph, graph2: Graph) -> bool:
 
 # igraph_count_subisomorphisms_vf2: no Python type known for type: ISOCOMPAT_FUNC
 
-# igraph_get_subisomorphisms_vf2: no Python type known for type: VECTOR_INT_LIST
+# igraph_get_subisomorphisms_vf2: no Python type known for type: ISOCOMPAT_FUNC
 
 
 def canonical_permutation(graph: Graph, colors: Optional[Iterable[int]] = None) -> IntArray:
@@ -7059,7 +7255,28 @@ def permute_vertices(graph: Graph, permutation: Iterable[int]) -> Graph:
 
 # igraph_automorphism_group_bliss: no Python type known for type: BLISSINFO
 
-# igraph_subisomorphic_lad: no Python type known for type: VECTOR_INT_LIST
+
+def subisomorphic_lad(pattern: Graph, target: Graph, induced: bool, domains: Optional[Iterable[Iterable[VertexLike]]] = None) -> tuple[bool, IntArray, list[IntArray]]:
+    """Type-annotated wrapper for ``igraph_subisomorphic_lad``."""
+    # Prepare input arguments
+    c_pattern = pattern
+    c_target = target
+    c_domains = iterable_of_vertex_index_iterable_to_igraph_vector_int_list_t(domains) if domains is not None else None
+    c_iso = igraph_bool_t()
+    c_map = _VectorInt.create(0)
+    c_maps = _VectorIntList.create(0)
+    c_induced = any_to_igraph_bool_t(induced)
+
+    # Call wrapped function
+    igraph_subisomorphic_lad(c_pattern, c_target, c_domains, c_iso, c_map, c_maps, c_induced)
+
+    # Prepare output arguments
+    iso = c_iso.value
+    map = igraph_vector_int_t_to_numpy_array(c_map)
+    maps = igraph_vector_int_list_t_to_list_of_numpy_array(c_maps)
+
+    # Construct return value
+    return iso, map, maps
 
 
 def simplify_and_colorize(graph: Graph) -> tuple[Graph, IntArray, IntArray]:
@@ -7142,7 +7359,24 @@ def is_maximal_matching(graph: Graph, matching: Iterable[int], types: Optional[I
 
 # igraph_power_law_fit: no Python type known for type: PLFIT
 
-# igraph_sir: no Python type known for type: SIR_LIST
+
+def sir(graph: Graph, beta: float, gamma: float, no_sim: int = 100) -> list[SIRSimulation]:
+    """Type-annotated wrapper for ``igraph_sir``."""
+    # Prepare input arguments
+    c_graph = graph
+    c_beta = beta
+    c_gamma = gamma
+    c_no_sim = no_sim
+    c_res = _SIRList.create(0)
+
+    # Call wrapped function
+    igraph_sir(c_graph, c_beta, c_gamma, c_no_sim, c_res)
+
+    # Prepare output arguments
+    res = igraph_sir_list_to_list_of_sir_simulations(c_res)
+
+    # Construct return value
+    return res
 
 
 def running_mean(data: Iterable[float], binwidth: int) -> RealArray:

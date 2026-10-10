@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 
 from contextlib import contextmanager
-from ctypes import addressof, get_errno, memmove, POINTER
+from ctypes import addressof, cast, get_errno, memmove, POINTER
 from os import strerror
 from typing import (
     Any,
@@ -29,12 +29,20 @@ from .lib import (
     igraph_es_none,
     igraph_es_vector_copy,
     igraph_es_1,
+    igraph_graph_list_remove_fast,
+    igraph_graph_list_size,
+    igraph_matrix_list_get_ptr,
+    igraph_matrix_list_push_back,
+    igraph_matrix_list_size,
     igraph_matrix_int_init_array,
     igraph_matrix_int_ncol,
     igraph_matrix_int_nrow,
     igraph_matrix_init_array,
     igraph_matrix_ncol,
     igraph_matrix_nrow,
+    igraph_strvector_get,
+    igraph_strvector_push_back,
+    igraph_strvector_size,
     igraph_vector_bool_get,
     igraph_vector_bool_get_ptr,
     igraph_vector_bool_init_array,
@@ -56,6 +64,9 @@ from .lib import (
     igraph_vector_list_get_ptr,
     igraph_vector_list_push_back,
     igraph_vector_list_size,
+    igraph_vector_ptr_get,
+    igraph_vector_ptr_push_back,
+    igraph_vector_ptr_size,
     igraph_vector_push_back,
     igraph_vector_size,
     igraph_vector_view,
@@ -68,6 +79,7 @@ from .types import (
     igraph_bool_t,
     igraph_int_t,
     igraph_real_t,
+    igraph_sir_t,
     np_type_of_igraph_bool_t,
     np_type_of_igraph_int_t,
     np_type_of_igraph_real_t,
@@ -81,6 +93,7 @@ from .types import (
     MatrixLike,
     MatrixIntLike,
     RealArray,
+    SIRSimulation,
     VertexLike,
     VertexPair,
     VertexSelector,
@@ -89,14 +102,21 @@ from .utils import bytes_to_str
 from .wrappers import (
     _AttributeCombination,
     _EdgeSelector,
+    _Graph,
+    _GraphList,
     _Matrix,
     _MatrixInt,
+    _MatrixList,
+    _SIRList,
+    _StrVector,
     _Vector,
     _VectorBool,
     _VectorInt,
     _VectorIntList,
     _VectorList,
+    _VectorPtr,
     _VertexSelector,
+    _create_graph_from_boxed,
 )
 
 if TYPE_CHECKING:
@@ -117,8 +137,12 @@ __all__ = (
     "edge_selector_to_igraph_es_t",
     "edge_weights_to_igraph_vector_t",
     "edge_weights_to_igraph_vector_t_view",
+    "igraph_graph_list_t_to_list_of_graphs",
     "igraph_matrix_t_to_numpy_array",
     "igraph_matrix_int_t_to_numpy_array",
+    "igraph_matrix_list_t_to_list_of_numpy_array",
+    "igraph_sir_list_to_list_of_sir_simulations",
+    "igraph_strvector_t_to_list",
     "igraph_vector_t_to_list",
     "igraph_vector_bool_t_to_list",
     "igraph_vector_int_t_to_list",
@@ -131,6 +155,9 @@ __all__ = (
     "igraph_vector_int_list_t_to_list_of_numpy_array",
     "igraph_vector_list_t_to_list_of_numpy_array",
     "iterable_edge_indices_to_igraph_vector_int_t",
+    "iterable_of_graphs_to_igraph_vector_ptr_t",
+    "iterable_of_matrices_to_igraph_matrix_list_t",
+    "iterable_of_strings_to_igraph_strvector_t",
     "iterable_of_edge_index_iterable_to_igraph_vector_int_list_t",
     "iterable_of_iterable_to_igraph_vector_int_list_t",
     "iterable_of_iterable_to_igraph_vector_list_t",
@@ -444,6 +471,50 @@ def iterable_of_iterable_to_igraph_vector_list_t(
         igraph_vector_list_push_back(result, vec)
         vec.release()
 
+    return result
+
+
+def iterable_of_matrices_to_igraph_matrix_list_t(
+    items: Iterable[MatrixLike],
+) -> _MatrixList:
+    result = _MatrixList.create(0)
+
+    for item in items:
+        matrix = sequence_to_igraph_matrix_t(item)
+        igraph_matrix_list_push_back(result, matrix)
+        matrix.release()
+
+    return result
+
+
+def iterable_of_graphs_to_igraph_vector_ptr_t(graphs: Iterable[Graph]) -> _VectorPtr:
+    """Converts an iterable of graphs into an igraph pointer vector that points
+    to the low-level igraph graph objects of the graphs.
+
+    The pointer vector keeps references to the graphs so they stay alive as
+    long as the pointer vector itself.
+    """
+    from igraph_ctypes.graph import Graph
+
+    graph_list = list(graphs)
+    result = _VectorPtr.create(0)
+
+    for graph in graph_list:
+        if not isinstance(graph, Graph):
+            raise TypeError(f"expected a Graph, got {type(graph)!r}")
+        igraph_vector_ptr_push_back(result, addressof(graph._instance.unwrap()))
+
+    result._keepalive = graph_list
+    return result
+
+
+def iterable_of_strings_to_igraph_strvector_t(items: Iterable[str]) -> _StrVector:
+    if isinstance(items, (str, bytes)):
+        raise TypeError("expected an iterable of strings, got a single string")
+
+    result = _StrVector.create(0)
+    for item in items:
+        igraph_strvector_push_back(result, str(item).encode("utf-8"))
     return result
 
 
@@ -883,6 +954,72 @@ def igraph_vector_int_t_to_numpy_array_view(vector: _VectorInt) -> IntArray:
     buf_type = igraph_int_t * n
     buf = buf_type.from_address(addr)
     return np.frombuffer(buf, dtype=np_type_of_igraph_int_t)
+
+
+def igraph_graph_list_t_to_list_of_graphs(graph_list: _GraphList) -> list[Graph]:
+    """Moves the graphs out of an igraph graph list into Python graph objects.
+
+    The graph list is empty when the function returns.
+    """
+    result = []
+
+    # Taking the graphs from the end keeps the remaining ones in place
+    for index in range(igraph_graph_list_size(graph_list) - 1, -1, -1):
+        graph = _Graph()
+        igraph_graph_list_remove_fast(graph_list, index, graph)
+        result.append(_create_graph_from_boxed(graph))
+
+    result.reverse()
+    return result
+
+
+def igraph_matrix_list_t_to_list_of_numpy_array(
+    matrix_list: _MatrixList,
+) -> list[RealArray]:
+    n = igraph_matrix_list_size(matrix_list)
+    matrix = _Matrix()
+    result = []
+
+    for i in range(n):
+        # We are re-using the same _Matrix instance to wrap different
+        # low-level igraph_matrix_t instances because it's only temporary
+        # until we convert it to a NumPy array
+        ptr = igraph_matrix_list_get_ptr(matrix_list, i)
+        matrix._set_wrapped_instance(ptr.contents)
+        result.append(igraph_matrix_t_to_numpy_array(matrix))
+
+    return result
+
+
+def igraph_strvector_t_to_list(vector: _StrVector) -> list[str]:
+    return [
+        bytes_to_str(igraph_strvector_get(vector, i) or b"")
+        for i in range(igraph_strvector_size(vector))
+    ]
+
+
+def igraph_sir_list_to_list_of_sir_simulations(
+    sir_list: _SIRList,
+) -> list[SIRSimulation]:
+    vec = _Vector()
+    vec_int = _VectorInt()
+    result = []
+
+    for i in range(igraph_vector_ptr_size(sir_list)):
+        sir = cast(igraph_vector_ptr_get(sir_list, i), POINTER(igraph_sir_t)).contents
+
+        # Temporary wrappers, re-used for each igraph_sir_t until we convert
+        # the vectors to NumPy arrays
+        vec._set_wrapped_instance(sir.times)
+        times = igraph_vector_t_to_numpy_array(vec)
+        counts = []
+        for count in (sir.no_s, sir.no_i, sir.no_r):
+            vec_int._set_wrapped_instance(count)
+            counts.append(igraph_vector_int_t_to_numpy_array(vec_int))
+
+        result.append(SIRSimulation(times, *counts))
+
+    return result
 
 
 def igraph_vector_list_t_to_list_of_numpy_array(

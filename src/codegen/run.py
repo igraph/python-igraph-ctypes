@@ -564,6 +564,7 @@ def main():
             "FileLike",
             "IntArray",
             "RealArray",
+            "SIRSimulation",
             "VertexLike",
             "VertexPair",
             "VertexSelector",

@@ -20,6 +20,7 @@ from ctypes import (
 )
 from io import IOBase
 from os import PathLike
+from dataclasses import dataclass
 from typing import Any, Callable, Iterable, Mapping, Literal, Sequence
 
 
@@ -108,7 +109,7 @@ class igraph_vector_int_list_t(Structure):
 class igraph_vector_ptr_t(Structure):
     """ctypes representation of ``igraph_vector_ptr_t``"""
 
-    _fields_ = vector_fields(c_void_p)
+    _fields_ = vector_fields(c_void_p) + [("item_destructor", c_void_p)]
 
 
 class igraph_matrix_t(Structure):
@@ -185,6 +186,17 @@ class igraph_t(Structure):
         ("is_", igraph_vector_int_t),
         ("attr", py_object),
         ("cache", c_void_p),
+    ]
+
+
+class igraph_sir_t(Structure):
+    """ctypes representation of ``igraph_sir_t``"""
+
+    _fields_ = [
+        ("times", igraph_vector_t),
+        ("no_s", igraph_vector_int_t),
+        ("no_i", igraph_vector_int_t),
+        ("no_r", igraph_vector_int_t),
     ]
 
 
@@ -627,6 +639,28 @@ MatrixIntLike = Sequence[Sequence[int]] | npt.NDArray
 
 VertexLike = int
 """Type alias for Python types that can be converted to an igraph vertex ID"""
+
+
+@dataclass(frozen=True, eq=False)
+class SIRSimulation:
+    """Result of a single run of a simulation of the SIR epidemic model.
+
+    All the arrays have the same length; the item at a given index of the
+    count arrays belongs to the time instant at the same index in ``times``.
+    """
+
+    times: RealArray
+    """Time instants of the events of the simulation"""
+
+    susceptible: IntArray
+    """Number of susceptible individuals at each time instant"""
+
+    infected: IntArray
+    """Number of infected individuals at each time instant"""
+
+    recovered: IntArray
+    """Number of recovered individuals at each time instant"""
+
 
 VertexPair = tuple[VertexLike, VertexLike]
 """A pair of objects that can both be converted into igraph vertex IDs"""

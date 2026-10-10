@@ -47,6 +47,7 @@ from .types import (
     igraph_rewiring_stats_t,
     igraph_rng_t,
     igraph_rng_type_t,
+    igraph_sir_t,
     igraph_warning_handler_t,
 )
 
@@ -255,6 +256,10 @@ igraph_vector_ptr_destroy = _lib.igraph_vector_ptr_destroy
 igraph_vector_ptr_destroy.restype = None
 igraph_vector_ptr_destroy.argtypes = [c_void_p]
 
+igraph_vector_ptr_destroy_all = _lib.igraph_vector_ptr_destroy_all
+igraph_vector_ptr_destroy_all.restype = None
+igraph_vector_ptr_destroy_all.argtypes = [c_void_p]
+
 igraph_vector_ptr_clear = _lib.igraph_vector_ptr_clear
 igraph_vector_ptr_clear.restype = None
 igraph_vector_ptr_clear.argtypes = [POINTER(igraph_vector_ptr_t)]
@@ -263,15 +268,35 @@ igraph_vector_ptr_get = _lib.igraph_vector_ptr_get
 igraph_vector_ptr_get.restype = c_void_p
 igraph_vector_ptr_get.argtypes = [POINTER(igraph_vector_ptr_t), igraph_int_t]
 
+igraph_vector_ptr_push_back = _lib.igraph_vector_ptr_push_back
+igraph_vector_ptr_push_back.restype = handle_igraph_error_t
+igraph_vector_ptr_push_back.argtypes = [POINTER(igraph_vector_ptr_t), c_void_p]
+
 igraph_vector_ptr_resize = _lib.igraph_vector_ptr_resize
 igraph_vector_ptr_resize.restype = handle_igraph_error_t
 igraph_vector_ptr_resize.argtypes = [POINTER(igraph_vector_ptr_t), igraph_int_t]
+
+igraph_vector_ptr_set_item_destructor = _lib.igraph_vector_ptr_set_item_destructor
+igraph_vector_ptr_set_item_destructor.restype = c_void_p
+igraph_vector_ptr_set_item_destructor.argtypes = [POINTER(igraph_vector_ptr_t), c_void_p]
 
 igraph_vector_ptr_size = _lib.igraph_vector_ptr_size
 igraph_vector_ptr_size.restype = igraph_int_t
 igraph_vector_ptr_size.argtypes = [POINTER(igraph_vector_ptr_t)]
 
 # String vector type
+
+igraph_strvector_init = _lib.igraph_strvector_init
+igraph_strvector_init.restype = handle_igraph_error_t
+igraph_strvector_init.argtypes = [POINTER(igraph_strvector_t), igraph_int_t]
+
+igraph_strvector_destroy = _lib.igraph_strvector_destroy
+igraph_strvector_destroy.restype = None
+igraph_strvector_destroy.argtypes = [c_void_p]
+
+igraph_strvector_get = _lib.igraph_strvector_get
+igraph_strvector_get.restype = c_char_p
+igraph_strvector_get.argtypes = [POINTER(igraph_strvector_t), igraph_int_t]
 
 igraph_strvector_clear = _lib.igraph_strvector_clear
 igraph_strvector_clear.restype = None
@@ -376,6 +401,46 @@ igraph_matrix_int_ncol.argtypes = [POINTER(igraph_matrix_int_t)]
 igraph_matrix_int_nrow = _lib.igraph_matrix_int_nrow
 igraph_matrix_int_nrow.restype = igraph_int_t
 igraph_matrix_int_nrow.argtypes = [POINTER(igraph_matrix_int_t)]
+
+# List of matrices type
+
+igraph_matrix_list_init = _lib.igraph_matrix_list_init
+igraph_matrix_list_init.restype = handle_igraph_error_t
+igraph_matrix_list_init.argtypes = [POINTER(igraph_matrix_list_t), igraph_int_t]
+
+igraph_matrix_list_destroy = _lib.igraph_matrix_list_destroy
+igraph_matrix_list_destroy.restype = None
+igraph_matrix_list_destroy.argtypes = [c_void_p]
+
+igraph_matrix_list_get_ptr = _lib.igraph_matrix_list_get_ptr
+igraph_matrix_list_get_ptr.restype = POINTER(igraph_matrix_t)
+igraph_matrix_list_get_ptr.argtypes = [POINTER(igraph_matrix_list_t), igraph_int_t]
+
+igraph_matrix_list_push_back = _lib.igraph_matrix_list_push_back
+igraph_matrix_list_push_back.restype = handle_igraph_error_t
+igraph_matrix_list_push_back.argtypes = [POINTER(igraph_matrix_list_t), POINTER(igraph_matrix_t)]
+
+igraph_matrix_list_size = _lib.igraph_matrix_list_size
+igraph_matrix_list_size.restype = igraph_int_t
+igraph_matrix_list_size.argtypes = [POINTER(igraph_matrix_list_t)]
+
+# List of graphs type
+
+igraph_graph_list_init = _lib.igraph_graph_list_init
+igraph_graph_list_init.restype = handle_igraph_error_t
+igraph_graph_list_init.argtypes = [POINTER(igraph_graph_list_t), igraph_int_t]
+
+igraph_graph_list_destroy = _lib.igraph_graph_list_destroy
+igraph_graph_list_destroy.restype = None
+igraph_graph_list_destroy.argtypes = [c_void_p]
+
+igraph_graph_list_remove_fast = _lib.igraph_graph_list_remove_fast
+igraph_graph_list_remove_fast.restype = handle_igraph_error_t
+igraph_graph_list_remove_fast.argtypes = [POINTER(igraph_graph_list_t), igraph_int_t, POINTER(igraph_t)]
+
+igraph_graph_list_size = _lib.igraph_graph_list_size
+igraph_graph_list_size.restype = igraph_int_t
+igraph_graph_list_size.argtypes = [POINTER(igraph_graph_list_t)]
 
 # List of vectors type
 
@@ -505,6 +570,12 @@ igraph_rng_default.restype = POINTER(igraph_rng_t)
 igraph_rng_set_default = _lib.igraph_rng_set_default
 igraph_rng_set_default.restype = POINTER(igraph_rng_t)
 igraph_rng_set_default.argtypes = [POINTER(igraph_rng_t)]
+
+# Results of SIR simulations
+
+igraph_sir_destroy = _lib.igraph_sir_destroy
+igraph_sir_destroy.restype = None
+igraph_sir_destroy.argtypes = [POINTER(igraph_sir_t)]
 
 # Graph type
 

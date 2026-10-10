@@ -99,6 +99,40 @@ MATRIX_INT:
     OUT: "%C% = _MatrixInt.create(0, 0)"
   OUTCONV: "%I% = igraph_matrix_int_t_to_numpy_array(%C%)"
 
+# Lists of vectors, matrices and strings
+
+VECTOR_LIST:
+  PY_TYPE: Iterable[Iterable[float]]
+  PY_RETURN_TYPE: list[RealArray]
+  INCONV:
+    IN: "%C% = iterable_of_iterable_to_igraph_vector_list_t(%I%)"
+    OUT: "%C% = _VectorList.create(0)"
+  OUTCONV: "%I% = igraph_vector_list_t_to_list_of_numpy_array(%C%)"
+
+VECTOR_INT_LIST:
+  PY_TYPE: Iterable[Iterable[int]]
+  PY_RETURN_TYPE: list[IntArray]
+  INCONV:
+    IN: "%C% = iterable_of_iterable_to_igraph_vector_int_list_t(%I%)"
+    OUT: "%C% = _VectorIntList.create(0)"
+  OUTCONV: "%I% = igraph_vector_int_list_t_to_list_of_numpy_array(%C%)"
+
+MATRIX_LIST:
+  PY_TYPE: Iterable[MatrixLike]
+  PY_RETURN_TYPE: list[RealArray]
+  INCONV:
+    IN: "%C% = iterable_of_matrices_to_igraph_matrix_list_t(%I%)"
+    OUT: "%C% = _MatrixList.create(0)"
+  OUTCONV: "%I% = igraph_matrix_list_t_to_list_of_numpy_array(%C%)"
+
+VECTOR_STR:
+  PY_TYPE: Iterable[str]
+  PY_RETURN_TYPE: list[str]
+  INCONV:
+    IN: "%C% = iterable_of_strings_to_igraph_strvector_t(%I%)"
+    OUT: "%C% = _StrVector.create(0)"
+  OUTCONV: "%I% = igraph_strvector_t_to_list(%C%)"
+
 # Graph, vertex and edge related classes
 
 GRAPH:
@@ -133,6 +167,25 @@ VERTEX_INDICES:
     IN: "%C% = iterable_vertex_indices_to_igraph_vector_int_t(%I%)"
     OUT: "%C% = _VectorInt.create(0)"
   OUTCONV: "%I% = igraph_vector_int_t_to_numpy_array(%C%)"
+
+GRAPH_LIST:
+  PY_TYPE: Iterable[Graph]
+  PY_RETURN_TYPE: list[Graph]
+  INCONV:
+    OUT: "%C% = _GraphList.create(0)"
+  OUTCONV: "%I% = igraph_graph_list_t_to_list_of_graphs(%C%)"
+
+GRAPH_PTR_LIST:
+  PY_TYPE: Iterable[Graph]
+  INCONV:
+    IN: "%C% = iterable_of_graphs_to_igraph_vector_ptr_t(%I%)"
+
+ALL_VERTEX_QTY:
+  PY_TYPE: Iterable[float]
+  PY_RETURN_TYPE: RealArray
+  INCONV:
+    OUT: "%C% = _Vector.create(0)"
+  OUTCONV: "%I% = igraph_vector_t_to_numpy_array(%C%)"
 
 VERTEX_INDICES_LIST:
   PY_TYPE: Iterable[Iterable[VertexLike]]
@@ -267,6 +320,15 @@ VERTEX_ATTRIBUTE_COMBINATION:
     IN: "%C% = mapping_to_attribute_combination_t(%I%)"
   DEFAULT:
     Default: "None"
+
+# Results of simulations
+
+SIR_LIST:
+  PY_TYPE: Iterable[SIRSimulation]
+  PY_RETURN_TYPE: list[SIRSimulation]
+  INCONV:
+    OUT: "%C% = _SIRList.create(0)"
+  OUTCONV: "%I% = igraph_sir_list_to_list_of_sir_simulations(%C%)"
 
 # File I/O
 

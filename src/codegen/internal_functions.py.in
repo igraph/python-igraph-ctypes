@@ -18,18 +18,24 @@ from .types import (
     MatrixLike,
     MatrixIntLike,
     RealArray,
+    SIRSimulation,
     VertexLike,
     VertexPair,
     VertexSelector,
 )
 from .wrappers import (
     _Graph,
+    _GraphList,
     _Matrix,
     _MatrixInt,
+    _MatrixList,
+    _SIRList,
+    _StrVector,
     _Vector,
     _VectorBool,
     _VectorInt,
     _VectorIntList,
+    _VectorList,  # noqa: F401 (used by outputs of type VECTOR_LIST)
     _create_graph_from_boxed,
 )
 
